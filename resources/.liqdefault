@@ -1,0 +1,10 @@
+(ns user
+  (:require [dk.salza.liq.editor :as editor]
+            [clojure.java.io :as io]
+            [clojure.string :as str])
+  (:use [dk.salza.liq.cshell]))
+
+(editor/add-to-setting ::editor/searchpaths "/tmp")
+(editor/add-to-setting ::editor/snippets "(->> \"/tmp\" ls (lrex #\"something\") p)")
+(editor/add-to-setting ::editor/files "/tmp/tmp.clj")
+(println (str (io/file (io/resource ".liqdefault"))))
