@@ -13,13 +13,12 @@ Watch this video to get a sense of how the editor works: [liquid01.mp4](https://
 ## Installation
 
 ### Download and execution
-Download [liq-0.4.0-standalone.jar](http://salza.dk/liq-0.4.0-standalone.jar)
+Download [liq-0.4.0.jar](https://github.com/mogenslund/liquid/releases/download/v0.4.0/liq-0.4.0.jar)
+Also download clojure-1.8.0.jar from [clojure.org](http://clojure.org/community/downloads)
 
 Execute the program with:
 
-    java -cp liq-0.4.0-standalone.jar clojure.main -m dk.salza.liq.core
-
-It is possible to execute the program with the "java -jar ..." command, but I do not recomment that. The "java -cp ..." entry will start the program in "user" namespace enabling easier execution of some snippets.
+    java -cp clojure-1.8.0.jar:liq-0.4.0.jar clojure.main -m dk.salza.liq.core
 
 ### Leiningen
 Clone the github project and execute the command below to generate a jar file
