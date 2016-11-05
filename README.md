@@ -12,6 +12,13 @@ I could tell a lot about the editor, but I think you see see the video below for
 ## Demo video
 Watch this video to get a sense of how the editor works: [liquid01.mp4](https://drive.google.com/file/d/0B5Au3PxHCmgBM2MySHl4aUVWTEE/view?usp=sharing)
 
+## Status of the application
+**The program is not production ready yet**
+
+Most of the basic features I want are in place, but needs to be described further and polished (like checking for unsaved buffers on exit etc.)
+
+The exstension system alse needs to mature, with best practices and welldefined integration points. I may still have to do changes to some basic structures to accommodate this.
+
 ## Installation
 
 ### Download and execution
