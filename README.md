@@ -7,6 +7,8 @@ I have been using Emacs for many years. I have tweaked it a lot and implemented 
 
 I could tell a lot about the editor, but I think you see see the video below for a demonstration.
 
+![Liquid Text Editor](liquid01.png)
+
 ## Demo video
 Watch this video to get a sense of how the editor works: [liquid01.mp4](https://drive.google.com/file/d/0B5Au3PxHCmgBM2MySHl4aUVWTEE/view?usp=sharing)
 
