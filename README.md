@@ -13,7 +13,7 @@ Watch this video to get a sense of how the editor works: [liquid01.mp4](https://
 ## Installation
 
 ### Download and execution
-*Notice:* The editor will only work on Linux and Mac at the moment. In later versions support for Windows will be implemented.
+**Notice:** The editor will only work on Linux and Mac at the moment. In later versions support for Windows will be implemented.
 
 Download [liq-0.4.0.jar](https://github.com/mogenslund/liquid/releases/download/v0.4.0/liq-0.4.0.jar)
 Also download clojure-1.8.0.jar from [clojure.org](http://clojure.org/community/downloads)
