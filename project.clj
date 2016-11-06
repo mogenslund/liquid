@@ -1,4 +1,4 @@
-(defproject liq "0.4.0" ;"0.5.0-SNAPSHOT"
+(defproject liq "0.4.1" ;"0.4.2-SNAPSHOT"
   :description "This project is an attempt to create a text editor for editing
                Clojure files and Markdown files. It operates primarily in a
                terminal, but with dynamics and extensibilities inspired by
