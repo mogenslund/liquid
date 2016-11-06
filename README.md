@@ -3,11 +3,11 @@ Salza &lambda;iquid text editor is designed with clojure developers in mind.
 
 The editor is written in pure Clojure. That is, there are no other dependencies, not even curses!
 
-I have been using Emacs for many years. I have tweaked it a lot and implemented modes to simulate the Vim insert/edit modes for editing text, which I like. As you will see in the video below, I am very inspired by Emacs and Vim, but I have choosen it not to be Emacs or Vim. I have not implemented support for all kinds of formats. You can implement that, if you want to.
+I have been using Emacs for many years. I have tweaked it a lot and implemented modes, to simulate the Vim way of switching between insert mode and normal mode for navigation. I like being able to use the whole keyboard for navigation. As you will see in the video below, I am very inspired by Emacs and Vim, but I have choosen not to try to copy or reimplement Emacs or Vim. I have only stolen the features that I need or like. I hope others will just create plugins or extensions to make the editor support other features that they like.
 
 ![Liquid Text Editor](liquid01.png)
 
-I could tell a lot about the editor, but I think you see see the video below for a demonstration.
+I could tell a lot about the editor, but I think you should see the video below for a demonstration.
 
 ## Demo video
 Watch this video to get a sense of how the editor works: [liquid01.mp4](https://drive.google.com/file/d/0B5Au3PxHCmgBM2MySHl4aUVWTEE/view?usp=sharing)
