@@ -158,13 +158,12 @@
 
 (defn ttyquit
   []
-  ;(print "\033[0;37m\033[2J")
-  ;(print "\033[c")
-  ;(print "\033[?25h")
-  ;(flush)
+  (print "\033[0;37m\033[2J")
+  (print "\033[?25h")
+  (flush)
   (util/cmd "/bin/sh" "-c" "stty -echo cooked </dev/tty")
-  (util/cmd "/bin/sh" "-c" "stty -echo reset </dev/tty")
-  ;(util/cmd "reset")
+  (util/cmd "/bin/sh" "-c" "stty -echo sane </dev/tty")
+  (println "")
   (System/exit 0))
 
 (defrecord TtyAdapter []
