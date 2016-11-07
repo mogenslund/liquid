@@ -126,8 +126,9 @@ Modify the content below and save it to .liq in your home directory:
                 [dk.salza.liq.modes.typeaheadmode :as typeaheadmode])
       (:use [dk.salza.liq.cshell]
     
-    (editor/add-searchpath "/tmp")              ; Files below /tmp will not be chooseable from the Ctrl+Space chooser
+    (editor/add-searchpath "/tmp")              ; Files below /tmp will now be chooseable from the Ctrl+Space chooser
     (editor/add-snippet "Something to insert.") ; This snippet will be available from the Ctrl+Space chooser
+    (editor/add-file "/tmp/tmp.clj")            ; Open /tmp/tmp.clj for editing
     (editor/add-file (str (System/getProperty "user.home") ".liq")) ; Open .liq file for editing
 
 ## Options
