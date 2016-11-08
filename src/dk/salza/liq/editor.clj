@@ -249,6 +249,12 @@
   (insert string)
   (previous-buffer))
 
+(defn evaluate-file-raw
+  ([filepath]
+    (try (load-file filepath)
+      (catch Exception e (prompt-set (util/pretty-exception e)))))
+  ([] (when-let [filepath (get-filename)] (evaluate-file-raw filepath))))
+
 (defn evaluate-file
   ([filepath]
     (let [output (try

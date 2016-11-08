@@ -88,7 +88,9 @@
                     :C-g editor/previous-buffer
                     :backspace delete-char
                     :C-k next-res
+                    :down next-res
                     :tab prev-res ; tab = C-i in termainal!
+                    :up prev-res
                     :enter execute
                     :space #(update-search " ")
                     }

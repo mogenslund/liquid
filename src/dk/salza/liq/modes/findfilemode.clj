@@ -99,8 +99,11 @@
                       :backspace delete
                       :C-g editor/previous-buffer
                       :C-j up
+                      :left up
                       :C-k next-res
+                      :down next-res
                       :tab prev-res ; tab and C-i are the same in terminal
+                      :up prev-res
                       :enter execute
                       }
                       (keys/alphanum-mapping insert)

@@ -1,77 +1,10 @@
 (ns dk.salza.liq.adapters.ttyadapter
   (:require [dk.salza.liq.apis :refer :all]
             [dk.salza.liq.util :as util]
+            [dk.salza.liq.keys :as keys]
             [clojure.string :as str]))
 
 (def esc (str "\033" "["))
-
-(defn raw2keyword
-  [raw]
-  (let [k (str (char raw))]
-     (cond (re-matches #"[a-zA-Z0-9]" k) (keyword k)
-           (= k "\t") :tab
-           (= k " ") :space
-           (= raw 13) :enter
-           (= raw 33) :exclamation
-           (= raw 34) :quote
-           (= raw 35) :hash
-           (= raw 36) :dollar
-           (= raw 37) :percent
-           (= raw 38) :ampersand
-           (= raw 39) :singlequote
-           (= raw 40) :parenstart
-           (= raw 41) :parenend
-           (= raw 42) :asterisk
-           (= raw 43) :plus
-           (= raw 44) :comma
-           (= raw 45) :dash
-           (= raw 46) :dot
-           (= raw 47) :slash
-           (= raw 58) :colon
-           (= raw 59) :semicolon
-           (= raw 60) :lt
-           (= raw 61) :equal
-           (= raw 62) :gt
-           (= raw 63) :question
-           (= raw 64) :at
-           (= raw 91) :bracketstart
-           (= raw 92) :backslash
-           (= raw 93) :bracketend
-           (= raw 94) :hat
-           (= raw 95) :underscore
-           ;(= raw 105) :up           
-           ;(= raw 106) :left           
-           ;(= raw 107) :down           
-           ;(= raw 108) :right           
-           (= raw 123) :bracesstart
-           (= raw 124) :pipe
-           (= raw 125) :bracesend
-           (= raw 126) :tilde
-           (= raw 164) :curren
-           (= raw 197) :caa
-           (= raw 198) :cae
-           (= raw 216) :coe
-           (= raw 229) :aa
-           (= raw 230) :ae
-           (= raw 248) :oe
-           (= raw 5) :C-e
-           (= raw 6) :C-f
-           (= raw 7) :C-g
-           (= raw 8) :C-h
-           (= raw 10) :C-j
-           (= raw 11) :C-k
-           (= raw 12) :C-l
-           (= raw 14) :C-n
-           (= raw 15) :C-o
-           (= raw 15) :C-p
-           (= raw 17) :C-q
-           (= raw 18) :C-r
-           (= raw 19) :C-s
-           (= raw 20) :C-t
-           (= raw 23) :C-w
-           (= raw 0) :C-space
-           (= raw 127) :backspace
-           true :unknown)))
 
 (defn ttyrows
   []
@@ -86,9 +19,10 @@
 (defn ttywait-for-input
   []
   ;(util/cmd "/bin/sh" "-c" "stty -echo raw </dev/tty")
-  (let [input (.read (java.io.BufferedReader. *in*))]
-    ;(spit "/tmp/keys.txt" (str input " - " "" (raw2keyword input) "\n") :append true)
-    (raw2keyword input)))
+  (let [r (java.io.BufferedReader. *in*)
+        input (+ (.read r) (if (.ready r) (* 256 (+ (.read r) 1)) 0) (if (.ready r) (* 256 256 (+ (.read r) 1)) 0))]
+    ;(spit "/tmp/keys.txt" (str (pr-str input) " - " "" (keys/raw2keyword input) "\n") :append true)
+    (keys/raw2keyword input)))
 
 (def old-lines (atom {}))
 ;Black       0;30     Dark Gray     1;30
@@ -100,6 +34,7 @@
 ;Brown       0;33     Yellow        1;33
 ;Light Gray  0;37     White         1;37
 ;; http://misc.flogisoft.com/bash/tip_colors_and_formatting
+;; http://ascii-table.com/ansi-escape-sequences.php
 
 (defn ttyprint-lines
   [lines]

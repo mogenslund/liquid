@@ -43,6 +43,10 @@
          :C-space commandmode/run
          :space #(editor/forward-page)
          ;:C-s editor/search
+         :right editor/forward-char
+         :left editor/backward-char
+         :up editor/backward-line
+         :down editor/forward-line
          :C-s #(promptmode/run editor/find-next '("SEARCH"))
          :v editor/selection-toggle
          :g {:g editor/beginning-of-buffer
@@ -51,14 +55,11 @@
          :C-g editor/escape
          :e editor/eval-last-sexp
          :E editor/evaluate-file
+         :C-e editor/evaluate-file-raw
          :l editor/forward-char
-         :right editor/forward-char
          :j editor/backward-char
-         :left editor/backward-char
          :i editor/backward-line
-         :up editor/backward-line
          :k editor/forward-line
-         :down editor/forward-line
          :o (fn [] (do (editor/insert-line) (editor/swap-actionmapping)))
          :J editor/beginning-of-line
          :G editor/end-of-buffer

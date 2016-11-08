@@ -3,10 +3,10 @@
 ;; http://ascii-table.com/ansi-escape-sequences.php
 (defn raw2keyword
   [raw]
-  (let [k (str (char raw))]
+  (let [k (str (char (min raw 200)))]
      (cond (re-matches #"[a-zA-Z0-9]" k) (keyword k)
-           (= k "\t") :tab
-           (= k " ") :space
+           (= raw 9) :tab
+           (= raw 32) :space
            (= raw 13) :enter
            (= raw 33) :exclamation
            (= raw 34) :quote
@@ -35,6 +35,10 @@
            (= raw 93) :bracketend
            (= raw 94) :hat
            (= raw 95) :underscore
+           (= raw 4348955) :up           
+           (= raw 4545563) :left           
+           (= raw 4414491) :down           
+           (= raw 4480027) :right           
            (= raw 123) :bracesstart
            (= raw 124) :pipe
            (= raw 125) :bracesend
@@ -46,13 +50,18 @@
            (= raw 229) :aa
            (= raw 230) :ae
            (= raw 248) :oe
+           (= raw 5) :C-e
            (= raw 6) :C-f
            (= raw 7) :C-g
+           (= raw 8) :C-h
            (= raw 10) :C-j
            (= raw 11) :C-k
            (= raw 12) :C-l
+           (= raw 14) :C-n
            (= raw 15) :C-o
+           (= raw 15) :C-p
            (= raw 17) :C-q
+           (= raw 18) :C-r
            (= raw 19) :C-s
            (= raw 20) :C-t
            (= raw 23) :C-w
