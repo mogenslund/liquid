@@ -24,12 +24,12 @@ The exstension system alse needs to mature, with best practices and welldefined 
 ### Download and execution
 **Notice:** The editor will only work on Linux and Mac at the moment. In later versions support for Windows will be implemented.
 
-Download [liq-0.4.1.jar](https://github.com/mogenslund/liquid/releases/download/v0.4.1/liq-0.4.1.jar)
+Download [liq-0.4.2.jar](https://github.com/mogenslund/liquid/releases/download/v0.4.2/liq-0.4.2.jar)
 Also download clojure-1.8.0.jar from [clojure.org](http://clojure.org/community/downloads)
 
 Execute the program with:
 
-    java -cp clojure-1.8.0.jar:liq-0.4.1.jar clojure.main -m dk.salza.liq.core
+    java -cp clojure-1.8.0.jar:liq-0.4.2.jar clojure.main -m dk.salza.liq.core
 
 #### Known bugs
 No known bugs at the moment.
