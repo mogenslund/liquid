@@ -108,6 +108,7 @@ Use *C-q* to quit editor.
       C-f: Open file
 
 #### Clojure code
+      C-e: Evaluate current file without capturing output (for (re)-loading internal stuff)
       E:   Evaluate current file
       e:   Evaluate current s-expression
       1:   Select current s-expression (Multiple presses will make the cursor switch between begin and end parenthesis.)

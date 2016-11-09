@@ -33,7 +33,17 @@
   ;(editor/set-mode plainmode/mode)
   (editor/add-window (window/create "main" 1 44 rows (- columns 46) "scratch")) ; todo: Change to percent given by setting. Not hard numbers
   (editor/new-buffer "scratch")
-  (editor/insert "Welcome to λiquid\n-----------------\n")
+  (editor/insert (str "# Welcome to λiquid\n"
+                      "To quit press C-q. To escape situation press C-g. To undo press u in navigation mode (blue cursor)\n"
+                      "Use tab to switch between insert mode (green cursor) and navigation mode (blue cursor).\n\n"
+                      "## Basic navigation\nIn navigation mode (blue cursor):\n\n"
+                      "  j: Left\n  l: Right\n  i: Up\n  k: Down\n\n"
+                      "  C-space: Command typeahead (escape with C-g)\n"
+                      "  C-f: Find file\n\n"
+                      "## Evaluation\n"
+                      "Place cursor between the parenthesis below and type \"e\" in navigation mode, to evaluate the expression:\n"
+                      "(range 10 30)\n"
+                     ))
   ;(editor/set-mode plainmode/mode)
   (editor/end-of-buffer)
   (load-user-file))

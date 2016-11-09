@@ -50,6 +50,10 @@
            (= raw 229) :aa
            (= raw 230) :ae
            (= raw 248) :oe
+           (= raw 1) :C-a
+           (= raw 2) :C-b
+           (= raw 3) :C-c
+           (= raw 4) :C-d
            (= raw 5) :C-e
            (= raw 6) :C-f
            (= raw 7) :C-g
@@ -59,14 +63,23 @@
            (= raw 12) :C-l
            (= raw 14) :C-n
            (= raw 15) :C-o
-           (= raw 15) :C-p
+           (= raw 16) :C-p
            (= raw 17) :C-q
            (= raw 18) :C-r
            (= raw 19) :C-s
            (= raw 20) :C-t
+           (= raw 21) :C-u
+           (= raw 22) :C-v
            (= raw 23) :C-w
+           (= raw 24) :C-x
+           (= raw 25) :C-y
+           (= raw 26) :C-z
            (= raw 0) :C-space
            (= raw 127) :backspace
+           (= raw 25115) :M-a
+           (= raw 25371) :M-b
+           (= raw 25627) :M-c
+           (= raw 31003) :M-x
            true :unknown)))
 
 (defn alphanum-mapping
