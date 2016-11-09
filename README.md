@@ -10,10 +10,10 @@ I have been using Emacs for many years. I have tweaked it a lot and implemented 
 I could tell a lot about the editor, but I think you should see the video below for a demonstration.
 
 ## Demo video
-Watch this video to get a sense of how the editor works: [liquid01](https://youtu.be/ZdzuYGtk4Ac)
+Watch this video to get a sense of how the editor works: [liquid01](https://drive.google.com/file/d/0B5Au3PxHCmgBM2MySHl4aUVWTEE/view?usp=sharing)
 
 ## Technical video explaining the core datastructure of the editor
-This video is for technical minded people to get a view of the inside of the construction of the editor. Useful for understanding the idea behind the editor or as inspiration for similar projects or extensions of this: [slider01](https://youtu.be/OylNScj40Bk)
+This video is for technical minded people to get a view of the inside of the construction of the editor. Useful for understanding the idea behind the editor or as inspiration for similar projects or extensions of this: [slider01](https://drive.google.com/file/d/0B5Au3PxHCmgBNjJodzNjQ2w4c2M/view?usp=sharing)
 
 ## Status of the application
 **The program is not production ready yet**
