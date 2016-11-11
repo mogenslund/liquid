@@ -12,13 +12,25 @@
 (def default-mode (atom nil))
 (def searchstring (atom ""))
 (def macro-seq (atom '()))
+
 (def macro-record (atom false))
+
+(def editor (ref nil))
+
+(defn init
+  []
+  (dosync
+    (ref-set editor {::buffers '()
+                     ::windows '()
+                     ::settings {::searchpaths '()
+                                 ::files '()
+                                 ::snippets '()
+                                 ::commands '()
+                                 ::interactive '()}})))
 
 (defn set-default-mode
   [mode]
   (reset! default-mode mode))
-
-(def editor (ref nil))
 
 (defn doto-buffer
   "Apply the given function to the top-most buffer."
@@ -399,13 +411,3 @@
   []
   (doall (map handle-input '(:i :i :j))))
 
-(defn init
-  []
-  (dosync
-    (ref-set editor {::buffers '()
-                     ::windows '()
-                     ::settings {::searchpaths '()
-                                 ::files '()
-                                 ::snippets '()
-                                 ::commands '()
-                                 ::interactive '()}})))
