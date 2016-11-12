@@ -14,8 +14,8 @@
   (:gen-class))
 
 (defn load-user-file
-  []
-  (let [file (fileutil/file (System/getProperty "user.home") ".liq")]
+  [path]
+  (let [file (fileutil/file path)] ; (fileutil/file (System/getProperty "user.home") ".liq")]
     (if (and (fileutil/exists? file) (not (fileutil/folder? file)))
       (editor/evaluate-file-raw (str file))
       (do (editor/add-to-setting ::editor/searchpaths "/tmp")
@@ -45,8 +45,7 @@
                       "(range 10 30)\n"
                      ))
   ;(editor/set-mode plainmode/mode)
-  (editor/end-of-buffer)
-  (load-user-file))
+  (editor/end-of-buffer))
 
 (defn update-gui
   [adapter]
@@ -69,14 +68,34 @@
                 (update-gui adapter)
                 (when (not= ch @changes) (recur @changes)))))))
 
+(defn read-arg
+  "Reads the value of an argument.
+  If the argument is on the form --arg=value
+  then (read-args args \"--arg=\") vil return
+  value.
+  If the argument is on the form --arg then
+  non-nil will bereturned if the argument exists
+  otherwise nil."
+  [args arg]
+  (first (filter identity
+                 (map #(re-find (re-pattern (str "(?<=" arg ").*"))
+                                %)
+                      args))))
+
 (defn -main
   [& args]
-  (let [adapter (if (and (> (count args) 0) (= (first args) "jframe"))  (JframeAdapter.) (TtyAdapter.))]
+  (let [adapter (if (read-arg args "--jframe") (JframeAdapter.) (TtyAdapter.))
+        singlethreaded (read-arg args "--no-threads")]
     (init adapter)
     (init-editor (- (rows adapter) 1) (columns adapter))
+    (when-not (read-arg args "--no-init-file") 
+      (load-user-file
+        (or (read-arg args "--load=")
+            (fileutil/file (System/getProperty "user.home") ".liq"))))
     (loop []
-      (request-update-gui adapter) ; Threaded version
-      ;(update-gui adapter) ; Non threaded version
+      (if singlethreaded
+        (update-gui adapter)          ; Non threaded version
+        (request-update-gui adapter)) ; Threaded version
       (let [input (wait-for-input adapter)]
         (when (= input :C-q) (quit adapter))
         (when (= input :C-space) (reset adapter))
