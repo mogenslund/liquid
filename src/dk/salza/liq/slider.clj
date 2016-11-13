@@ -284,10 +284,14 @@
   (-> sl (right-until #"\s") (right 1) (right-until #"\S"))) ; (not (not (re-matches #"\S" "\n")))
 
 (defn end-of-line
+  "Moves point to the end of the line. Right before the
+  next line break."
   [sl]
   (right-until sl #"\n"))
 
 (defn beginning-of-line
+  "Moves the point to the beginning
+  of the current line."
   [sl]
   (loop [sl0 sl]
     (if (or (empty? (sl0 ::before)) (= (first (sl0 ::before)) "\n"))
@@ -320,16 +324,14 @@
             :else (recur (forward-line sl2 columns) sl2)))))
                    
 
-(defn forward-visual-column-old
-  [sl columns column]
-  (loop [sl0 (-> sl (forward-line columns))]
-     (if (or (= (get-visual-column sl0 columns) column)
-             (end? sl0)
-             (= (get-char sl0) "\n"))
-         sl0
-         (recur (right sl0 1)))))
-
 (defn forward-visual-column
+  "Moves the point forward one line, where
+  the lines are wrapped. The parameter columns is
+  how many chars are allowed on one line. The parameter
+  column is the current selected column.
+  The visual result of this function is the cursor will
+  be located on the same column on the next line, nomatter
+  if the line was wrapped or not."
   [sl columns column]
   (let [cur-column (get-visual-column sl columns)]
     (loop [sl0 (-> sl (left cur-column) (forward-line columns))]
@@ -349,6 +351,10 @@
        sl0)))
 
 (defn get-region
+  "Returns the content between the mark
+  with the given name and the point.
+  If there is no mark with the given name
+  nil is returned."
   [sl markname]
   (let [mark (get-mark sl markname)]
     (cond (nil? mark) nil
@@ -358,6 +364,9 @@
           :else (apply str (take (- mark (get-point sl)) (sl ::after))))))
 
 (defn delete-region
+  "Deletes the region between the given
+  mark and the point. If the mark does
+  not exist, nothing is deleted."
   [sl markname]
   (if-let [mark (get-mark sl markname)]
     (let [p0 (get-point sl)]
@@ -366,6 +375,9 @@
     sl))
 
 (defn delete-line
+  "Deletes the current line.
+  The point will be placed at the beginning
+  of the next line."
   [sl]
   (-> sl beginning-of-line
          (set-mark "deleteline")
@@ -391,6 +403,8 @@
     (take rows (rest (iterate #(-> % (set-mark "beginning") (forward-line columns)) sl)))))
 
 (defn find-next
+  "Moves the point to the next search match
+  from the current point position."
   [sl search]
   (let [s (map str (seq (str/lower-case search)))
         len (count s)]
@@ -400,33 +414,33 @@
             :else (recur (right sl0 1))))))
 
 
-(defn frame
-  [sl rows columns top-of-window]
-  (if (< (get-point sl) top-of-window)
-    (frame sl rows columns 0)
-    (let [point0 (get-point sl)
-          ;; A lazy list of sliders, each with point one line ahead of the preceeding
-          linesliders (iterate
-                        #(-> % (set-mark "beginning") (forward-line columns))
-                        (-> sl (set-point top-of-window) (set-mark "beginning")))
-          ;; Number of rows to go, to get to point
-          pointrow (+ (count (take-while
-                             #(< (get-point %) point0)
-                             linesliders))
-                      (if (or (= (get-char (left sl 1)) "\n") (beginning? sl)) 1 0))
-          pointcol (- point0 (get-mark (nth linesliders pointrow) "beginning") -1)] 
-      (if (> pointrow rows)
-          ;; Recenter
-          (frame sl rows columns (get-point (nth linesliders (- pointrow (int (* 0.4 rows))))))
-          ;; Generate lines from marked list of sliders
-          ;; todo: Check performance by replace map with pmap
-          (let [lines (map #(if (= (get-mark % "beginning") (get-point %))
-                                ""
-                                (get-region
-                                  (if (= (get-char (left % 1)) "\n") (left % 1) %) ; The if is to avoid ending with newline
-                                  "beginning"))
-                           (take rows (rest linesliders)))]
-            {:lines lines
-             :top-of-window top-of-window
-             :cursor {:row pointrow :column pointcol}
-             :selection {:column nil :row nil}})))))
+;(defn frame
+;  [sl rows columns top-of-window]
+;  (if (< (get-point sl) top-of-window)
+;    (frame sl rows columns 0)
+;    (let [point0 (get-point sl)
+;          ;; A lazy list of sliders, each with point one line ahead of the preceeding
+;          linesliders (iterate
+;                        #(-> % (set-mark "beginning") (forward-line columns))
+;                        (-> sl (set-point top-of-window) (set-mark "beginning")))
+;          ;; Number of rows to go, to get to point
+;          pointrow (+ (count (take-while
+;                             #(< (get-point %) point0)
+;                             linesliders))
+;                      (if (or (= (get-char (left sl 1)) "\n") (beginning? sl)) 1 0))
+;          pointcol (- point0 (get-mark (nth linesliders pointrow) "beginning") -1)] 
+;      (if (> pointrow rows)
+;          ;; Recenter
+;          (frame sl rows columns (get-point (nth linesliders (- pointrow (int (* 0.4 rows))))))
+;          ;; Generate lines from marked list of sliders
+;          ;; todo: Check performance by replace map with pmap
+;          (let [lines (map #(if (= (get-mark % "beginning") (get-point %))
+;                                ""
+;                                (get-region
+;                                  (if (= (get-char (left % 1)) "\n") (left % 1) %) ; The if is to avoid ending with newline
+;                                  "beginning"))
+;                           (take rows (rest linesliders)))]
+;            {:lines lines
+;             :top-of-window top-of-window
+;             :cursor {:row pointrow :column pointcol}
+;             :selection {:column nil :row nil}})))))
