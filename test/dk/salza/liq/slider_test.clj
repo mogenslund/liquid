@@ -208,24 +208,24 @@
 
    )))
 
-(deftest frame-test
-  (let [sl (create "aaa\n1\n22\n333\n4444\n55555\nbb bb bbb\ncccc cccc ccccc")]
-    (testing "Frame lines"
-      (is (= ((frame sl 7 4 0) :lines) '("aaa" "1" "22" "333" "4444" "5555" "5")))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 20)) 4 4 0) :lines) '("aaa" "bbb" "ccc" "ddd")))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd\n") (right 20)) 4 4 0) :lines) '("" "" "" "")))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd\neee") (right 16)) 4 4 0) :lines) '("eee" "" "" "")))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd\neee\n") (right 16)) 4 4 0) :lines) '("eee" "" "" ""))))
-    (testing "Frame cursor"
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 0)) 4 4 0) :cursor) {:row 1 :column 1}))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 1)) 4 4 0) :cursor) {:row 1 :column 2}))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 2)) 4 4 0) :cursor) {:row 1 :column 3}))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 3)) 4 4 0) :cursor) {:row 1 :column 4}))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 4)) 4 4 0) :cursor) {:row 2 :column 1}))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 5)) 4 4 0) :cursor) {:row 2 :column 2}))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd\neee") (right 20)) 4 4 0) :cursor) {:row 1 :column 4}))
-      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd\neee\n") (right 25)) 4 4 0) :cursor) {:row 1 :column 1}))
-    )))
+;(deftest frame-test
+;  (let [sl (create "aaa\n1\n22\n333\n4444\n55555\nbb bb bbb\ncccc cccc ccccc")]
+;    (testing "Frame lines"
+;      (is (= ((frame sl 7 4 0) :lines) '("aaa" "1" "22" "333" "4444" "5555" "5")))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 20)) 4 4 0) :lines) '("aaa" "bbb" "ccc" "ddd")))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd\n") (right 20)) 4 4 0) :lines) '("" "" "" "")))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd\neee") (right 16)) 4 4 0) :lines) '("eee" "" "" "")))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd\neee\n") (right 16)) 4 4 0) :lines) '("eee" "" "" ""))))
+;    (testing "Frame cursor"
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 0)) 4 4 0) :cursor) {:row 1 :column 1}))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 1)) 4 4 0) :cursor) {:row 1 :column 2}))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 2)) 4 4 0) :cursor) {:row 1 :column 3}))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 3)) 4 4 0) :cursor) {:row 1 :column 4}))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 4)) 4 4 0) :cursor) {:row 2 :column 1}))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd") (right 5)) 4 4 0) :cursor) {:row 2 :column 2}))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd\neee") (right 20)) 4 4 0) :cursor) {:row 1 :column 4}))
+;      (is (= ((frame (-> (create "aaa\nbbb\nccc\nddd\neee\n") (right 25)) 4 4 0) :cursor) {:row 1 :column 1}))
+;    )))
 
 (deftest point-to-mark-nil-test
   (testing "Moving point to nonexiting mark."
