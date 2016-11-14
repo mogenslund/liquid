@@ -27,12 +27,12 @@ The exstension system alse needs to mature, with best practices and welldefined 
 ### Download and execution
 **Notice:** The editor will only work on Linux and Mac at the moment. In later versions support for Windows will be implemented.
 
-Download [liq-0.4.2.jar](https://github.com/mogenslund/liquid/releases/download/v0.4.2/liq-0.4.2.jar)
+Download [liq-0.4.3.jar](https://github.com/mogenslund/liquid/releases/download/v0.4.3/liq-0.4.3.jar)
 Also download clojure-1.8.0.jar from [clojure.org](http://clojure.org/community/downloads)
 
 Execute the program with:
 
-    java -cp clojure-1.8.0.jar:liq-0.4.2.jar clojure.main -m dk.salza.liq.core
+    java -cp clojure-1.8.0.jar:liq-0.4.3.jar clojure.main -m dk.salza.liq.core
 
 #### Known bugs
 No known bugs at the moment.
@@ -123,20 +123,22 @@ Use *C-q* to quit editor.
 ## Sample .liq file
 Modify the content below and save it to .liq in your home directory:
 
-    (ns user
-      (:require [clojure.string :as str]
-                [dk.salza.liq.editor :as editor]
-                [dk.salza.liq.mode :as mode]
-                [dk.salza.liq.modes.typeaheadmode :as typeaheadmode])
-      (:use [dk.salza.liq.cshell]
-    
-    (editor/add-searchpath "/tmp")              ; Files below /tmp will now be chooseable from the Ctrl+Space chooser
-    (editor/add-snippet "Something to insert.") ; This snippet will be available from the Ctrl+Space chooser
-    (editor/add-file "/tmp/tmp.clj")            ; Open /tmp/tmp.clj for editing
-    (editor/add-file (str (System/getProperty "user.home") ".liq")) ; Open .liq file for editing
+```clojure
+(ns user
+  (:require [clojure.string :as str]
+            [dk.salza.liq.editor :as editor]
+            [dk.salza.liq.mode :as mode]
+            [dk.salza.liq.modes.typeaheadmode :as typeaheadmode])
+  (:use [dk.salza.liq.cshell]
+
+(editor/add-searchpath "/tmp")              ; Files below /tmp will now be chooseable from the Ctrl+Space chooser
+(editor/add-snippet "Something to insert.") ; This snippet will be available from the Ctrl+Space chooser
+(editor/add-file "/tmp/tmp.clj")            ; Open /tmp/tmp.clj for editing
+(editor/add-file (str (System/getProperty "user.home") ".liq")) ; Open .liq file for editing
+```
 
 ## Options
-It is not working yet, but at some time the argument "jframe" should start a JFrame implementation of the view.
+It is not working yet, but at some time the argument "--jframe" should start a JFrame implementation of the view.
 
 ## License
 Copyright &copy; 2016 Mogens Br&oslash;dsgaard Lund
