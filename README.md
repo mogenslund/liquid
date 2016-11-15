@@ -20,7 +20,7 @@ This video is for technical minded people to get a view of the inside of the con
 
 Most of the basic features I want are in place, but needs to be described further and polished (like checking for unsaved buffers on exit etc.)
 
-The exstension system alse needs to mature, with best practices and welldefined integration points. I may still have to do changes to some basic structures to accommodate this.
+The extension system also needs to mature, with best practices and well-defined integration points. I may still have to do changes to some basic structures to accommodate this.
 
 ## Installation
 
@@ -50,7 +50,7 @@ or just to run
 Right now the only dependency is Clojure itself. I would like to keep it that way, as for core functionality. When starting Liquid, any resources can just be added to the classpath, and the code will be available from inside Liquid. So it is not a limitation to Liquid, it just means that anything requiring other dependencies should be implemented as plugins and be loaded together with Liquid. Extensions can be loaded through a .liq file in the home folder.
 
 ## Inspiration from Emacs and Vi
-From Emacs I have been inspired by extensibility. Clojure is also the language for writeing extensions. That was in fact a primary motivation for creating the editor. Actually it is possible to include the editor into a project and make the editor part of the program. This thought is very similar to the REPL (read-eval-print-loop), but more like an edit-eval-render-loop.
+From Emacs I have been inspired by extensibility. Clojure is also the language for writing extensions. That was in fact a primary motivation for creating the editor. Actually it is possible to include the editor into a project and make the editor part of the program. This thought is very similar to the REPL (read-eval-print-loop), but more like an edit-eval-render-loop.
 
 From Vi I have stolen the concept of normal/insert mode. I really like the ability to use the whole keyboard to navigate the file and execute commands at one time, while typing text in another. The tab key is used to switch between the two modes. The color of the cursor will indicate which mode is in use. I have resisted the attempt to use the same keybindings as Vi. Some are the same, but as default I have chosen the keys jkli as navigation keys. They are located where the fingers are placed and layed out like the arrow keys. Look at jkli on the keyboard. Different up and down operations are mapped to different combinations with "i" and "k" (up and down), while different sideway actions are mapped to "j" and "l". E.g going to the end of the line is done with shift+l and the beginning of the line with shift+j.
 
@@ -67,7 +67,7 @@ In plainmode, which is the default mode for regular text, clojure code and markd
 TAB switches between two keymappings, one for navigation and common commands and one for typing text. (Very similar to vim, but with some differences.)
 Notices that the cursor changes between blue for navigation and green for insert.
 
-When in insertmode most keys just prints the character pressed.
+When in insertmode most keys just print the character pressed.
 
 Use *C-g* to try to escape from a state.
 Use *C-q* to quit editor.
