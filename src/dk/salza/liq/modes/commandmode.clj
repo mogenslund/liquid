@@ -74,7 +74,7 @@
 
 (defn activate
   [functions]
-  (let [filesbelow (fn [path] (filter #(not (re-find #"\.(png|class|jpg|pdf)" %)) (filter cs/file? (cs/lsr path))))
+  (let [filesbelow (fn [path] (filter #(not (re-find #"\.(png|class|jpg|pdf|git/)" %)) (filter cs/file? (cs/lsr path))))
         everything 
         (concat
           (map #(vector :buffer %) (filter #(not= "commandmode" %) (editor/buffer-names)))
