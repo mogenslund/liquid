@@ -16,16 +16,16 @@ Watch this video to get a sense of how the editor works: [liquid01](https://driv
 This video is for technical minded people to get a view of the inside of the construction of the editor. Useful for understanding the idea behind the editor or as inspiration for similar projects or extensions of this: [slider01](https://drive.google.com/file/d/0B5Au3PxHCmgBNjJodzNjQ2w4c2M/view?usp=sharing)
 
 ## Use cases
- * **Tight integration** with Clojure code. It should be easy to have the same code executed from within the editor as well as outside. Using a real language for extensions provides a great advantage compared to a "home made" extension language, that only fits the specific editor.  
+ * __Tight integration__ with Clojure code. It should be easy to have the same code executed from within the editor as well as outside. Using a real language for extensions provides a great advantage compared to a "home made" extension language, that only fits the specific editor.  
 Example: As a QA Engineer I do test automation using Selenium WebDriver. I have included the Selenium jar into my local environment, so now I can execute tests, parts of tests or snippets from within &lambda;iquid.  
 All other tools that I create in Clojure, which are useful as is, are easy to make accessible from within the editor as well.
 
- * **Embedding** the editor into your your application. Include the &lambda;iquid to your project and use it as part of your program or for debugging and patching, just like you already do with the REPL, but with some advantages: It is easier to open a file with code and execute parts of it, or jump between snippets, do modifications, and execute again.  
+ * __Embedding__ the editor into your your application. Include the &lambda;iquid to your project and use it as part of your program or for debugging and patching, just like you already do with the REPL, but with some advantages: It is easier to open a file with code and execute parts of it, or jump between snippets, do modifications, and execute again.  
 Example: I have a file with snippets like: `(patch "myserver")`, `(status "myserver")` and `(run-test "name-of-test")`. I just modify "myserver", if needed, and press "e" to execute the command.
 
 ## Future visions
 
- * **Port to ClojureScript** Since there are no other dependencies than Clojure itself and not much Java Interop, I don't think it would be that hard, to port parts of the editor to ClojureScript, if there is a use case for that.
+ * __Port to ClojureScript__ Since there are no other dependencies than Clojure itself and not much Java Interop, I don't think it would be that hard, to port parts of the editor to ClojureScript, if there is a use case for that.
 
 ## Status of the application
 **The program is not production ready yet**
