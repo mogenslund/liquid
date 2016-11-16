@@ -1,4 +1,6 @@
 # Salza &lambda;iquid text editor
+[![Clojars Project](https://img.shields.io/clojars/v/mogenslund/liquid.svg)](https://clojars.org/mogenslund/liquid)
+
 Salza &lambda;iquid text editor is designed with clojure developers in mind.
 
 The editor is written in pure Clojure. That is, there are no other dependencies, not even curses!
@@ -48,7 +50,6 @@ Execute the program with:
 
     java -cp clojure-1.8.0.jar:liq-0.4.3.jar clojure.main -m dk.salza.liq.core
 
-[![Clojars Project](https://img.shields.io/clojars/v/mogenslund/liquid.svg)](https://clojars.org/mogenslund/liquid)
 #### Known bugs
 No known bugs at the moment.
 
