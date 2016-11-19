@@ -44,6 +44,7 @@
            (= raw 125) :bracesend
            (= raw 126) :tilde
            (= raw 164) :curren
+           (= raw 180) :backtick
            (= raw 197) :caa
            (= raw 198) :cae
            (= raw 216) :coe
@@ -130,6 +131,7 @@
    :bracesend #(fun "}")
    :tilde #(fun "~")
    :curren #(fun "¤")
+   :backtick #(fun "´")
    :caa #(fun "Å")
    :cae #(fun "Æ")
    :coe #(fun "Ø")
