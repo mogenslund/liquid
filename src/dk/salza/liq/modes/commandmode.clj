@@ -61,8 +61,13 @@
           (= (first hit) :snippet) (do (editor/previous-buffer) (editor/insert (second hit)))
           (= (first hit) :file)   (editor/find-file (second hit))
           (= (first hit) :command) (do (editor/previous-buffer) (editor/eval-safe (second hit)))
-          (= (first hit) :interactive) (do (editor/previous-buffer) (promptmode/run (second (second hit))
-                                                                                    (nth (second hit) 2))))
+          (= (first hit) :interactive) (let [fun (second (second hit))
+                                             params (nth (second hit) 2)]
+                                         (editor/previous-buffer)
+                                         (if params
+                                           (promptmode/run fun params)
+                                           (editor/eval-safe fun))))
+                                         ;(nth (second hit) 2))))
           ;(= (first hit) :folder) (ed/find-file (second hit)))
     (editor/previous-buffer)))
 
