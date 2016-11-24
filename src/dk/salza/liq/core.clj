@@ -25,9 +25,10 @@
       ;(user/load-default))))
 
 (defn init-editor
-  [rows columns]
+  [rows columns userfile]
   (editor/init)
   (editor/set-default-mode plainmode/mode)
+  (when userfile (load-user-file userfile))
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")
   ;(editor/set-mode plainmode/mode)
@@ -85,13 +86,12 @@
 (defn -main
   [& args]
   (let [adapter (if (read-arg args "--jframe") (JframeAdapter.) (TtyAdapter.))
-        singlethreaded (read-arg args "--no-threads")]
+        singlethreaded (read-arg args "--no-threads")
+        userfile (when-not (read-arg args "--no-init-file") 
+                   (or (read-arg args "--load=")
+                       (fileutil/file (System/getProperty "user.home") ".liq")))]
     (init adapter)
-    (init-editor (- (rows adapter) 1) (columns adapter))
-    (when-not (read-arg args "--no-init-file") 
-      (load-user-file
-        (or (read-arg args "--load=")
-            (fileutil/file (System/getProperty "user.home") ".liq"))))
+    (init-editor (- (rows adapter) 1) (columns adapter) userfile)
     (loop []
       (if singlethreaded
         (update-gui adapter)          ; Non threaded version
