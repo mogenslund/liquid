@@ -37,17 +37,23 @@
       (println "TimeoutException or Interrupted")
       (.destroy process))))
 
+(def localclipboard (atom ""))
+
 (defn clipboard-content
   []
-  (let [clipboard (.getSystemClipboard (java.awt.Toolkit/getDefaultToolkit))]
-    (try
-      (.getTransferData (.getContents clipboard nil) (java.awt.datatransfer.DataFlavor/stringFlavor))
-      (catch java.lang.NullPointerException e ""))))
+  (if (java.awt.GraphicsEnvironment/isHeadless)
+    @localclipboard
+    (let [clipboard (.getSystemClipboard (java.awt.Toolkit/getDefaultToolkit))]
+      (try
+        (.getTransferData (.getContents clipboard nil) (java.awt.datatransfer.DataFlavor/stringFlavor))
+        (catch java.lang.NullPointerException e "")))))
 
 (defn set-clipboard-content
   [text]
-  (let [clipboard (.getSystemClipboard (java.awt.Toolkit/getDefaultToolkit))]
-    (.setContents clipboard (java.awt.datatransfer.StringSelection. text) nil)))
+  (reset! localclipboard text)
+  (when (not (java.awt.GraphicsEnvironment/isHeadless))
+    (let [clipboard (.getSystemClipboard (java.awt.Toolkit/getDefaultToolkit))]
+      (.setContents clipboard (java.awt.datatransfer.StringSelection. text) nil))))
 
 (defn update-map
   "Updates a map using update-in if the
