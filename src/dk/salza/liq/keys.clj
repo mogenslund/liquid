@@ -81,6 +81,17 @@
            (= raw 25371) :M-b
            (= raw 25627) :M-c
            (= raw 31003) :M-x
+           (= raw 5394459) :f2
+           (= raw 5459995) :f3
+           (= raw 5525531) :f4
+           (= raw 32565) :f5
+           (= raw 32567) :f6
+           (= raw 32568) :f7
+           (= raw 32569) :f8
+           (= raw 32560) :f9
+           (= raw 32561) :f10
+           ;(= raw ) :f11
+           (= raw 32564) :f12
            true :unknown)))
 
 (defn alphanum-mapping
