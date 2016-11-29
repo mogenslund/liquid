@@ -46,6 +46,9 @@
   [keyw entry]
   (when (not (some #{entry} (setting keyw)))
     (dosync (alter editor update-in [::settings keyw] conj entry))))
+(defn set-setting
+  [keyw value]
+  (dosync (alter editor assoc-in [::settings keyw] value)))
 
 (defn add-command [fun] (add-to-setting ::commands fun))
 (defn add-searchpath [s] (add-to-setting ::searchpaths s))
@@ -346,6 +349,8 @@
     (cond (= type :file) (if (.isAbsolute (io/file value))
                            (find-file value)
                            (find-file (str (io/file (get-folder) value))))
+          (= type :url) (when-let [start-browser (setting :start-browser)]
+                          (start-browser value))
           (= type :function) (goto-definition value))))
 
 (defn remove-buffer
@@ -410,4 +415,3 @@
 (defn tmp-do-macro
   []
   (doall (map handle-input '(:i :i :j))))
-
