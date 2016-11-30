@@ -78,8 +78,53 @@
   [sl n]
   (apply str (map get-char (take n (iterate #(right % 1) sl)))))
 
+(defn clojure-highlighter
+  [face ch pch ppch sl]
+  (cond (= face :string)  (cond (and (= pch "\"") (= ppch "\\")) face
+                                (and (= pch "\"") (string? (-> sl (left 2) (get-char)))) :plain
+                                (and (= pch "\"") (re-matches #"[^#\( \[{\n]" ppch)) :plain
+                                (and (= pch "\"") (re-matches #"[\)\]}]" (or ch " "))) :plain
+                                :else face)
+        (= face :plain)   (cond (and (= ch "\"") (re-matches #"[#\( \[{\n]" pch)) :string
+                                (= ch ";") :comment
+                                (and (= ch "#") (or (= pch "\n") (= (get-point sl) 0))) :comment 
+                                (and (= pch "(") (re-find #"def(n|n-|test|record|protocol)? " (look-ahead sl 13))) :type1
+                                (and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
+                                :else face)
+        (= face :type1)   (cond (= ch " ") :type2
+                                :else face)
+        (= face :type2)   (cond (= ch " ") :plain
+                                :else face)
+        (= face :type3)   (cond (re-matches #"[\)\]}\s]" (or ch " ")) :plain
+                                :else face)
+        (= face :comment) (cond (= ch "\n") :plain
+                                :else face)
+                          :else face))
+(defn javascript-highlighter
+  [face ch pch ppch sl]
+  (cond (= face :string)  (cond (and (= pch "'") (= ppch "\\")) face
+                                (and (= pch "'") (string? (-> sl (left 2) (get-char)))) :plain
+                                (and (= pch "'") (re-matches #"[^#\( \[{\n]" ppch)) :plain
+                                (and (= pch "'") (re-matches #"[\)\]}]" (or ch " "))) :plain
+                                :else face)
+        (= face :plain)   (cond (and (= ch "'") (re-matches #"[#\( \[{\n]" pch)) :string
+                                (and (= ch "/") (= (-> sl (right 1) (get-char)) "/")) :comment
+                                ;(and (re-matches #"\s?" pch) (re-find #"(var|function)" (or (look-ahead sl 9) ""))) :type1
+                                ;(and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
+                                :else face)
+        (= face :type1)   (cond (= ch " ") :type2
+                                (= ch "(") :plain
+                                :else face)
+        (= face :type2)   (cond (re-matches #"[^-a-zA-Z0-9_]" ch) :plain
+                                :else face)
+;        (= face :type3)   (cond (re-matches #"[\)\]}\s]" (or ch " ")) :plain
+;                                :else face)
+        (= face :comment) (cond (= ch "\n") :plain
+                                :else face)
+        :else face))
+
 (defn apply-syntax-highlight
-  [sl rows towid cursor-color]
+  [sl rows towid cursor-color syntaxhighlighter]
   (loop [sl0 sl n 0 face :plain bgface :plain pch "" ppch ""]
      (if (> n rows)
        (set-point sl0 (@top-of-window towid))
@@ -87,26 +132,7 @@
              p (get-point sl0)
              selection (get-mark sl0 "selection")
              cursor (get-mark sl0 "cursor")
-             nextface   (cond (= face :string)  (cond (and (= pch "\"") (= ppch "\\")) face
-                                                      (and (= pch "\"") (string? (-> sl0 (left 2) (get-char)))) :plain
-                                                      (and (= pch "\"") (re-matches #"[^#\( \[{\n]" ppch)) :plain
-                                                      (and (= pch "\"") (re-matches #"[\)\]}]" (or ch " "))) :plain
-                                                      :else face)
-                              (= face :plain)   (cond (and (= ch "\"") (re-matches #"[#\( \[{\n]" pch)) :string
-                                                      (= ch ";") :comment
-                                                      (and (= ch "#") (or (= pch "\n") (= p 0))) :comment 
-                                                      (and (= pch "(") (re-find #"def(n|n-|test|record|protocol)? " (look-ahead sl0 13))) :type1
-                                                      (and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
-                                                      :else face)
-                              (= face :type1)   (cond (= ch " ") :type2
-                                                      :else face)
-                              (= face :type2)   (cond (= ch " ") :plain
-                                                      :else face)
-                              (= face :type3)   (cond (re-matches #"[\)\]}\s]" (or ch " ")) :plain
-                                                      :else face)
-                              (= face :comment) (cond (= ch "\n") :plain
-                                                      :else face)
-                              :else face)
+             nextface (syntaxhighlighter face ch pch ppch sl0)
              nextbgface (cond (= p cursor) (if (= cursor-color :green) :cursor1 :cursor2)
                               (and selection (>= p (min selection cursor)) (< p (max selection cursor))) :selection
                               (and selection (>= p (max selection cursor))) :plain
@@ -157,9 +183,11 @@
         sl0 (apply-br-and-update-tow sl rows columns towid tow)
         ;tmp (futil/log (get-mark sl "cursor"))
         ;tmp1 (futil/log (get-mark sl0 "cursor"))
-        sl1 (apply-syntax-highlight sl0 rows towid cursor-color)
+        filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
+        syntaxhighlighter (cond (re-matches #"^.*\.js$" filename) javascript-highlighter
+                                :else clojure-highlighter)
+        sl1 (apply-syntax-highlight sl0 rows towid cursor-color  syntaxhighlighter)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
-        filename (or (buffer/get-filename buffer) (buffer/get-name buffer))
         dirty (buffer/get-dirty buffer)
         statuslinecontent (str "L" (format "%-6s" (buffer/get-linenumber buffer))
                                timestamp
