@@ -109,13 +109,13 @@
                                 :else face)
         (= face :plain)   (cond (and (= ch "'") (re-matches #"[#\( \[{\n]" pch)) :string
                                 (and (= ch "/") (= (-> sl (right 1) (get-char)) "/")) :comment
-                                (and (or (= pch " ") (= pch "\n") (= pch "")) (re-find #"^(var|function)" (or (look-ahead sl 9) ""))) :type1
+                                (and (or (= pch " ") (= pch "\n") (= pch "")) (re-find #"^(var|function)[ \(]" (str (look-ahead sl 9) "    "))) :type1
                                 ;(and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
                                 :else face)
-        (= face :type1)   (cond (= ch " ") :type2
+        (= face :type1)   (cond (= pch " ") :type2
                                 (= ch "(") :plain
                                 :else face)
-        (= face :type2)   (cond (re-matches #"[^-a-zA-Z0-9_]" ch) :plain
+        (= face :type2)   (cond (or (= ch " ") (= ch "(") (= ch "=")) :plain
                                 :else face)
 ;        (= face :type3)   (cond (re-matches #"[\)\]}\s]" (or ch " ")) :plain
 ;                                :else face)
