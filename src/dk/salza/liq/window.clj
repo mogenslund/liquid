@@ -140,6 +140,7 @@
                                 (and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
                                 :else face)
         (= face :type1)   (cond (= pch "<") :type2
+                                (and (= pch ">") (= ch "<")) :type1
                                 :else :plain)
         (= face :type2)   (cond (= ch " ") :plain
                                 (= ch ">") :type1
