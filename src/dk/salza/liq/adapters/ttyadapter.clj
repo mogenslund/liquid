@@ -36,6 +36,11 @@
 ;; http://misc.flogisoft.com/bash/tip_colors_and_formatting
 ;; http://ascii-table.com/ansi-escape-sequences.php
 
+(defn print-color
+  [index & strings] ;   0         1          2        3          4         5        6    7   8        9     10
+  (let [colorpalette ["0;37" "38;5;131" "38;5;105" "38;5;11" "38;5;40" "38;5;117" "42" "44" "45" "48;5;235" "49"]]
+    (print (str "\033[" (colorpalette index) "m" (apply str strings)))))
+
 (defn ttyprint-lines
   [lines]
   ;; Redraw whole screen once in a while
@@ -52,27 +57,31 @@
       (let [diff (max 1 (- (count (filter #(and (string? %) (not= % "")) oldcontent))
                            (count (filter #(and (string? %) (not= % "")) content))))
             padding (format (str "%" diff "s") " ")]
-        (print (str "\033[" row ";" column "H\033[s" "\033[48;5;235m \033[0;37m\033[49m"))
-
+        (print (str "\033[" row ";" column "H\033[s"))
+        (print-color  9 " ")
+        (print-color 0)
+        (print-color 10)
         (doseq [ch (line :line)]
           (if (string? ch)
             (if (= ch "\t") (print (char 172)) (print ch)) 
             (do
-              (cond (= (ch :face) :string) (print "\033[38;5;131m")
-                    (= (ch :face) :comment) (print "\033[38;5;105m")
-                    (= (ch :face) :type1) (print "\033[38;5;11m") ; defn
-                    (= (ch :face) :type2) (print "\033[38;5;40m") ; function
-                    (= (ch :face) :type3) (print "\033[38;5;117m") ; keyword
-                    :else (print "\033[0;37m"))
-              (cond (= (ch :bgface) :cursor1) (print "\033[42m")
-                    (= (ch :bgface) :cursor2) (print "\033[44m")
-                    (= (ch :bgface) :selection) (print "\033[48;5;52m")
-                    (= (ch :bgface) :statusline) (print "\033[48;5;235m")
-                    :else (print "\033[49m"))
+              (cond (= (ch :face) :string) (print-color 1)
+                    (= (ch :face) :comment) (print-color 2)
+                    (= (ch :face) :type1) (print-color 3) ; defn
+                    (= (ch :face) :type2) (print-color 4) ; function
+                    (= (ch :face) :type3) (print-color 5) ; keyword
+                    :else (print-color 0))
+              (cond (= (ch :bgface) :cursor1) (print-color 6)
+                    (= (ch :bgface) :cursor2) (print-color 7)
+                    (= (ch :bgface) :selection) (print-color 8)
+                    (= (ch :bgface) :statusline) (print-color 9)
+                    :else (print-color 10))
             )))
         (if (= row (count lines))
-          (print (str "  " padding))
-          (print (str "\033[0;37m\033[49m" padding))))
+          (do
+            (print (str "  " padding))
+            (print-color 0))
+          (print-color 10 padding)))
       (swap! old-lines assoc key content))
     ))
   (flush))
