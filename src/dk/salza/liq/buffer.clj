@@ -67,7 +67,7 @@
 (defn get-mode [buffer] (buffer ::mode))
 (defn set-mode [buffer mode] (assoc buffer ::mode mode))
 (defn swap-actionmapping [buffer] (doto-mode buffer mode/swap-actionmapping))
-(defn set-dirty ([buffer dirty] (assoc buffer ::dirty dirty))
+(defn set-dirty ([buffer dirty] (if (buffer ::filename) (assoc buffer ::dirty dirty) buffer))
                 ([buffer] (set-dirty buffer true)))
 (defn get-dirty [buffer] (buffer ::dirty))
 (defn get-filename [buffer] (buffer ::filename))

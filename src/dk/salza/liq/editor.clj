@@ -69,6 +69,11 @@
 (defn buffer-names
   []
   (map ::buffer/name (@editor ::buffers)))
+
+(defn dirty-buffers
+  []
+  (map ::buffer/name (filter ::buffer/dirty (@editor ::buffers))))
+
   
 (defn switch-to-buffer
   [buffername]
