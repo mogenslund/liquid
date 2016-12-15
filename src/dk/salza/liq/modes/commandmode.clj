@@ -83,12 +83,12 @@
         everything 
         (concat
           (map #(vector :buffer %) (filter #(not= "commandmode" %) (editor/buffer-names)))
-          (map #(vector :file %) (editor/setting ::editor/files))
-          (map #(vector :file %) (apply concat (map filesbelow (editor/setting ::editor/searchpaths))))
+          (map #(vector :command %) (editor/setting ::editor/commands))
+          (map #(vector :interactive %) (editor/setting ::editor/interactive))
           (map #(vector :snippet %) (editor/setting ::editor/snippets))
           (map #(vector :snippet %) functions)
-          (map #(vector :command %) (editor/setting ::editor/commands))
-          (map #(vector :interactive %) (editor/setting ::editor/interactive)))]
+          (map #(vector :file %) (editor/setting ::editor/files))
+          (map #(vector :file %) (apply concat (map filesbelow (editor/setting ::editor/searchpaths)))))]
     (swap! state assoc ::previous (editor/get-name))
     (swap! state assoc ::search "")
     (swap! state assoc ::oldsearch "")
