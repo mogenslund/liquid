@@ -75,6 +75,7 @@
            (= raw 24) :C-x
            (= raw 25) :C-y
            (= raw 26) :C-z
+           (= raw 4635) :C-M-q
            (= raw 0) :C-space
            (= raw 127) :backspace
            (= raw 25115) :M-a

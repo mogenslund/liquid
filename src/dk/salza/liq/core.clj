@@ -3,6 +3,7 @@
             [dk.salza.liq.apis :refer :all]
             [dk.salza.liq.adapters.ttyadapter]
             ;[user :as user]
+            [clojure.string :as str]
             [dk.salza.liq.adapters.jframeadapter]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
@@ -97,7 +98,14 @@
         (update-gui adapter)          ; Non threaded version
         (request-update-gui adapter)) ; Threaded version
       (let [input (wait-for-input adapter)]
-        (when (= input :C-q) (quit adapter))
+        (when (= input :C-M-q) (quit adapter))
+        (when (= input :C-q)
+          (let [dirty (editor/dirty-buffers)]
+            (if (empty? dirty)
+              (quit adapter)
+              (editor/prompt-set (str "There are dirty buffers:\n\n"
+                                      (str/join "\n" dirty) "\n\n"
+                                      "Press C-M-q to quit anyway.")))))
         (when (= input :C-space) (reset adapter))
         (editor/handle-input input)
         (swap! changes inc))
