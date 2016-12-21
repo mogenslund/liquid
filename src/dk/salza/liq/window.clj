@@ -213,6 +213,7 @@
         ;tmp1 (futil/log (get-mark sl0 "cursor"))
         filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
         syntaxhighlighter (cond (re-matches #"^.*\.js$" filename) javascript-highlighter
+                                (re-matches #"^.*\.java$" filename) javascript-highlighter
                                 (re-matches #"^.*\.xml$" filename) xml-highlighter
                                 :else clojure-highlighter)
         sl1 (apply-syntax-highlight sl0 rows towid cursor-color  syntaxhighlighter)
