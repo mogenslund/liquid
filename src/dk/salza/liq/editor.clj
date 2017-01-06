@@ -280,7 +280,7 @@
     (let [output (try
                    (with-out-str
                      (println
-                       (cond (re-find #"\.js$" filepath) (cshell/cmd "nodejs" filepath) 
+                       (cond (re-find #"\.js$" filepath) (cshell/cmd "node" filepath) 
                              :else (str (load-file filepath)))))
                 (catch Exception e (util/pretty-exception e)))]
         (prompt-set (str/trim output))))
