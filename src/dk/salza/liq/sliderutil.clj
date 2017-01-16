@@ -38,4 +38,5 @@
           (re-matches #"\(.*" word) {:type :function :value (str/replace word #"(\(|\))" "")}
           (re-matches #"[-a-z0-9\.]+/[-a-z0-9]+" word) {:type :function :value (str/replace word #"(\(|\))" "")}
           (re-matches #"/.*" word) {:type :file :value word}
+          (re-matches #".*(data:image/png;base64,.*)" word) {:type :base64image :value (re-find #"(?<=base64,)[^\)]*" word)}
           :else {:type :file :value word})))
