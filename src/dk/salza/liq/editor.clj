@@ -17,16 +17,7 @@
 
 (def editor (ref nil))
 
-(defn init
-  []
-  (dosync
-    (ref-set editor {::buffers '()
-                     ::windows '()
-                     ::settings {::searchpaths '()
-                                 ::files '()
-                                 ::snippets '()
-                                 ::commands '()
-                                 ::interactive '()}})))
+
 
 (defn set-default-mode
   [mode]
@@ -49,6 +40,10 @@
 (defn set-setting
   [keyw value]
   (dosync (alter editor assoc-in [::settings keyw] value)))
+
+(defn set-global-key
+  [keyw fun]
+  (dosync (alter editor assoc-in [::global-keymap keyw] fun)))
 
 (defn add-command [fun] (add-to-setting ::commands fun))
 (defn add-searchpath [s] (add-to-setting ::searchpaths s))
@@ -183,7 +178,8 @@
 
 (defn get-action
   [keyw]
-  (-> (get-mode) ::mode/actionmapping first keyw))
+  (or (-> (get-mode) ::mode/actionmapping first keyw)
+      (-> @editor ::global-keymap keyw)))
 
 (defn new-buffer
   [name]
@@ -420,3 +416,16 @@
 (defn tmp-do-macro
   []
   (doall (map handle-input '(:i :i :j))))
+
+;;(set-global-key :M-a #(prompt-append "test"))
+(defn init
+  []
+  (dosync
+    (ref-set editor {::buffers '()
+                     ::windows '()
+                     ::global-keymap {:C-r #(prompt-append "test")}
+                     ::settings {::searchpaths '()
+                                 ::files '()
+                                 ::snippets '()
+                                 ::commands '()
+                                 ::interactive '()}})))
