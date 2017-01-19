@@ -49,6 +49,7 @@
   [st]
   (swap! state update ::search #(str % st))
   (swap! state assoc ::selected nil)
+  (swap! state update ::selected #(inc (or % -1)))
   (update-display))
 
 (defn delete
@@ -77,7 +78,7 @@
     (update-display)))
 
 (defn execute
-  []
+  [fun]
   (let [hit (@state ::hit)]
     (if (fileutil/folder? hit)
       (do
@@ -86,10 +87,18 @@
                            ::selected nil
                            ::hit nil)
         (update-display))
-      (editor/find-file hit))))
+      (fun hit)
+      )))
+
+(defn execute-search
+  [fun]
+  (let [path (@state ::path)
+        search (@state ::search)]
+    (fun (fileutil/file (@state ::path) (@state ::search)))))
+  
 
 (defn run
-  []
+  [fun]
   (let [path (editor/get-folder)
         ffmode (-> (mode/create "findfilemode")
                    (mode/set-actions
@@ -104,7 +113,8 @@
                       :down next-res
                       :tab prev-res ; tab and C-i are the same in terminal
                       :up prev-res
-                      :enter execute
+                      :enter #(execute fun)
+                      :M-enter #(execute-search fun)
                       }
                       (keys/alphanum-mapping insert)
                       (keys/symbols-mapping insert))))]

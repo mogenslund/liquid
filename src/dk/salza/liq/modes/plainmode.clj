@@ -18,7 +18,7 @@
            :tab editor/swap-actionmapping
            :C-o editor/other-window
            :C-space commandmode/run
-           :C-f findfilemode/run
+           :C-f #(findfilemode/run editor/find-file)
            :right editor/forward-char
            :left editor/backward-char
            :up editor/backward-line
@@ -39,7 +39,7 @@
          :tab editor/swap-actionmapping
          :C-o editor/other-window
          :M editoractions/prompt-to-tmp
-         :C-f findfilemode/run
+         :C-f #(findfilemode/run editor/find-file)
          :C-space commandmode/run
          :space #(editor/forward-page)
          ;:C-s editor/search

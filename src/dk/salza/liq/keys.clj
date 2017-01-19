@@ -78,6 +78,7 @@
            (= raw 4635) :C-M-q
            (= raw 0) :C-space
            (= raw 127) :backspace
+           (= raw 3611) :M-enter
            (= raw 25115) :M-a
            (= raw 25371) :M-b
            (= raw 25627) :M-c
