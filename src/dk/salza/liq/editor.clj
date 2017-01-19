@@ -27,7 +27,8 @@
   "Apply the given function to the top-most buffer."
   [fun & args]
   (dosync
-    (alter editor update ::buffers #(apply doto-first (list* % fun args)))))
+    (alter editor update ::buffers #(apply doto-first (list* % fun args))))
+  nil)
 
 (defn current-buffer [] (-> @editor ::buffers first))
 (defn current-window [] (-> @editor ::windows first))
@@ -288,14 +289,14 @@
     (when isprompt (other-window))
     (let [output (try
                    (if sexp (with-out-str (println (load-string sexp))) "")
-                   (catch Exception e (util/pretty-exception e)))]
-      (when (not isprompt) (prompt-set output)))))
+                   (catch Exception e (do (spit "/tmp/liq.log" e) (util/pretty-exception e))))]
+      (when (and (not= output "") (not isprompt)) (prompt-set output)))))
 
 (defn eval-safe
   [fun]
   (let [output (try
                  (with-out-str (fun))
-                 (catch Exception e (util/pretty-exception e)))]
+                 (catch Exception e (do (spit "/tmp/liq.log" e) (util/pretty-exception e))))]
       (when output (prompt-set output))))
 
 

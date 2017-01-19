@@ -45,6 +45,7 @@
                       "## Evaluation\n"
                       "Place cursor between the parenthesis below and type \"e\" in navigation mode, to evaluate the expression:\n"
                       "(range 10 30)\n"
+                      "(editor/end-of-buffer)\n"
                      ))
   ;(editor/set-mode plainmode/mode)
   (editor/end-of-buffer))
