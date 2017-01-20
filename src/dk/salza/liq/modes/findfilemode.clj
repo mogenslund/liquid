@@ -24,7 +24,7 @@
         folders (filter #(re-find pat %) (conj (sort-by str/upper-case (fileutil/get-folders (@state ::path))) ".."))
         files (filter #(re-find pat %) (sort-by str/upper-case (fileutil/get-files (@state ::path))))
         res (concat (map #(str "    [" (fileutil/filename %) "]") folders) (map #(str "    " (fileutil/filename %) "") files))]
-    (if (@state ::selected)
+    (if (and (@state ::selected) (> (count res) 0))
       (swap! state assoc ::hit (nth (concat folders files) (min (@state ::selected) (dec (count res)))))
       (swap! state assoc ::hit (fileutil/file (@state ::path) (@state ::search))))
     (editor/clear)
@@ -48,8 +48,8 @@
 (defn insert
   [st]
   (swap! state update ::search #(str % st))
-  (swap! state assoc ::selected nil)
-  (swap! state update ::selected #(inc (or % -1)))
+  (swap! state assoc ::selected 0)
+  ;(swap! state update ::selected #(inc (or % -1)))
   (update-display))
 
 (defn delete
