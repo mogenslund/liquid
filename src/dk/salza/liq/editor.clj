@@ -47,13 +47,14 @@
   (dosync (alter editor assoc-in [::global-keymap keyw] fun)))
 
 (defn add-command [fun] (add-to-setting ::commands fun))
-(defn add-searchpath [s] (add-to-setting ::searchpaths s))
-(defn add-snippet [s] (add-to-setting ::snippets s))
-(defn add-file [f] (add-to-setting ::files f))
+(defn add-searchpath [s] (add-to-setting ::searchpaths s) nil)
+(defn add-snippet [s] (add-to-setting ::snippets s) nil)
+(defn add-file [f] (add-to-setting ::files f) nil)
 
 (defn add-interactive
   [label fun & arglabels]
-  (add-to-setting ::interactive [label fun arglabels]))
+  (add-to-setting ::interactive [label fun arglabels])
+  nil)
 
 (defn add-window [window] (dosync (alter editor update ::windows conj window)))
 (defn get-windows [] (@editor ::windows))
