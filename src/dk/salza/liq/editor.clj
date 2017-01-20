@@ -44,9 +44,9 @@
 
 (defn set-global-key
   [keyw fun]
-  (dosync (alter editor assoc-in [::global-keymap keyw] fun)))
+  (dosync (alter editor assoc-in [::global-keymap keyw] fun)) nil)
 
-(defn add-command [fun] (add-to-setting ::commands fun))
+(defn add-command [fun] (add-to-setting ::commands fun) nil)
 (defn add-searchpath [s] (add-to-setting ::searchpaths s) nil)
 (defn add-snippet [s] (add-to-setting ::snippets s) nil)
 (defn add-file [f] (add-to-setting ::files f) nil)
