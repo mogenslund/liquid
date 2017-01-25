@@ -1,6 +1,5 @@
 (ns dk.salza.liq.adapters.jframeadapter
-  (:require [dk.salza.liq.apis :refer :all]
-            [dk.salza.liq.util :as util]
+  (:require [dk.salza.liq.util :as util]
             [clojure.string :as str]))
 
 
@@ -170,11 +169,11 @@
   []
   (System/exit 0))
 
-(defrecord JframeAdapter []
-  Adapter
-  (init [this] (jframeinit))
-  (rows [this] (jframerows))
-  (columns [this] (jframecolumns))
-  (wait-for-input [this] (jframewait-for-input))
-  (print-lines [this lines] (jframeprint-lines lines))
-  (quit [this] (jframequit)))
+(def adapter {:init jframeinit
+              :rows jframerows
+              :columns jframecolumns
+              :wait-for-input jframewait-for-input
+              :printlines jframeprint-lines
+              ;:reset jframereset
+              :quit jframequit})
+

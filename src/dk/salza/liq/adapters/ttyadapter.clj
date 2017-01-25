@@ -1,6 +1,5 @@
 (ns dk.salza.liq.adapters.ttyadapter
-  (:require [dk.salza.liq.apis :refer :all]
-            [dk.salza.liq.util :as util]
+  (:require [dk.salza.liq.util :as util]
             [dk.salza.liq.keys :as keys]
             [clojure.string :as str]))
 
@@ -110,12 +109,11 @@
   (println "")
   (System/exit 0))
 
-(defrecord TtyAdapter []
-  Adapter
-  (init [this] (ttyinit))
-  (rows [this] (ttyrows))
-  (columns [this] (ttycolumns))
-  (wait-for-input [this] (ttywait-for-input))
-  (print-lines [this lines] (ttyprint-lines lines))
-  (reset [this] (ttyreset))
-  (quit [this] (ttyquit)))
+(def adapter {:init ttyinit
+              :rows ttyrows
+              :columns ttycolumns
+              :wait-for-input ttywait-for-input
+              :print-lines ttyprint-lines
+              :reset ttyreset
+              :quit ttyquit})
+

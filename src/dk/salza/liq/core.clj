@@ -1,17 +1,14 @@
 (ns dk.salza.liq.core
   (:require [clojure.java.io :as io]
-            [dk.salza.liq.apis :refer :all]
-            [dk.salza.liq.adapters.ttyadapter]
+            [dk.salza.liq.adapters.ttyadapter :as ttyadapter]
             ;[user :as user]
             [clojure.string :as str]
-            [dk.salza.liq.adapters.jframeadapter]
+            [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.fileutil :as fileutil]
             [dk.salza.liq.modes.promptmode :as promptmode]
             [dk.salza.liq.modes.plainmode :as plainmode])
-  (:import (dk.salza.liq.adapters.ttyadapter TtyAdapter)
-           (dk.salza.liq.adapters.jframeadapter JframeAdapter))
   (:gen-class))
 
 (defn load-user-file
@@ -57,7 +54,7 @@
         lineslist (doall (map #(window/render %1 %2) windows buffers))]
         ;(spit "/tmp/lines.txt" (pr-str lineslist)) 
         (doseq [lines lineslist]
-          (print-lines adapter lines))))
+          ((adapter :print-lines) lines))))
 
 (def updater (atom (future nil)))
 (def changes (atom 0))
@@ -87,27 +84,27 @@
 
 (defn -main
   [& args]
-  (let [adapter (if (read-arg args "--jframe") (JframeAdapter.) (TtyAdapter.))
+  (let [adapter (if (read-arg args "--jframe") jframeadapter/adapter ttyadapter/adapter)
         singlethreaded (read-arg args "--no-threads")
         userfile (when-not (read-arg args "--no-init-file") 
                    (or (read-arg args "--load=")
                        (fileutil/file (System/getProperty "user.home") ".liq")))]
-    (init adapter)
-    (init-editor (- (rows adapter) 1) (columns adapter) userfile)
+    ((adapter :init))
+    (init-editor (- ((adapter :rows)) 1) ((adapter :columns)) userfile)
     (loop []
       (if singlethreaded
         (update-gui adapter)          ; Non threaded version
         (request-update-gui adapter)) ; Threaded version
-      (let [input (wait-for-input adapter)]
-        (when (= input :C-M-q) (quit adapter))
+      (let [input ((adapter :wait-for-input))]
+        (when (= input :C-M-q) ((adapter :quit)))
         (when (= input :C-q)
           (let [dirty (editor/dirty-buffers)]
             (if (empty? dirty)
-              (quit adapter)
+              ((adapter :quit))
               (editor/prompt-set (str "There are dirty buffers:\n\n"
                                       (str/join "\n" dirty) "\n\n"
                                       "Press C-M-q to quit anyway.")))))
-        (when (= input :C-space) (reset adapter))
+        (when (= input :C-space) ((adapter :reset)))
         (editor/handle-input input)
         (swap! changes inc))
       (recur))))
