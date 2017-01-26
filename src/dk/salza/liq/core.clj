@@ -1,6 +1,7 @@
 (ns dk.salza.liq.core
   (:require [clojure.java.io :as io]
             [dk.salza.liq.adapters.ttyadapter :as ttyadapter]
+            [dk.salza.liq.adapters.winttyadapter :as winttyadapter]
             ;[user :as user]
             [clojure.string :as str]
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
@@ -82,9 +83,15 @@
                                 %)
                       args))))
 
+(defn is-windows
+  []
+  (re-matches #"(?i)win.*" (System/getProperty "os.name")))
+
 (defn -main
   [& args]
-  (let [adapter (if (read-arg args "--jframe") jframeadapter/adapter ttyadapter/adapter)
+  (let [adapter (cond (read-arg args "--jframe") jframeadapter/adapter
+                      (is-windows) winttyadapter/adapter
+                      :else ttyadapter/adapter)
         singlethreaded (read-arg args "--no-threads")
         userfile (when-not (read-arg args "--no-init-file") 
                    (or (read-arg args "--load=")
