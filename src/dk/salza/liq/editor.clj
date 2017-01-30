@@ -279,6 +279,7 @@
                    (with-out-str
                      (println
                        (cond (re-find #"\.js$" filepath) (cshell/cmd "node" filepath) 
+                             (re-find #"\.lisp$" filepath) (cshell/cmd "clisp" filepath)
                              :else (str (load-file filepath)))))
                 (catch Exception e (util/pretty-exception e)))]
         (prompt-set (str/trim output))))
