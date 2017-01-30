@@ -5,6 +5,7 @@
             ;[user :as user]
             [clojure.string :as str]
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
+            [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.fileutil :as fileutil]
@@ -90,6 +91,7 @@
 (defn -main
   [& args]
   (let [adapter (cond (read-arg args "--jframe") jframeadapter/adapter
+                      (read-arg args "--ghost") ghostadapter/adapter
                       (is-windows) winttyadapter/adapter
                       :else ttyadapter/adapter)
         singlethreaded (read-arg args "--no-threads")
