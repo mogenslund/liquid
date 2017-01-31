@@ -19,6 +19,15 @@
   (ghostadapter/send-input :empty))
 
 (defn- short-screen-notation
+  "This function takes the lines which are created
+  by window/render and comprimises (with a little loss) the
+  content to a smaller string.
+  The point is just to have something simple to check, when
+  checking the rendered window in a test check.
+  The output is a string with normal text, where special codes
+  are just small substring of length 3, starting with ¤.
+  For example a linebreak will is \"¤BR\" and plain text
+  with cursor1 background is \"¤PG\"."
   [lines]
   (str/join "¤BR"
     (for [line lines]
@@ -43,6 +52,13 @@
         )))))
 
 (defn- screen-check
+  "Takes some input, as a list of text snippets and
+  keywords corresponding to input characers, and a
+  string corresponding to some subcontent of the expected
+  screenoutput comprised with the short-screen-notation.
+  For example:
+  (screen-check [:enter \"abc\" :tab] \"¤BRabc¤PB \")
+  will be a success."
   [input expected]
   (let [program (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=90"))]
     (send-input "ggvGdd" :tab) ; Clearing screen. Ready to type
