@@ -91,7 +91,9 @@
 (defn -main
   [& args]
   (let [adapter (cond (read-arg args "--jframe") jframeadapter/adapter
-                      (read-arg args "--ghost") ghostadapter/adapter
+                      (read-arg args "--ghost") (ghostadapter/adapter
+                                                      (Integer/parseInt (read-arg args "--rows="))
+                                                      (Integer/parseInt (read-arg args "--columns=")))
                       (is-windows) winttyadapter/adapter
                       :else ttyadapter/adapter)
         singlethreaded (read-arg args "--no-threads")

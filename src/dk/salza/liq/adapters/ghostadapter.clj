@@ -5,33 +5,34 @@
 
 (def display (atom '()))
 
-(def input (atom nil))
+(def input (atom (clojure.lang.PersistentQueue/EMPTY)))
 
-(defn set-input
+(defn send-input
   [inp]
-  (println "set-input" inp)
-  (reset! input inp))
+  (println "send-input" inp)
+  (swap! input conj inp))
 
 (defn get-display
   []
   (println "get-display")
   @display)
 
-(defn rows
-  []
-  20)
+;(defn rows
+;  []
+;  20)
 
-(defn columns
-  []
-  80)
+;(defn columns
+;  []
+;  80)
 
 (defn wait-for-input
   []
   (loop []
     (println "Waiting")
-    (if @input
-      (let [res @input]
-        (reset! input nil)
+    (if (not (empty? @input))
+      (let [res (peek @input)]
+        (println "read input" res)
+        (swap! input pop)
         res)
       (do
         (Thread/sleep 100)
@@ -53,10 +54,12 @@
   []
   (System/exit 0))
 
-(def adapter {:init init
-              :rows rows
-              :columns columns
-              :wait-for-input wait-for-input
-              :print-lines print-lines
-              :reset reset
-              :quit quit})
+(defn adapter
+  [rows columns]
+  {:init init
+   :rows (fn [] rows)
+   :columns (fn [] columns)
+   :wait-for-input wait-for-input
+   :print-lines print-lines
+   :reset reset
+   :quit quit})

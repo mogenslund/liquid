@@ -7,23 +7,16 @@
   (testing "Nothing"
     (is (= 1 1))))
 
+(defn- send-input
+  [& syms]
+  (doseq [s syms]
+    (ghostadapter/send-input s)))
+
 (deftest temporary
   (testing "Experiment with ghostadapter"
-    (future (core/-main "--no-init-file" "--ghost"))
-    ;(Thread/sleep 200) (ghostadapter/set-input :tab)
-    (Thread/sleep 200) (ghostadapter/set-input :g)
-    (Thread/sleep 200) (ghostadapter/set-input :g)
-    (Thread/sleep 200) (ghostadapter/set-input :v)
-    (Thread/sleep 200) (ghostadapter/set-input :G)
-    (Thread/sleep 200) (ghostadapter/set-input :d)
-    (Thread/sleep 200) (ghostadapter/set-input :d)
-    (Thread/sleep 200) (ghostadapter/set-input :tab)
-    (Thread/sleep 200) (ghostadapter/set-input :p)
-    (Thread/sleep 200) (ghostadapter/set-input :p)
-    (Thread/sleep 200) (ghostadapter/set-input :p)
-    (Thread/sleep 200) (ghostadapter/set-input :p)
-    (Thread/sleep 200)
+    (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=80"))
+    (send-input :g :g :v :G :d :d :tab :p :p :p :p :empty)
+    (while (not (empty? @ghostadapter/input))
+      (Thread/sleep 10))
     (println "DISPLAY" (ghostadapter/get-display))
-    (Thread/sleep 200)
-    (ghostadapter/set-input :C-q)
-  ))
+    (ghostadapter/send-input :C-q)))
