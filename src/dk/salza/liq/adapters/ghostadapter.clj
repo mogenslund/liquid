@@ -9,12 +9,12 @@
 
 (defn send-input
   [inp]
-  (println "send-input" inp)
+  ;(println "send-input" inp)
   (swap! input conj inp))
 
 (defn get-display
   []
-  (println "get-display")
+  ;(println "get-display")
   @display)
 
 ;(defn rows
@@ -28,10 +28,10 @@
 (defn wait-for-input
   []
   (loop []
-    (println "Waiting")
+    ;(println "Waiting")
     (if (not (empty? @input))
       (let [res (peek @input)]
-        (println "read input" res)
+        ;(println "read input" res)
         (swap! input pop)
         res)
       (do

@@ -43,11 +43,11 @@
   (let [buffer (create-buffer "aa aa\naaa aa" "aaa")]
     (println (visualize buffer))))
 
-(tmp-test)
+;(tmp-test)
 
 (deftest insert-token-test
   (let [sl (-> (slider/create "abc\ndef") (slider/right 2))]
-    (println (-> sl (insert-token :xyz) slider/get-visible-content))
+    ;(println (-> sl (insert-token :xyz) slider/get-visible-content))
     (testing "Insert token"
       (is (= (-> sl (insert-token :xyz) slider/get-visible-content)
              "ab¤c\ndef")))))

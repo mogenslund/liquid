@@ -47,10 +47,11 @@
 
 (defn insert
   [st]
-  (swap! state update ::search #(str % st))
-  (swap! state assoc ::selected 0)
-  ;(swap! state update ::selected #(inc (or % -1)))
-  (update-display))
+  (when (not (re-matches #"[/\\]" st)) ; Ignore forward and back slashes
+    (swap! state update ::search #(str % st))
+    (swap! state assoc ::selected 0)
+    ;(swap! state update ::selected #(inc (or % -1)))
+    (update-display)))
 
 (defn delete
   []

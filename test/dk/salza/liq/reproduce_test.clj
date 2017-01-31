@@ -6,10 +6,6 @@
             [dk.salza.liq.window :as window]
             [dk.salza.liq.core :as core]))
 
-(deftest a-test
-  (testing "Nothing"
-    (is (= 1 1))))
-
 ;; lein test :only dk.salza.liq.reproduce-test/eval-last-sexp-interactively
 (deftest eval-last-sexp-interactively
   (testing "That calling (eval-last-sexp) on

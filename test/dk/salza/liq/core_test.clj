@@ -1,22 +1,74 @@
 (ns dk.salza.liq.core-test
   (:require [clojure.test :refer :all]
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
+            [clojure.string :as str]
             [dk.salza.liq.core :as core]))
-
-(deftest a-test
-  (testing "Nothing"
-    (is (= 1 1))))
 
 (defn- send-input
   [& syms]
   (doseq [s syms]
-    (ghostadapter/send-input s)))
+    (if (string? s)
+      (doseq [c s] (ghostadapter/send-input
+                     (cond (= (str c) " ") :space
+                           (= (str c) "(") :parenstart
+                           (= (str c) ")") :parenend
+                           (= (str c) "[") :bracketstart
+                           (= (str c) "]") :bracketend
+                           :else (keyword (str c)))))
+      (ghostadapter/send-input s)))
+  (ghostadapter/send-input :empty))
 
-(deftest temporary
-  (testing "Experiment with ghostadapter"
-    (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=80"))
-    (send-input :g :g :v :G :d :d :tab :p :p :p :p :empty)
-    (while (not (empty? @ghostadapter/input))
-      (Thread/sleep 10))
-    (println "DISPLAY" (ghostadapter/get-display))
-    (ghostadapter/send-input :C-q)))
+(defn- short-screen-notation
+  [lines]
+  (str/join "¤BR"
+    (for [line lines]
+      (reduce str (format "¤%02d" (line :column)) 
+        (for [c (line :line)]
+          (cond (not (map? c)) (str c)
+                :else (str "¤"
+                        (cond (= (c :face) :plain) "P"
+                              (= (c :face) :type1) "1"
+                              (= (c :face) :type2) "2"
+                              (= (c :face) :type3) "3"
+                              (= (c :face) :comment) "C"
+                              (= (c :face) :string) "S"
+                              :else "?")
+                        (cond (= (c :bgface) :plain) "P"
+                              (= (c :bgface) :cursor1) "G"
+                              (= (c :bgface) :cursor2) "B"
+                              (= (c :bgface) :selection) "S"
+                              (= (c :bgface) :statusline) "L"
+                              :else "?")
+                         ))
+        )))))
+
+(defn- screen-check
+  [input expected]
+  (let [program (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=90"))]
+    (send-input "ggvGdd" :tab) ; Clearing screen. Ready to type
+    (apply send-input input)
+    (while (not (empty? @ghostadapter/input)) (Thread/sleep 10))
+    (let [windowcontent (ghostadapter/get-display)]
+      ;(println "DISPLAY:" (short-screen-notation windowcontent))
+      (is (.contains (short-screen-notation windowcontent) expected)))))
+
+(deftest defn-highlight
+  (testing "Checking highlight of defn"
+    (screen-check ["(defn myfun" :enter " []" :enter " (do))"]
+                  "¤44(¤1Pdefn¤2P myfun¤BR¤44¤PP []¤BR¤44 (do))¤PG ¤PP¤BR¤"))) 
+
+(deftest reproduce-findfile-slash
+  (testing "Reproduce error when typing /a in findfile mode"
+    (screen-check [:C-f :slash :a]
+                  "findfile")))
+
+; (deftest temporary
+;   (testing "Experiment with ghostadapter"
+;     (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=90"))
+;     (send-input "ggvGdd" :tab "(defn aaa")
+;     (while (not (empty? @ghostadapter/input))
+;       (Thread/sleep 10))
+;     (let [windowcontent (ghostadapter/get-display)]
+;       (println windowcontent)
+;       (println "DISPLAY:" (short-screen-notation windowcontent)))
+;     (ghostadapter/send-input :C-q)))
