@@ -100,7 +100,8 @@
 
 (defn run
   [fun]
-  (let [path (editor/get-folder)
+  (let [context (editor/get-context)
+        path (if (= (context :type) :file) (re-find #"/.*/" (context :value)) (editor/get-folder))
         ffmode (-> (mode/create "findfilemode")
                    (mode/set-actions
                    (merge

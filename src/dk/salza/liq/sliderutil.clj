@@ -30,7 +30,10 @@
   the matched string.
   Output like {:type :file :value /tmp/tmp.txt}"
   [sl]
-  (let [sl0 (-> sl (left-until #"[ \n\"]") (right-until #"[\w(\[/]") (set-mark "contextstart")) ;(right 1) (set-mark "contextstart")) (re-find #"\w" "  x")
+  (let [sl0 (-> sl (left-until #"[^ \n\"]")
+                   (left-until #"[ \n\"]")
+                   (right-until #"[\w(\[/]")
+                   (set-mark "contextstart")) ;(right 1) (set-mark "contextstart")) (re-find #"\w" "  x")
         sl1 (-> sl0 (right-until #"[ |\n|\"]"))
         word (get-region sl1 "contextstart")]
     (cond (re-matches #"https?://.*" word) {:type :url :value word}

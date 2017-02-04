@@ -13,6 +13,8 @@
             [dk.salza.liq.modes.plainmode :as plainmode])
   (:gen-class))
 
+(def adapter (ref nil))
+
 (defn load-user-file
   [path]
   (let [file (fileutil/file path)] ; (fileutil/file (System/getProperty "user.home") ".liq")]
@@ -50,25 +52,25 @@
   (editor/end-of-buffer))
 
 (defn update-gui
-  [adapter]
+  []
   (let [windows (reverse (editor/get-windows))
         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
         lineslist (doall (map #(window/render %1 %2) windows buffers))]
         ;(spit "/tmp/lines.txt" (pr-str lineslist)) 
         (doseq [lines lineslist]
-          ((adapter :print-lines) lines))))
+          ((@adapter :print-lines) lines))))
 
-(def updater (atom (future nil)))
-(def changes (atom 0))
+(def updater (ref (future nil)))
+(def changes (ref 0))
 
 (defn request-update-gui
-  [adapter]
+  []
   (when (future-done? @updater)
-    (reset! updater
+    (dosync (ref-set updater
             (future
               (loop [ch @changes]
-                (update-gui adapter)
-                (when (not= ch @changes) (recur @changes)))))))
+                (update-gui)
+                (when (not= ch @changes) (recur @changes))))))))
 
 (defn read-arg
   "Reads the value of an argument.
@@ -90,33 +92,34 @@
 
 (defn -main
   [& args]
-  (let [adapter (cond (read-arg args "--jframe") jframeadapter/adapter
-                      (read-arg args "--ghost") (ghostadapter/adapter
-                                                      (Integer/parseInt (read-arg args "--rows="))
-                                                      (Integer/parseInt (read-arg args "--columns=")))
-                      (is-windows) winttyadapter/adapter
-                      :else ttyadapter/adapter)
-        singlethreaded (read-arg args "--no-threads")
+  (dosync (ref-set adapter 
+    (cond (read-arg args "--jframe") jframeadapter/adapter
+          (read-arg args "--ghost") (ghostadapter/adapter
+                                      (Integer/parseInt (read-arg args "--rows="))
+                                      (Integer/parseInt (read-arg args "--columns=")))
+          (is-windows) winttyadapter/adapter
+           :else ttyadapter/adapter)))
+  (let [singlethreaded (read-arg args "--no-threads")
         userfile (when-not (read-arg args "--no-init-file") 
                    (or (read-arg args "--load=")
                        (fileutil/file (System/getProperty "user.home") ".liq")))]
-    ((adapter :init))
-    (init-editor (- ((adapter :rows)) 1) ((adapter :columns)) userfile)
+    ((@adapter :init))
+    (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
     (loop []
       (if singlethreaded
-        (update-gui adapter)          ; Non threaded version
-        (request-update-gui adapter)) ; Threaded version
-      (let [input ((adapter :wait-for-input))]
-        (when (= input :C-M-q) ((adapter :quit)))
+        (update-gui)          ; Non threaded version
+        (request-update-gui)) ; Threaded version
+      (let [input ((@adapter :wait-for-input))]
+        (when (= input :C-M-q) ((@adapter :quit)))
         (when (= input :C-q)
           (let [dirty (editor/dirty-buffers)]
             (if (empty? dirty)
-              ((adapter :quit))
+              ((@adapter :quit))
               (editor/prompt-set (str "There are dirty buffers:\n\n"
                                       (str/join "\n" dirty) "\n\n"
                                       "Press C-M-q to quit anyway.")))))
-        (when (= input :C-space) ((adapter :reset)))
+        (when (= input :C-space) ((@adapter :reset)))
         (editor/handle-input input)
-        (swap! changes inc))
+        (dosync (alter changes inc)))
       (recur))))
     
