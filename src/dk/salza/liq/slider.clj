@@ -1,6 +1,27 @@
 (ns dk.salza.liq.slider
-  "This is
-  documentation for the slider namespace."
+  "The slider is a basic construction resembling the most
+  fundamental actions of a text edtior.
+  The slider is immutable, so every slider function in this
+  namespace will take a slider as input together with some
+  parameters and evaluate to a new slider.
+  By having the slider as first parameter a series of actions
+  can be performed by using the threading operator \"->\",
+  like:
+ 
+  (->
+    sl
+    (end-of-line)
+    (forward-char 3))
+
+  Some of the basic operations are:
+  * Moving cursor
+  * Inserting and removing content
+  * Setting marks and moving cursor to marks
+  * Marking regions
+
+  The sliderutil contains more slider related functions,
+  which are more complex and usually composed of the basic
+  functions in this file."
   (:require [clojure.string :as str]))
 
 (defn create
@@ -20,14 +41,14 @@
   before = (d c b a), after = (e f)."
   ([text]
     (let [after (if (string? text) (map str text) text)] ; Creating with a list '("a" "b") should also work
-     {::before '()
-      ::after after
-      ::point 0
-      ::linenumber 1
-      ::totallines (inc (count (filter #(= % "\n") after))) ; Only to make the end function perform
-      ::marks {}})) ; A map of named positions, like "selection" -> 18.
-                    ; The positions are pushed, when text is insertet
-                    ; strictly before the mark.
+     {::before '()    ; The list of characters before the cursor in reverse order
+      ::after after   ; The list of characters after the cursor in normal order
+      ::point 0       ; The current point (cursor position). Starts at 0, the begining of the slider
+      ::linenumber 1  ; Meta information for fast retrievel of the current line number
+      ::totallines (inc (count (filter #(= % "\n") after))) ; Only to make the end function perform optimal
+      ::marks {}}))   ; A map of named positions, like "selection" -> 18.
+                      ; The positions are pushed, when text is insertet
+                      ; strictly before the mark.
   ([] (create "")))
 
 (defn clear
@@ -37,7 +58,7 @@
   (create))
 
 (defn beginning
-  "Moves point to the beginning of the slider."
+  "Moves the point (cursor) to the beginning of the slider."
   [sl]
   (assoc sl
    ::before '()
@@ -97,7 +118,9 @@
     (reduce #(assoc %1 %2 (max point (+ (%1 %2) amount))) marks ks)))
 
 (defn left
-  "Move the point to the left the given amount of times."
+  "Move the point to the left the given amount of times.
+  So moving one character left is achieved with
+  (left sl 1)."
   [sl amount]
   (let [tmp (take amount (sl ::before))             ; Characters to be moved from :before to :after
         n (count tmp)                               ; Might be less than amount, since at most (count :before)
@@ -221,6 +244,14 @@
   )
 
 (defn right-until
+  "Moves the cursor forward, until the current char matches the
+  regular expression. The cursor will be placed just before the
+  character. The function only matches single characters, not
+  character sequences!
+  If there is no match, the cursor will move all the way to the
+  end of the slider.
+  Example (cursor = ^):
+    aaacde^aacf   -- right-until c -->   aacdeaa^cf."
   [sl regex] ; (re-matches #"(a|b)" "a")
   (loop [s sl]
     (let [c (get-char s)]
@@ -229,6 +260,14 @@
         (recur (right s 1))))))
 
 (defn left-until
+  "Moves the cursor backward, until the current char matches the
+  regular expression. The cursor will be places just before the
+  character. The function only mathces single characters, not
+  character sequences!
+  If there is no match, the cursor will move all the way to the
+  beginning of the slider.
+  Example (cursor = ^):
+    aaacde^aacf   -- left-until c -->   aa^cdeaacf."
   [sl regex] ; (re-matches #"(a|b)" "a")
   (loop [s (if (end? sl) (left sl 1) sl)]
     (let [c (get-char s)]
@@ -267,6 +306,9 @@
                              :else level)))))
 
 (defn select-sexp-at-point
+  "Selects the smallest valid s-expression containing
+  the point (cursor position). The function take into
+  account that the parenthesis should be balanced."
   [sl]
   (let [sel (get-mark sl "selection")
         sl0 (-> sl (mark-paren-start) (mark-paren-end))]
