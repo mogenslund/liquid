@@ -11,7 +11,7 @@
 
 (defn filter-headlines
   [content]
-  (->> content (str/split-lines) (filter #(re-find #"^(\(defn|function|#|;#)" %))))
+  (->> content (str/split-lines) (filter #(re-find #"^(\(def|function|#|;#)" %))))
 
 ;(filter-headlines)
 

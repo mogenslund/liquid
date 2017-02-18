@@ -60,10 +60,12 @@
                    (keyPressed [e] (println "a"))
                    (keyReleased [e] (println "b"))
                    (keyTyped [e] (reset! last-key (event2keyword e))))))
+        tmplabel (javax.swing.JLabel. "<html><body><font color=\"red\" bgcolor=\"blue\">RED</font> not</body></html>")
                 ]
     (doto (javax.swing.JFrame. "λiquid")
       ;(.add editorpane)
       (.add panel)
+      (.add tmplabel)
       (.setSize 800 600)
       (.show))
     (while (nil? (.getGraphics panel))
@@ -176,4 +178,3 @@
               :printlines jframeprint-lines
               ;:reset jframereset
               :quit jframequit})
-
