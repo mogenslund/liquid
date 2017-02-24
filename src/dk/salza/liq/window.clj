@@ -87,7 +87,7 @@
                                 :else face)
         (= face :plain)   (cond (and (= ch "\"") (re-matches #"[#\( \[{\n]" pch)) :string
                                 (= ch ";") :comment
-                                (and (= ch "#") (or (= pch "\n") (= (get-point sl) 0))) :comment 
+                                (and (= ch "#") (or (= pch "\n") (= pch "") (= (get-point sl) 0))) :comment 
                                 (and (= pch "(") (re-find #"def(n|n-|test|record|protocol)? " (look-ahead sl 13))) :type1
                                 (and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
                                 :else face)

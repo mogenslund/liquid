@@ -51,6 +51,7 @@
          :v editor/selection-toggle
          :g {:g editor/beginning-of-buffer
              :t editor/top-align-page
+             :n editor/top-next-headline
              :c #(editor/prompt-append (str "--" (editor/get-context) "--"))
              :i dk.salza.liq.extensions.headlinenavigator/run}
          :C-g editor/escape

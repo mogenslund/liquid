@@ -319,7 +319,12 @@
     (doto-buffer buffer/find-next @searchstring)
     (update-mem-col)))
 
-    
+(defn top-next-headline
+  []
+  (find-next "\n# ")
+  (forward-char 1)
+  (top-align-page))
+  
 (defn goto-definition
   [funname]
   (if (re-find #"/" funname)
