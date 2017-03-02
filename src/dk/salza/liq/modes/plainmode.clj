@@ -4,7 +4,7 @@
             [dk.salza.liq.mode :as mode]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.modes.findfilemode :as findfilemode]
-            [dk.salza.liq.modes.commandmode :as commandmode]
+            ;[dk.salza.liq.modes.commandmode :as commandmode]
             [dk.salza.liq.modes.promptmode :as promptmode]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.coreutil :refer :all]))
@@ -16,8 +16,7 @@
         (merge
           {:cursor-color :green
            :tab editor/swap-actionmapping
-           :C-o editor/other-window
-           :C-space commandmode/run
+           ;:C-space commandmode/run
            :C-f #(findfilemode/run editor/find-file)
            :right editor/forward-char
            :left editor/backward-char
@@ -37,10 +36,9 @@
       (mode/set-actions
         {:cursor-color :blue
          :tab editor/swap-actionmapping
-         :C-o editor/other-window
          :M editoractions/prompt-to-tmp
          :C-f #(findfilemode/run editor/find-file)
-         :C-space commandmode/run
+         ;:C-space commandmode/run
          :space #(editor/forward-page)
          ;:C-s editor/search
          :right editor/forward-char
@@ -54,6 +52,7 @@
              :n editor/top-next-headline
              :c #(editor/prompt-append (str "--" (editor/get-context) "--"))
              :i dk.salza.liq.extensions.headlinenavigator/run}
+         :dash editor/top-next-headline
          :C-g editor/escape
          :e editor/eval-last-sexp
          :E editor/evaluate-file

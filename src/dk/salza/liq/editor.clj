@@ -38,6 +38,7 @@
   [keyw entry]
   (when (not (some #{entry} (setting keyw)))
     (dosync (alter editor update-in [::settings keyw] conj entry))))
+
 (defn set-setting
   [keyw value]
   (dosync (alter editor assoc-in [::settings keyw] value)))
@@ -190,6 +191,19 @@
       (alter editor update ::buffers conj (buffer/create name))))
   (switch-to-buffer name)
   (set-mode @default-mode))
+
+(defn register-mode
+  "Register a mode.
+  Name like commandmode.
+  modecommand like commandmode/run."
+  [name modecommand]
+  (dosync (alter editor assoc-in [::modes name] modecommand)))
+
+(defn mode-command
+  [name]
+  (let [m (-> @editor ::modes name)]
+    (when m
+      m)))
 
 (defn find-file
   [filepath]
@@ -431,7 +445,11 @@
   (dosync
     (ref-set editor {::buffers '()
                      ::windows '()
-                     ::global-keymap {:C-r #(prompt-append "test")}
+                     ::modes {}
+                     ::global-keymap {:C-r #(prompt-append "test")
+                                      :C-space #((mode-command :commandmode))
+                                      :C-o other-window
+                                     }
                      ::settings {::searchpaths '()
                                  ::files '()
                                  ::snippets '()

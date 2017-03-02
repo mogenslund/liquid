@@ -10,6 +10,7 @@
             [dk.salza.liq.window :as window]
             [dk.salza.liq.fileutil :as fileutil]
             [dk.salza.liq.modes.promptmode :as promptmode]
+            [dk.salza.liq.modes.commandmode :as commandmode]
             [dk.salza.liq.modes.plainmode :as plainmode])
   (:gen-class))
 
@@ -30,6 +31,8 @@
   [rows columns userfile]
   (editor/init)
   (editor/set-default-mode plainmode/mode)
+  (editor/register-mode :commandmode commandmode/run)
+  (editor/register-mode :commandmode1 #(println "abc"))
   (when userfile (load-user-file userfile))
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")
