@@ -192,19 +192,6 @@
   (switch-to-buffer name)
   (set-mode @default-mode))
 
-(defn register-mode
-  "Register a mode.
-  Name like commandmode.
-  modecommand like commandmode/run."
-  [name modecommand]
-  (dosync (alter editor assoc-in [::modes name] modecommand)))
-
-(defn mode-command
-  [name]
-  (let [m (-> @editor ::modes name)]
-    (when m
-      m)))
-
 (defn find-file
   [filepath]
   (if (not (get-buffer filepath))
@@ -445,9 +432,7 @@
   (dosync
     (ref-set editor {::buffers '()
                      ::windows '()
-                     ::modes {}
                      ::global-keymap {:C-r #(prompt-append "test")
-                                      :C-space #((mode-command :commandmode))
                                       :C-o other-window
                                      }
                      ::settings {::searchpaths '()

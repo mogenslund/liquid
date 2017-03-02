@@ -9,6 +9,7 @@
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.fileutil :as fileutil]
+            [dk.salza.liq.modes.findfilemode :as findfilemode]
             [dk.salza.liq.modes.promptmode :as promptmode]
             [dk.salza.liq.modes.commandmode :as commandmode]
             [dk.salza.liq.modes.plainmode :as plainmode])
@@ -31,12 +32,11 @@
   [rows columns userfile]
   (editor/init)
   (editor/set-default-mode plainmode/mode)
-  (editor/register-mode :commandmode commandmode/run)
-  (editor/register-mode :commandmode1 #(println "abc"))
+  (editor/set-global-key :C-space commandmode/run)
+  (editor/set-global-key :C-f #(findfilemode/run editor/find-file))
   (when userfile (load-user-file userfile))
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")
-  ;(editor/set-mode plainmode/mode)
   (editor/add-window (window/create "main" 1 44 rows (- columns 46) "scratch")) ; todo: Change to percent given by setting. Not hard numbers
   (editor/new-buffer "scratch")
   (editor/insert (str "# Welcome to λiquid\n"
