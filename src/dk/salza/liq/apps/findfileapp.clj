@@ -1,4 +1,4 @@
-(ns dk.salza.liq.modes.findfilemode
+(ns dk.salza.liq.apps.findfileapp
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [dk.salza.liq.editor :as editor]

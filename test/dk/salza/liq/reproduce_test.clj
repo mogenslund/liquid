@@ -2,7 +2,6 @@
   "Tests for reproducing known bugs"
   (:require [clojure.test :refer :all]
             [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.modes.plainmode :as plainmode]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.core :as core]))
 
@@ -13,7 +12,6 @@
            (editor/end-of-buffer) will not freeze
           the program"
     (editor/init)
-    (editor/set-default-mode plainmode/mode)
     (editor/add-window (window/create "prompt" 1 1 30 40 "-prompt-"))
     (editor/new-buffer "-prompt-")
     (editor/add-window (window/create "main" 1 44 30 (- 100 46) "scratch")) ; todo: Change to percent given by setting. Not hard numbers

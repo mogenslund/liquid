@@ -1,9 +1,10 @@
-(ns dk.salza.liq.modes.commandmode
+(ns dk.salza.liq.apps.commandapp
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.mode :as mode]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.cshell :as cs]
-            [dk.salza.liq.modes.promptmode :as promptmode]
+            [dk.salza.liq.apps.promptapp :as promptapp]
+            [dk.salza.liq.apps.textapp :as textapp]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
 
@@ -59,13 +60,13 @@
   (if-let [hit (@state ::hit)]
     (cond (= (first hit) :buffer) (editor/switch-to-buffer (second hit))
           (= (first hit) :snippet) (do (editor/previous-buffer) (editor/insert (second hit)))
-          (= (first hit) :file)   (editor/find-file (second hit))
+          (= (first hit) :file)   (textapp/run (second hit)) ;(editor/find-file (second hit))
           (= (first hit) :command) (do (editor/previous-buffer) (editor/eval-safe (second hit)))
           (= (first hit) :interactive) (let [fun (second (second hit))
                                              params (nth (second hit) 2)]
                                          (editor/previous-buffer)
                                          (if params
-                                           (promptmode/run fun params)
+                                           (promptapp/run fun params)
                                            (editor/eval-safe fun))))
                                          ;(nth (second hit) 2))))
           ;(= (first hit) :folder) (ed/find-file (second hit)))
@@ -115,6 +116,6 @@
                     }
                     (keys/alphanum-mapping update-search)
                     (keys/symbols-mapping update-search))))]
-    (editor/new-buffer "-commandmode-")
+    (editor/new-buffer "-commandapp-")
     (editor/set-mode mode)
     (activate functions)))

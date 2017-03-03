@@ -1,4 +1,4 @@
-(ns dk.salza.liq.modes.promptmode
+(ns dk.salza.liq.apps.promptapp
   (:require [dk.salza.liq.editor :as editor]
             [clojure.string :as str]
             [dk.salza.liq.mode :as mode]

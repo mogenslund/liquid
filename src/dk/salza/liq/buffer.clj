@@ -4,6 +4,7 @@
             [dk.salza.liq.mode :as mode]
             [dk.salza.liq.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]
+            ;[dk.salza.liq.modes.plainmode :as plainmode]
             [clojure.string :as str]))
 
 (defn create
@@ -15,7 +16,7 @@
    ::filename nil
    ::dirty false
    ::mem-col 0
-   ::mode nil})
+   ::mode nil}) ;plainmode/mode})
 
 (defn create-from-file
   [path]
@@ -27,7 +28,7 @@
      ::filename path
      ::dirty false
      ::mem-col 0
-     ::mode nil}))
+     ::mode nil})) ;plainmode/mode}))
 
 (defn- doto-slider
   [buffer fun & args]
@@ -116,6 +117,12 @@
 (defn sexp-at-point [buffer] (sliderutil/sexp-at-point (buffer ::slider)))
 (defn get-line [buffer] (-> buffer beginning-of-line (set-mark "linestart")
                                    end-of-line (get-region "linestart")))
+
+(defn get-action
+  [buffer keyw]
+  (when (-> buffer ::mode)
+    (-> buffer ::mode ::mode/actionmapping first keyw)))
+
 (defn end-of-buffer? [buffer] (slider/end? (buffer ::slider)))
 
 (defn save-buffer

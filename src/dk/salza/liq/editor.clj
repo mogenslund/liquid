@@ -3,7 +3,6 @@
             [dk.salza.liq.window :as window]
             [dk.salza.liq.util :as util]
             [dk.salza.liq.clojureutil :as clojureutil]
-            [dk.salza.liq.mode :as mode]
             [dk.salza.liq.cshell :as cshell]
             [clojure.java.io :as io]
             [dk.salza.liq.coreutil :refer :all]
@@ -181,7 +180,8 @@
 
 (defn get-action
   [keyw]
-  (or (-> (get-mode) ::mode/actionmapping first keyw)
+  (or (buffer/get-action (current-buffer) keyw)
+  ;(or (-> (get-mode) ::mode/actionmapping first keyw)
       (-> @editor ::global-keymap keyw)))
 
 (defn new-buffer
@@ -193,6 +193,16 @@
   (set-mode @default-mode))
 
 (defn find-file
+  [filepath]
+  (if (not (get-buffer filepath))
+    (do
+      (dosync
+        (alter editor update ::buffers conj (buffer/create-from-file filepath)))
+      (switch-to-buffer filepath)
+      (set-mode @default-mode))
+    (switch-to-buffer filepath)))
+
+(defn create-buffer-from-file
   [filepath]
   (if (not (get-buffer filepath))
     (do

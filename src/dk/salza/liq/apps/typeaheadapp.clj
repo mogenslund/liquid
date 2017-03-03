@@ -1,5 +1,5 @@
-(ns dk.salza.liq.modes.typeaheadmode
-  "A general mode for doing typeahead
+(ns dk.salza.liq.apps.typeaheadapp
+  "A general app for doing typeahead
   It needs a list to choose from and a to-string
   function to display and filter the list."
   (:require [dk.salza.liq.editor :as editor]
@@ -96,6 +96,6 @@
                     }
                     (keys/alphanum-mapping update-search)
                     (keys/symbols-mapping update-search))))]
-    (editor/new-buffer "-typeaheadmode-")
+    (editor/new-buffer "-typeaheadapp-")
     (editor/set-mode mode)
     (update-display)))

@@ -1,6 +1,6 @@
 (ns dk.salza.liq.extensions.headlinenavigator
   (:require [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.modes.typeaheadmode :as typeaheadmode]
+            [dk.salza.liq.apps.typeaheadapp :as typeaheadapp]
             [clojure.string :as str]))
 
 (defn callback
@@ -18,6 +18,6 @@
 (defn run
   []
   (spit "/tmp/tmp.txt" (pr-str (filter-headlines (editor/get-content)))) 
-  (typeaheadmode/run (doall (filter-headlines (editor/get-content)))
+  (typeaheadapp/run (doall (filter-headlines (editor/get-content)))
                      str ;second
                      callback))

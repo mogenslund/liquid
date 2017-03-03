@@ -1,4 +1,4 @@
-(ns dk.salza.liq.modes.plainmode
+(ns dk.salza.liq.modes.textmode
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.editoractions :as editoractions]
             [dk.salza.liq.mode :as mode]
@@ -7,9 +7,10 @@
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.coreutil :refer :all]))
 
-(def mode
-  (-> (mode/create "plainmode")
-      (mode/set-highlighter #(str ">> " "" %))
+(defn create
+  [syntaxhl]
+  (-> (mode/create "textmode")
+      (mode/set-highlighter syntaxhl)
       (mode/set-actions
         (merge
           {:cursor-color :green
