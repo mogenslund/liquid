@@ -1,4 +1,4 @@
-(ns dk.salza.liq.fileutil
+(ns dk.salza.liq.tools.fileutil
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [clojure.test :as test]))

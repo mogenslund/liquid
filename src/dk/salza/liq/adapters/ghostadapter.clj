@@ -1,5 +1,5 @@
 (ns dk.salza.liq.adapters.ghostadapter
-  (:require [dk.salza.liq.util :as util]
+  (:require [dk.salza.liq.tools.util :as util]
             [dk.salza.liq.keys :as keys]
             [clojure.string :as str]))
 

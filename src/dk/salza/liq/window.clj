@@ -1,7 +1,7 @@
 (ns dk.salza.liq.window
   (:require [dk.salza.liq.mode :as mode]
             [dk.salza.liq.buffer :as buffer]
-            [dk.salza.liq.fileutil :as futil])
+            [dk.salza.liq.tools.fileutil :as futil])
   (:use [dk.salza.liq.slider :as slider :exclude [create]]))
 
 (def top-of-window (atom {})) ; Keys are windowname-buffername

@@ -7,7 +7,7 @@
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
-            [dk.salza.liq.fileutil :as fileutil]
+            [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.apps.findfileapp :as findfileapp]
             [dk.salza.liq.apps.textapp :as textapp]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]

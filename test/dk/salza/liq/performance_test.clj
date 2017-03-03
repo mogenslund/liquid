@@ -1,7 +1,7 @@
 (ns dk.salza.liq.performance-test
   (:require [clojure.test :refer :all]
             [dk.salza.liq.slider :refer :all]
-            [dk.salza.liq.util :as util]
+            [dk.salza.liq.tools.util :as util]
             [dk.salza.liq.helper :refer :all]))
 
 (deftest slider-performance-test

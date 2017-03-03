@@ -1,4 +1,4 @@
-(ns dk.salza.liq.scratch
+(ns dk.salza.liq.tools.scratch
   (:require [clojure.zip :as zip]
             [clojure.java.io :as io]
             [clojure.string :as str]))
@@ -38,5 +38,4 @@
       (println "!!" l))))
 
 (filter-headlines)
-
 

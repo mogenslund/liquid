@@ -2,7 +2,7 @@
   (:require [dk.salza.liq.slider :as slider]
             [dk.salza.liq.sliderutil :as sliderutil]
             [dk.salza.liq.mode :as mode]
-            [dk.salza.liq.fileutil :as fileutil]
+            [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
 

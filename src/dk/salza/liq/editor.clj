@@ -1,9 +1,9 @@
 (ns dk.salza.liq.editor
   (:require [dk.salza.liq.buffer :as buffer]
             [dk.salza.liq.window :as window]
-            [dk.salza.liq.util :as util]
+            [dk.salza.liq.tools.util :as util]
             [dk.salza.liq.clojureutil :as clojureutil]
-            [dk.salza.liq.cshell :as cshell]
+            [dk.salza.liq.tools.cshell :as cshell]
             [clojure.java.io :as io]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))

@@ -1,6 +1,6 @@
 (ns dk.salza.liq.buffer-test
   (:require [clojure.test :refer :all]
-            [dk.salza.liq.fileutil :as fileutil]
+            [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.buffer :refer :all]))
 
 (deftest insert-test

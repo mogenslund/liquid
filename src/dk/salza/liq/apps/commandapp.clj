@@ -2,7 +2,7 @@
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.mode :as mode]
             [dk.salza.liq.keys :as keys]
-            [dk.salza.liq.cshell :as cs]
+            [dk.salza.liq.tools.cshell :as cs]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.textapp :as textapp]
             [dk.salza.liq.coreutil :refer :all]

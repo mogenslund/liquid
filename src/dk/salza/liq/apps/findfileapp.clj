@@ -4,7 +4,7 @@
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.mode :as mode]
             [dk.salza.liq.keys :as keys]
-            [dk.salza.liq.fileutil :as fileutil]
+            [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]))
 
 (def state (atom {}))

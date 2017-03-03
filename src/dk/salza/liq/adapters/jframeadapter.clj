@@ -1,5 +1,5 @@
 (ns dk.salza.liq.adapters.jframeadapter
-  (:require [dk.salza.liq.util :as util]
+  (:require [dk.salza.liq.tools.util :as util]
             [clojure.string :as str]))
 
 

@@ -1,4 +1,4 @@
-(ns dk.salza.liq.cshell
+(ns dk.salza.liq.tools.cshell
   "A namespace for shell like utils
   in clojure style."
   (:require [clojure.string :as str]
