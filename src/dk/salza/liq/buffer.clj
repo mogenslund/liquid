@@ -4,7 +4,6 @@
             [dk.salza.liq.mode :as mode]
             [dk.salza.liq.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]
-            ;[dk.salza.liq.modes.plainmode :as plainmode]
             [clojure.string :as str]))
 
 (defn create
@@ -16,7 +15,7 @@
    ::filename nil
    ::dirty false
    ::mem-col 0
-   ::mode nil}) ;plainmode/mode})
+   ::mode nil})
 
 (defn create-from-file
   [path]
@@ -28,7 +27,7 @@
      ::filename path
      ::dirty false
      ::mem-col 0
-     ::mode nil})) ;plainmode/mode}))
+     ::mode nil}))
 
 (defn- doto-slider
   [buffer fun & args]

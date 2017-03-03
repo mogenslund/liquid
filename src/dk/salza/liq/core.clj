@@ -2,7 +2,6 @@
   (:require [clojure.java.io :as io]
             [dk.salza.liq.adapters.ttyadapter :as ttyadapter]
             [dk.salza.liq.adapters.winttyadapter :as winttyadapter]
-            ;[user :as user]
             [clojure.string :as str]
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
@@ -13,8 +12,7 @@
             [dk.salza.liq.apps.textapp :as textapp]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
-            [dk.salza.liq.modes.textmode :as textmode]
-            [dk.salza.liq.modes.plainmode :as plainmode])
+            [dk.salza.liq.modes.textmode :as textmode])
   (:gen-class))
 
 (def adapter (ref nil))
@@ -56,7 +54,6 @@
                       "(range 10 30)\n"
                       "(editor/end-of-buffer)\n"
                      ))
-  ;(editor/set-mode plainmode/mode)
   (editor/end-of-buffer))
 
 (defn update-gui
