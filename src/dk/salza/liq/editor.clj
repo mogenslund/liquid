@@ -9,6 +9,7 @@
             [clojure.string :as str]))
 
 (def default-mode (atom nil))
+(def default-app (atom nil))
 (def searchstring (atom ""))
 (def macro-seq (atom '()))
 
@@ -21,6 +22,10 @@
 (defn set-default-mode
   [mode]
   (reset! default-mode mode))
+
+(defn set-default-app
+  [app]
+  (reset! default-app app))
 
 (defn doto-buffer
   "Apply the given function to the top-most buffer."
@@ -194,13 +199,7 @@
 
 (defn find-file
   [filepath]
-  (if (not (get-buffer filepath))
-    (do
-      (dosync
-        (alter editor update ::buffers conj (buffer/create-from-file filepath)))
-      (switch-to-buffer filepath)
-      (set-mode @default-mode))
-    (switch-to-buffer filepath)))
+  (@default-app filepath))
 
 (defn create-buffer-from-file
   [filepath]
