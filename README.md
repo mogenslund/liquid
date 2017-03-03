@@ -43,12 +43,12 @@ Some pieces, like syntax highlighting, are hardcoded. I did that, to have some s
 ### Download and execution
 **Notice:** The editor will only work on Linux and Mac at the moment. In later versions support for Windows will be implemented.
 
-Download [liquid-0.4.5.jar](https://github.com/mogenslund/liquid/releases/download/v0.4.5/liquid-0.4.5.jar)
+Download [liquid-0.6.0.jar](https://github.com/mogenslund/liquid/releases/download/v0.6.0/liquid-0.6.0.jar)
 Also download clojure-1.8.0.jar from [clojure.org](http://clojure.org/community/downloads)
 
 Execute the program with:
 
-    java -cp clojure-1.8.0.jar:liquid-0.4.5.jar clojure.main -m dk.salza.liq.core
+    java -cp clojure-1.8.0.jar:liquid-0.6.0.jar clojure.main -m dk.salza.liq.core
 
 #### Known bugs
 No known bugs at the moment.

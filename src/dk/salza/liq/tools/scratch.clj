@@ -6,6 +6,7 @@
 ;;;; Also do slider with marks. Marks should not be of fixed type. Probably not needed.
 ;;;; It should be possible just to drag out the slider, if the marks are not needed.
 ;;;; Slider should just automatically have marks: ['("a") '("b") {:mark1 10 :mymark 20}]
+;;
 
 ;(println (str/replace (slurp "https://en.wikipedia.org/wiki/Test_method") #"<[^>]*>" ""))
 (defn www
@@ -38,4 +39,3 @@
       (println "!!" l))))
 
 (filter-headlines)
-
