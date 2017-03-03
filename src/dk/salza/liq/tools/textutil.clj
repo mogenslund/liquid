@@ -1,4 +1,4 @@
-(ns dk.salza.liq.textutil
+(ns dk.salza.liq.tools.textutil
   (:require [clojure.string :as str]))
 
 (defn calc-context
