@@ -1,11 +1,12 @@
 (ns dk.salza.liq.mode
-  (:require [dk.salza.liq.coreutil :refer :all]))
+  (:require [dk.salza.liq.coreutil :refer :all]
+            [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]))
 
 (defn create
   [name]
   {::name name
    ::actionmapping '({} {}) ; use bump function to bring another to front
-   ::syntax-highlighter identity ; Function that takes a line and applies highlight
+   ::syntax-highlighter clojuremdhl/next-face ; Function that takes a line and applies highlight
    })
 
 (defn swap-actionmapping

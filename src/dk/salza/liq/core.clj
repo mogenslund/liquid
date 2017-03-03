@@ -10,6 +10,7 @@
             [dk.salza.liq.fileutil :as fileutil]
             [dk.salza.liq.apps.findfileapp :as findfileapp]
             [dk.salza.liq.apps.textapp :as textapp]
+            [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.modes.textmode :as textmode])
@@ -31,17 +32,17 @@
 (defn init-editor
   [rows columns userfile]
   (editor/init)
-  (editor/set-default-mode (textmode/create nil))
+  (editor/set-default-mode (textmode/create clojuremdhl/next-face))
   (editor/set-global-key :C-space commandapp/run)
   ;(editor/set-global-key :C-f #(findfileapp/run editor/find-file))
   (editor/set-global-key :C-f #(findfileapp/run textapp/run))
   (when userfile (load-user-file userfile))
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")
-  (editor/set-mode (textmode/create nil))
+  ;(editor/set-mode (textmode/create nil))
   (editor/add-window (window/create "main" 1 44 rows (- columns 46) "scratch")) ; todo: Change to percent given by setting. Not hard numbers
   (editor/new-buffer "scratch")
-  (editor/set-mode (textmode/create nil))
+  ;(editor/set-mode (textmode/create nil))
   (editor/insert (str "# Welcome to λiquid\n"
                       "To quit press C-q. To escape situation press C-g. To undo press u in navigation mode (blue cursor)\n"
                       "Use tab to switch between insert mode (green cursor) and navigation mode (blue cursor).\n\n"

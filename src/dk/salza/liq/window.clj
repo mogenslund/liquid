@@ -74,86 +74,6 @@
     ::slider/point (+ (sl ::slider/point) 1)
     ::slider/marks (slide-marks (sl ::slider/marks) (+ (sl ::slider/point) 0) 1)))
 
-(defn look-ahead
-  [sl n]
-  (apply str (map get-char (take n (iterate #(right % 1) sl)))))
-
-(defn clojure-highlighter
-  [face ch pch ppch sl]
-  (cond (= face :string)  (cond (and (= pch "\"") (= ppch "\\")) face
-                                (and (= pch "\"") (string? (-> sl (left 2) (get-char)))) :plain
-                                (and (= pch "\"") (re-matches #"[^#\( \[{\n]" ppch)) :plain
-                                (and (= pch "\"") (re-matches #"[\)\]}]" (or ch " "))) :plain
-                                :else face)
-        (= face :plain)   (cond (and (= ch "\"") (re-matches #"[#\( \[{\n]" pch)) :string
-                                (= ch ";") :comment
-                                (and (= ch "#") (or (= pch "\n") (= pch "") (= (get-point sl) 0))) :comment 
-                                (and (= pch "(") (re-find #"def(n|n-|test|record|protocol)? " (look-ahead sl 13))) :type1
-                                (and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
-                                :else face)
-        (= face :type1)   (cond (= ch " ") :type2
-                                :else face)
-        (= face :type2)   (cond (= ch " ") :plain
-                                :else face)
-        (= face :type3)   (cond (re-matches #"[\)\]}\s]" (or ch " ")) :plain
-                                :else face)
-        (= face :comment) (cond (= ch "\n") :plain
-                                :else face)
-                          :else face))
-
-(defn javascript-highlighter
-  [face ch pch ppch sl]
-  (cond (= face :string)  (cond (and (= pch "'") (= ppch "\\")) face
-                                (and (= pch "'") (string? (-> sl (left 2) (get-char)))) :plain
-                                (and (= pch "'") (re-matches #"[^#\( \[{\n]" ppch)) :plain
-                                (and (= pch "'") (re-matches #"[\)\]}]" (or ch " "))) :plain
-                                :else face)
-        (= face :plain)   (cond (and (= ch "'") (re-matches #"[#\( \[{\n]" pch)) :string
-                                (and (= ch "/") (= (-> sl (right 1) (get-char)) "/")) :comment
-                                (and (= pch "\n") (= ch " ") (= (-> sl (right 1) (get-char)) "*")) :comment
-                                (and (= pch "\n") (= ch "/") (= (-> sl (right 1) (get-char)) "*")) :comment
-                                (and (= pch "") (= ch "/") (= (-> sl (right 1) (get-char)) "*")) :comment
-                                (and (or (= pch " ") (= pch "\n") (= pch "")) (re-find #"^(var|function)[ \(]" (str (look-ahead sl 9) "    "))) :type1
-                                ;(and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
-                                :else face)
-        (= face :type1)   (cond (= pch " ") :type2
-                                (= ch "(") :plain
-                                :else face)
-        (= face :type2)   (cond (or (= ch " ") (= ch "(") (= ch "=")) :plain
-                                :else face)
-;        (= face :type3)   (cond (re-matches #"[\)\]}\s]" (or ch " ")) :plain
-;                                :else face)
-        (= face :comment) (cond (= ch "\n") :plain
-                                :else face)
-        :else face))
-
-(defn xml-highlighter
-  [face ch pch ppch sl]
-  (cond (= face :string)  (cond (and (= pch "\"") (= ppch "\\")) face
-                                (and (= pch "\"") (= ch ">")) :type1
-                                (and (= pch "\"") (string? (-> sl (left 2) (get-char)))) :plain
-                                (and (= pch "\"") (re-matches #"[^=#\( \[{\n]" ppch)) :plain
-                                (and (= pch "\"") (re-matches #"[\)\]}]" (or ch " "))) :plain
-                                :else face)
-        (= face :plain)   (cond (and (= ch "\"") (re-matches #"[=#\( \[{\n]" pch)) :string
-                                (= ch ";") :comment
-                                (and (= ch "#") (or (= pch "\n") (= (get-point sl) 0))) :comment 
-                                (= ch "<") :type1
-                                (= ch ">") :type1
-                                (and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
-                                :else face)
-        (= face :type1)   (cond (= pch "<") :type2
-                                (and (= pch ">") (= ch "<")) :type1
-                                :else :plain)
-        (= face :type2)   (cond (= ch " ") :plain
-                                (= ch ">") :type1
-                                :else face)
-        (= face :type3)   (cond (re-matches #"[\)\]}\s]" (or ch " ")) :plain
-                                :else face)
-        (= face :comment) (cond (= ch "\n") :plain
-                                :else face)
-                          :else face))
-
 (defn apply-syntax-highlight
   [sl rows towid cursor-color syntaxhighlighter]
   (loop [sl0 sl n 0 face :plain bgface :plain pch "" ppch ""]
@@ -215,10 +135,7 @@
         ;tmp (futil/log (get-mark sl "cursor"))
         ;tmp1 (futil/log (get-mark sl0 "cursor"))
         filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
-        syntaxhighlighter (cond (re-matches #"^.*\.js$" filename) javascript-highlighter
-                                (re-matches #"^.*\.java$" filename) javascript-highlighter
-                                (re-matches #"^.*\.xml$" filename) xml-highlighter
-                                :else clojure-highlighter)
+        syntaxhighlighter  (or (-> bmode ::mode/syntax-highlighter) (fn [face ch pch ppch sl] :plain))
         sl1 (apply-syntax-highlight sl0 rows towid cursor-color  syntaxhighlighter)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
         dirty (buffer/get-dirty buffer)
