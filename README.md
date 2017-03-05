@@ -143,9 +143,8 @@ Modify the content below and save it to .liq in your home directory:
 (ns user
   (:require [clojure.string :as str]
             [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.mode :as mode]
-            [dk.salza.liq.modes.typeaheadmode :as typeaheadmode])
-  (:use [dk.salza.liq.cshell]
+            [dk.salza.liq.mode :as mode])
+  (:use [dk.salza.liq.tools.cshell]))
 
 (editor/add-searchpath "/tmp")              ; Files below /tmp will now be chooseable from the Ctrl+Space chooser
 (editor/add-snippet "Something to insert.") ; This snippet will be available from the Ctrl+Space chooser
