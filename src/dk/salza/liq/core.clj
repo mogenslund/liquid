@@ -64,6 +64,8 @@
         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
         lineslist (doall (map #(window/render %1 %2) windows buffers))]
         ;(spit "/tmp/lines.txt" (pr-str lineslist)) 
+        (when (editor/check-full-gui-update)
+          ((@adapter :reset)))
         (doseq [lines lineslist]
           ((@adapter :print-lines) lines))))
 

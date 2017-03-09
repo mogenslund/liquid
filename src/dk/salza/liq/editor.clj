@@ -12,12 +12,22 @@
 (def default-app (atom nil))
 (def searchstring (atom ""))
 (def macro-seq (atom '()))
+(def full-gui-update (atom false))
 
 (def macro-record (atom false))
 
 (def editor (ref nil))
 
+(defn request-full-gui-update
+  []
+  (reset! full-gui-update true))
 
+
+(defn check-full-gui-update
+  []
+  (let [res @full-gui-update]
+    (reset! full-gui-update false)
+    res))
 
 (defn set-default-mode
   [mode]
@@ -302,7 +312,8 @@
     (let [output (try
                    (if sexp (with-out-str (println (load-string sexp))) "")
                    (catch Exception e (do (spit "/tmp/liq.log" e) (util/pretty-exception e))))]
-      (when (and (not= output "") (not isprompt)) (prompt-set output)))))
+      (when (and (not= output "") (not isprompt)) (prompt-set output))))
+  (request-full-gui-update))
 
 (defn eval-safe
   [fun]
