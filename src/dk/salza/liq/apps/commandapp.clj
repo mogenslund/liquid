@@ -20,7 +20,9 @@
   []
   (editor/clear)
   (editor/insert "\n\n")
-  (let [escaped (str/replace (@state ::search) #"\(" "\\\\(")
+  (let [escaped (-> (@state ::search)
+                    (str/replace  #"\(" "\\\\(")
+                    (str/replace  #"\n" "\\\\n"))
         pat (re-pattern (str "(?i)" (str/replace escaped #" " ".*")))
         update (> (count (@state ::oldsearch)) (count (@state ::search)))
         res (if update (@state ::everything) (@state ::filtered))
@@ -33,7 +35,7 @@
             label (cond (string? (second e)) (second e)
                         (vector? (second e)) (-> e second first)
                         :else (str (second e)))]
-        (editor/insert (str pre (first e) " " label "\n"))))
+        (editor/insert (str pre (first e) " " (str/replace label #"\n" "\\\\n") "\n"))))
     (editor/beginning-of-buffer)
     (editor/insert (str ">> " "" (@state ::search))))
     (editor/end-of-line))
