@@ -300,6 +300,7 @@
                      (println
                        (cond (re-find #"\.js$" filepath) (cshell/cmd "node" filepath) 
                              (re-find #"\.lisp$" filepath) (cshell/cmd "clisp" filepath)
+                             (re-find #"\.c$" filepath) (cshell/cmd "tcc" "-run" filepath)
                              :else (str (load-file filepath)))))
                 (catch Exception e (util/pretty-exception e)))]
         (prompt-set (str/trim output))))

@@ -13,6 +13,7 @@
     (let [syntaxhl (cond (nil? filepath) clojuremdhl/next-face
                          (re-matches #"^.*\.js$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.java$" filepath) javascripthl/next-face
+                         (re-matches #"^.*\.c$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.xml$" filepath) xmlhl/next-face
                           :else clojuremdhl/next-face) ;; In other cases use clojure/markdown
           mode (textmode/create syntaxhl)]
