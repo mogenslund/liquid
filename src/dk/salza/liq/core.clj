@@ -37,6 +37,8 @@
   (editor/set-global-key :C-space commandapp/run)
   ;(editor/set-global-key :C-f #(findfileapp/run editor/find-file))
   (editor/set-global-key :C-f #(findfileapp/run textapp/run))
+  (editor/set-global-key :C-o editor/other-window)
+  (editor/set-global-key :C-r #(editor/prompt-append "test"))
   (when userfile (load-user-file userfile))
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")

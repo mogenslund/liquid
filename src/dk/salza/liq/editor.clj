@@ -453,9 +453,7 @@
   (dosync
     (ref-set editor {::buffers '()
                      ::windows '()
-                     ::global-keymap {:C-r #(prompt-append "test")
-                                      :C-o other-window
-                                     }
+                     ::global-keymap {}
                      ::settings {::searchpaths '()
                                  ::files '()
                                  ::snippets '()
