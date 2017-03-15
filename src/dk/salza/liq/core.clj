@@ -23,6 +23,7 @@
   (let [file (fileutil/file path)] ; (fileutil/file (System/getProperty "user.home") ".liq")]
     (if (and (fileutil/exists? file) (not (fileutil/folder? file)))
       (editor/evaluate-file-raw (str file))
+      ;; Just some samples in case there is user file specified
       (do (editor/add-to-setting ::editor/searchpaths "/tmp")
           (editor/add-to-setting ::editor/snippets "(->> \"/tmp\" ls (lrex #\"something\") p)")
           (editor/add-to-setting ::editor/files "/tmp/tmp.clj")))))
