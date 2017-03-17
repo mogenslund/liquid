@@ -3,7 +3,6 @@
             [dk.salza.liq.window :as window]
             [dk.salza.liq.tools.util :as util]
             [dk.salza.liq.clojureutil :as clojureutil]
-            [dk.salza.liq.tools.cshell :as cshell]
             [clojure.java.io :as io]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
@@ -60,6 +59,10 @@
 (defn set-global-key
   [keyw fun]
   (dosync (alter editor assoc-in [::global-keymap keyw] fun)) nil)
+
+(defn set-eval-function
+  [extension fun]
+  (dosync (alter editor assoc-in [::file-eval extension] fun)) nil)
 
 (defn add-command [fun] (add-to-setting ::commands fun) nil)
 (defn add-searchpath [s] (add-to-setting ::searchpaths s) nil)
@@ -295,15 +298,15 @@
 
 (defn evaluate-file
   ([filepath]
-    (let [output (try
-                   (with-out-str
-                     (println
-                       (cond (re-find #"\.js$" filepath) (cshell/cmd "node" filepath) 
-                             (re-find #"\.lisp$" filepath) (cshell/cmd "clisp" filepath)
-                             (re-find #"\.c$" filepath) (cshell/cmd "tcc" "-run" filepath)
-                             :else (str (load-file filepath)))))
-                (catch Exception e (util/pretty-exception e)))]
-        (prompt-set (str/trim output))))
+    (let [extension (or (re-find #"(?<=\.)\w*$" filepath) :empty)
+          fun (or ((@editor ::file-eval) extension) ((@editor ::file-eval) :default))
+          output (when fun
+                   (try
+                     (with-out-str
+                       (println
+                         (fun filepath)))
+                    (catch Exception e (util/pretty-exception e))))]
+        (prompt-set (str/trim (or output "")))))
   ([] (when-let [filepath (get-filename)] (evaluate-file filepath))))
 
 (defn eval-sexp
@@ -454,6 +457,7 @@
     (ref-set editor {::buffers '()
                      ::windows '()
                      ::global-keymap {}
+                     ::file-eval {}
                      ::settings {::searchpaths '()
                                  ::files '()
                                  ::snippets '()

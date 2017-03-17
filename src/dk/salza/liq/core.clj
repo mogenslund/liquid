@@ -8,6 +8,7 @@
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.tools.fileutil :as fileutil]
+            [dk.salza.liq.tools.cshell :as cshell]
             [dk.salza.liq.apps.findfileapp :as findfileapp]
             [dk.salza.liq.apps.textapp :as textapp]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
@@ -40,6 +41,10 @@
   (editor/set-global-key :C-f #(findfileapp/run textapp/run))
   (editor/set-global-key :C-o editor/other-window)
   (editor/set-global-key :C-r #(editor/prompt-append "test"))
+  (editor/set-eval-function "lisp" #(cshell/cmd "clisp" %))
+  (editor/set-eval-function "js" #(cshell/cmd "node" %))
+  (editor/set-eval-function "c" #(cshell/cmd "tcc" "-run" %))
+  (editor/set-eval-function :default #(str (load-file %)))
   (when userfile (load-user-file userfile))
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")
