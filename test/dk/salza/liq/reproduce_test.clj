@@ -11,7 +11,6 @@
            an interactive function like
            (editor/end-of-buffer) will not freeze
           the program"
-    (editor/init)
     (editor/add-window (window/create "prompt" 1 1 30 40 "-prompt-"))
     (editor/new-buffer "-prompt-")
     (editor/add-window (window/create "main" 1 44 30 (- 100 46) "scratch")) ; todo: Change to percent given by setting. Not hard numbers

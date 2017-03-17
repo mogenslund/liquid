@@ -15,7 +15,15 @@
 
 (def macro-record (atom false))
 
-(def editor (ref nil))
+(def editor (ref {::buffers '()
+                  ::windows '()
+                  ::global-keymap {}
+                  ::file-eval {}
+                  ::settings {::searchpaths '()
+                              ::files '()
+                              ::snippets '()
+                              ::commands '()
+                              ::interactive '()}}))
 
 (defn request-full-gui-update
   []
@@ -449,17 +457,3 @@
 (defn tmp-do-macro
   []
   (doall (map handle-input '(:i :i :j))))
-
-;;(set-global-key :M-a #(prompt-append "test"))
-(defn init
-  []
-  (dosync
-    (ref-set editor {::buffers '()
-                     ::windows '()
-                     ::global-keymap {}
-                     ::file-eval {}
-                     ::settings {::searchpaths '()
-                                 ::files '()
-                                 ::snippets '()
-                                 ::commands '()
-                                 ::interactive '()}})))

@@ -33,7 +33,6 @@
 
 (defn init-editor
   [rows columns userfile]
-  (editor/init)
   (editor/set-default-mode (textmode/create clojuremdhl/next-face))
   (editor/set-default-app textapp/run)
   (editor/set-global-key :C-space commandapp/run)

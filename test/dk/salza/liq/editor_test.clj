@@ -4,7 +4,6 @@
 
 (deftest basic-editor-test
   (testing "Creating editor and simple buffer insert"
-    (editor/init)
     (editor/new-buffer "somebuffer")
     (editor/insert "abc")
     (is (= (editor/get-content) "abc"))
