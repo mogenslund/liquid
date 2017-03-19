@@ -14,6 +14,6 @@
     (reset! inputserver (server/start-server
                         {:port 8520                   
                          :name "inputserver"
-                         :accept dk.salza.liq.adapters.serveradapter/action}
+                         :accept 'dk.salza.liq.adapters.serveradapter/action}
                         )))
   (Thread/sleep 1000))

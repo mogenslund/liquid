@@ -5,6 +5,7 @@
             [clojure.string :as str]
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
+            [dk.salza.liq.adapters.webadapter :as webadapter]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.tools.fileutil :as fileutil]
@@ -110,6 +111,7 @@
   [& args]
   (dosync (ref-set adapter 
     (cond (read-arg args "--jframe") jframeadapter/adapter
+          (read-arg args "--web") webadapter/adapter
           (read-arg args "--ghost") (ghostadapter/adapter
                                       (Integer/parseInt (read-arg args "--rows="))
                                       (Integer/parseInt (read-arg args "--columns=")))
