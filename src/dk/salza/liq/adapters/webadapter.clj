@@ -7,6 +7,10 @@
            [com.sun.net.httpserver HttpExchange HttpHandler HttpServer]))
 
 (def server (atom nil))
+(def output (atom "aaaaaaa"))
+(def input (promise))
+
+
 (def style
      "body {
         background-color: #111111;
@@ -50,8 +54,38 @@
 (def javascript
   "function init() {
      document.onkeydown = function(evt) {
+                            var xmlhttp = new XMLHttpRequest();
                             document.getElementById(\"w0-r2\").innerHTML= evt.keyCode;
                             //alert(\"KeyCode: \" + evt.keyCode);
+                            
+                            if (evt.keyCode == 9) {
+                              var xhttp = new XMLHttpRequest();
+                              xhttp.onreadystatechange = function() {
+                                if (this.readyState == 4 && this.status == 200) {
+                                  document.getElementById(\"w0-r4\").innerHTML = this.responseText;
+                                }
+                              };
+                              xhttp.open(\"GET\", \"key/tab\", true);
+                              xhttp.send();
+                            } else if (evt.keyCode == 77) {
+                              var xhttp = new XMLHttpRequest();
+                              xhttp.onreadystatechange = function() {
+                                if (this.readyState == 4 && this.status == 200) {
+                                  document.getElementById(\"w0-r4\").innerHTML = this.responseText;
+                                }
+                              };
+                              xhttp.open(\"GET\", \"key/m\", true);
+                              xhttp.send();
+                            } else {
+                              var xhttp = new XMLHttpRequest();
+                              xhttp.onreadystatechange = function() {
+                                if (this.readyState == 4 && this.status == 200) {
+                                  document.getElementById(\"w0-r4\").innerHTML = this.responseText;
+                                }
+                              };
+                              xhttp.open(\"GET\", \"output\", true);
+                              xhttp.send();
+                            }
                           }}")
 
 (defn row
@@ -79,7 +113,11 @@
   (proxy [HttpHandler] []
     (handle
       [exchange]
-      (let [response (html)]
+      (let [path (.getPath (.getRequestURI exchange))
+            response (cond (= path "/output") @output
+                           (= path "/key/tab") (do (deliver input :tab) @output)
+                           (= path "/key/m") (do (deliver input :m) @output)
+                           :else (html))]
         (.sendResponseHeaders exchange 200 (count (.getBytes response)))
         (let [ostream (.getResponseBody exchange)]
           (.write ostream (.getBytes response))
@@ -112,14 +150,22 @@
 
 (defn wait-for-input
   []
-  (let [r (read-line)]
-    :k))
+  (let [r @input]
+    (def input (promise))
+    r))
+  ;(let [r (read-line)]
+  ;  :i))
+
+(defn print-lines
+  [lines]
+  (let [simple (clojure.string/join "\n" (map #(clojure.string/join "" (filter string? (% :line))) lines))]
+    (reset! output (str "<pre>" simple "</pre>"))))
 
 (def adapter
   {:init init
    :rows rows
    :columns columns
    :wait-for-input wait-for-input
-   :print-lines not-implemented-yet
+   :print-lines print-lines
    :reset not-implemented-yet
    :quit quit})
