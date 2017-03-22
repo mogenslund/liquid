@@ -40,25 +40,29 @@ Brainstorm - editor approach (Maybe not)
 
 (def style
      "body {
-        background-color: #111111;
+        background-color: #181818;
         margin: 0;
-        color: #dddddd
+        color: #e4e4ef
       }
 
       span.type1 {
-        color: yellow;
+        color: #ffdd33;
       }
 
       span.type2 {
-        color: green;
+        color: #95a99f;
       }
 
       span.type3 {
-        color: blue;
+        color: #ffdd33;
       }
 
       span.comment {
-        color: brown;
+        color: #cc8c3c;
+      }
+
+      span.string {
+        color: #73c936;
       }
 
       span.bgcursor1 {
@@ -74,8 +78,7 @@ Brainstorm - editor approach (Maybe not)
       }
 
       span.bgstatusline {
-        background-color: #444444;
-        color: #dddddd
+        background-color: #000000;
       }
 
       div.row {
@@ -85,10 +88,6 @@ Brainstorm - editor approach (Maybe not)
         white-space: pre;
       }
 
-      div.row::before {
-        background-color: #444444;
-        content: \" \";
-      }
       table, th, td {
         border-collapse: collapse;
         border: none;
@@ -138,11 +137,11 @@ Brainstorm - editor approach (Maybe not)
 
 (defn rows
   []
-  40)
+  60)
 
 (defn columns
   []
-  120)
+  140)
 
 (defn row
   [window r]
@@ -180,7 +179,7 @@ Brainstorm - editor approach (Maybe not)
 (defn convert-line
   [line]
   (str "w" (if (= (line :column) 1) "0" "1") "-r" (line :row) ":"
-    "<span class=\"plain bgplain\">"
+    "<span class=\"bgstatusline\"> </span><span class=\"plain bgplain\">"
     (str/join (for [c (line :line)] (if (string? c) c (str "</span><span class=\"" (name (c :face)) " bg" (name (c :bgface)) "\">"))))
     "</span>"
   ))

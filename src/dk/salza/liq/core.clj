@@ -111,17 +111,19 @@
   [& args]
   (dosync (ref-set adapter 
     (cond (read-arg args "--jframe") jframeadapter/adapter
-          (read-arg args "--web") webadapter/adapter
+          ;(read-arg args "--web") webadapter/adapter
           (read-arg args "--ghost") (ghostadapter/adapter
                                       (Integer/parseInt (read-arg args "--rows="))
                                       (Integer/parseInt (read-arg args "--columns=")))
           (is-windows) winttyadapter/adapter
            :else ttyadapter/adapter)))
+  
   (let [singlethreaded (read-arg args "--no-threads")
         userfile (when-not (read-arg args "--no-init-file") 
                    (or (read-arg args "--load=")
                        (fileutil/file (System/getProperty "user.home") ".liq")))]
     ((@adapter :init))
+    (when (read-arg args "--web") (webadapter/init))
     (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
     (loop []
       (if singlethreaded
