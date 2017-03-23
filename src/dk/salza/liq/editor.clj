@@ -322,7 +322,7 @@
   (let [isprompt (= (get-name) "-prompt-")]
     (when isprompt (other-window))
     (let [output (try
-                   (if sexp (with-out-str (println (load-string sexp))) "")
+                   (if sexp (with-out-str (println (load-string (str "(do (in-ns 'user) " sexp ")")))) "")
                    (catch Exception e (do (spit "/tmp/liq.log" e) (util/pretty-exception e))))]
       (when (and (not= output "") (not isprompt)) (prompt-set output))))
   (request-full-gui-update))

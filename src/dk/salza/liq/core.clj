@@ -109,37 +109,36 @@
 
 (defn -main
   [& args]
-  (dosync (ref-set adapter 
-    (cond (read-arg args "--jframe") jframeadapter/adapter
-          ;(read-arg args "--web") webadapter/adapter
-          (read-arg args "--ghost") (ghostadapter/adapter
-                                      (Integer/parseInt (read-arg args "--rows="))
-                                      (Integer/parseInt (read-arg args "--columns=")))
-          (is-windows) winttyadapter/adapter
-           :else ttyadapter/adapter)))
-  
-  (let [singlethreaded (read-arg args "--no-threads")
-        userfile (when-not (read-arg args "--no-init-file") 
-                   (or (read-arg args "--load=")
-                       (fileutil/file (System/getProperty "user.home") ".liq")))]
-    ((@adapter :init))
-    (when (read-arg args "--web") (webadapter/init))
-    (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
-    (loop []
-      (if singlethreaded
-        (update-gui)          ; Non threaded version
-        (request-update-gui)) ; Threaded version
-      (let [input ((@adapter :wait-for-input))]
-        (when (= input :C-M-q) ((@adapter :quit)))
-        (when (= input :C-q)
-          (let [dirty (editor/dirty-buffers)]
-            (if (empty? dirty)
-              ((@adapter :quit))
-              (editor/prompt-set (str "There are dirty buffers:\n\n"
-                                      (str/join "\n" dirty) "\n\n"
-                                      "Press C-M-q to quit anyway.")))))
-        (when (= input :C-space) ((@adapter :reset)))
-        (editor/handle-input input)
-        (dosync (alter changes inc)))
-      (recur))))
+  (let [rows (Integer/parseInt (or (read-arg args "--rows=") "40"))
+        columns (Integer/parseInt (or (read-arg args "--columns=") "140"))]
+    (dosync (ref-set adapter 
+      (cond (read-arg args "--jframe") jframeadapter/adapter
+            (or (read-arg args "--ghost") (read-arg args "--server")) (ghostadapter/adapter rows columns)
+            (is-windows) winttyadapter/adapter
+             :else ttyadapter/adapter)))
+    
+    (let [singlethreaded (read-arg args "--no-threads")
+          userfile (when-not (read-arg args "--no-init-file") 
+                     (or (read-arg args "--load=")
+                         (fileutil/file (System/getProperty "user.home") ".liq")))]
+      ((@adapter :init))
+      (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
+      (when (or (read-arg args "--web") (read-arg args "--server")) (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns))) :init)))
+      (loop []
+        (if singlethreaded
+          (update-gui)          ; Non threaded version
+          (request-update-gui)) ; Threaded version
+        (let [input ((@adapter :wait-for-input))]
+          (when (= input :C-M-q) ((@adapter :quit)))
+          (when (= input :C-q)
+            (let [dirty (editor/dirty-buffers)]
+              (if (empty? dirty)
+                ((@adapter :quit))
+                (editor/prompt-set (str "There are dirty buffers:\n\n"
+                                        (str/join "\n" dirty) "\n\n"
+                                        "Press C-M-q to quit anyway.")))))
+          (when (= input :C-space) ((@adapter :reset)))
+          (editor/handle-input input)
+          (dosync (alter changes inc)))
+        (recur)))))
     

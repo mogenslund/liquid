@@ -36,12 +36,15 @@ Brainstorm - editor approach (Maybe not)
 ;(def output (atom (promise)))
 ;; (def outputchanges (clojure.lang.PersistentQueue/EMPTY))
 (def input (atom (promise)))
+(def dimensions (atom {:rows 40 :columns 80}))
 
 
 (def style
      "body {
-        background-color: #181818;
+        //background-color: #181818;
+        background-color: #080808;
         margin: 0;
+        margin-top: 50;
         color: #e4e4ef
       }
 
@@ -63,6 +66,10 @@ Brainstorm - editor approach (Maybe not)
 
       span.string {
         color: #73c936;
+      }
+
+      span.bgplain {
+        background-color: #181818;
       }
 
       span.bgcursor1 {
@@ -88,12 +95,24 @@ Brainstorm - editor approach (Maybe not)
         white-space: pre;
       }
 
-      table, th, td {
+      th, td {
         border-collapse: collapse;
         border: none;
         padding: 0;
         border-spacing: 0;
-        margin: 0;
+        margin: 0px auto;
+        vertical-align: middle;
+        background-color: #181818;
+      }
+
+      table {
+        border-collapse: collapse;
+        border: solid;
+        padding: 0;
+        border-spacing: 0;
+        margin: 0px auto;
+        border-color: #000000;
+        background-color: #181818;
       }")
 
 (def javascript
@@ -118,10 +137,65 @@ Brainstorm - editor approach (Maybe not)
                    xhttp.send();
                  },200);
 
+     function mapk(letter, ctrl, meta) {
+      if (letter.length >= 2) {letter = letter.toLowerCase();} 
+       var ctrlstr = '';
+       if (ctrl) {
+         ctrlstr = 'C-';
+       }
+       var metastr = '';
+       if (meta) {
+         metastr = 'M-';
+       }
+
+       var keymap = new Object();
+       keymap[' '] = 'space';
+       keymap['!'] = 'exclamation';
+       keymap['\"'] = 'quote';
+       keymap['#'] = 'hash';
+       keymap['$'] = 'dollar';
+       keymap['%'] = 'percent';
+       keymap['&'] = 'ampersand';
+       keymap[\"'\"] = 'singlequote';
+       keymap['('] = 'parenstart';
+       keymap[')'] = 'parenend';
+       keymap['*'] = 'asterisk';
+       keymap['+'] = 'plus';
+       keymap[','] = 'comma';
+       keymap['-'] = 'dash';
+       keymap['.'] = 'dot';
+       keymap['/'] = 'slash';
+       keymap[':'] = 'colon';
+       keymap[';'] = 'semicolon';
+       keymap['<'] = 'lt';
+       keymap['='] = 'equal';
+       keymap['>'] = 'gt';
+       keymap['?'] = 'question';
+       keymap['@'] = 'at';
+       keymap['['] = 'bracketstart';
+       keymap[']'] = 'bracketend';
+       keymap['^'] = 'hat';
+       keymap['{'] = 'bracesstart';
+       keymap['_'] = 'underscore';
+       keymap['\\\\'] = 'backslash';
+       keymap['|'] = 'pipe';
+       keymap['}'] = 'bracesend';
+       keymap['~'] = 'tilde';
+       keymap['¤'] = 'curren';
+       keymap['´'] = 'backtick';
+       keymap['Å'] = 'caa';
+       keymap['Æ'] = 'cae';
+       keymap['Ø'] = 'coe';
+       keymap['å'] = 'aa';
+       keymap['æ'] = 'ae';
+       keymap['ø'] = 'oe';
+       return ctrlstr + metastr + (keymap[letter] || letter);
+     }
+
      document.onkeydown = function(evt) {
                             evt.preventDefault();
                             evt.stopPropagation();
-                            document.getElementById(\"tmp\").innerHTML = evt.which + ' ' + evt.ctrlKey + ' ' + evt.altKey + ' ' + evt.shiftKey;
+                            //document.getElementById(\"tmp\").innerHTML = evt.which + ' ' + evt.ctrlKey + ' ' + evt.altKey + ' ' + evt.shiftKey + ' ' + evt.key;
                             var keynum = 1000000 + 100000 * evt.ctrlKey + 10000 * evt.altKey + 1000 * evt.shiftKey + evt.which
                             xhttp.abort();
                             xhttp.onreadystatechange = function() {
@@ -130,18 +204,11 @@ Brainstorm - editor approach (Maybe not)
                                 //document.getElementById(\"w0-r4\").innerHTML = this.responseText;
                               }
                             };
-                            xhttp.open(\"GET\", \"key/\" + keynum, true);
+                            //xhttp.open(\"GET\", \"key/\" + keynum, true);
+                            xhttp.open(\"GET\", \"key/\" + mapk(evt.key, evt.ctrlKey, evt.altKey), true);
                             xhttp.send();
                           }}")
 
-
-(defn rows
-  []
-  60)
-
-(defn columns
-  []
-  140)
 
 (defn row
   [window r]
@@ -154,8 +221,8 @@ Brainstorm - editor approach (Maybe not)
        ;"a "
        ;(System/currentTimeMillis)
        "<table><tr>"
-       "<td>" (str/join "\n" (map #(row 0 %) (range 1 (inc (rows))))) "</td>"
-       "<td>" (str/join "\n" (map #(row 1 %) (range 1 (inc (rows))))) "</td>"
+       "<td>" (str/join "\n" (map #(row 0 %) (range 1 (inc (@dimensions :rows))))) "</td>"
+       "<td>" (str/join "\n" (map #(row 1 %) (range 1 (inc (@dimensions :rows))))) "</td>"
        "</tr></table>"
        "<div id=\"tmp\"></div>"
        "</body></html>"))
@@ -197,20 +264,6 @@ Brainstorm - editor approach (Maybe not)
         (str/join "\n" 
           (map convert-line (apply concat lineslist)))))
 
-(defn numkey2keyword
-  [num]
-  (let [c (if (= (subs num 1 2) "1") "C-" "")
-        m (if (= (subs num 2 3) "1") "M-" "")
-        s (if (= (subs num 3 4) "1") 0 32)
-        n (Integer/parseInt (subs num 4))]
-    (cond (and (>= n 65) (<= n 90)) (keyword (str c m (char (+ s n))))
-          (= num "1000013") :enter
-          (= num "1000190") :dot
-          (= num "1100032") :C-space
-          (= num "1000008") :backspace
-          (= num "1000009") :tab
-          :else (str c m (keys/raw2keyword (+ n s))))))
-
 ; (numkey2keyword "1110064") -> C-a
 ; (nth "abc" 1)
 ; (int \Z)
@@ -222,8 +275,8 @@ Brainstorm - editor approach (Maybe not)
       (let [path (.getPath (.getRequestURI exchange))
             response (cond (= path "/output") (get-output1)
                            ;(= path "/key/tab") (do (deliver @input :tab) (get-output))
-                           (re-find #"^/key/" path) (let [num (re-find #"(?<=/key/)\d+" path)
-                                                          c (numkey2keyword num)] 
+                           (re-find #"^/key/" path) (let [num (re-find #"(?<=/key/).*" path)
+                                                          c (keyword num)] 
                                                       (editor/handle-input c)
                                                       (get-output1))
                                                       ;(deliver @input c)
@@ -279,10 +332,12 @@ Brainstorm - editor approach (Maybe not)
 ;  (let [simple (clojure.string/join "\n" (map #(clojure.string/join "" (filter string? (% :line))) lines))]
 ;    (reset! output (str "<pre>" simple "</pre>"))))
 
-(def adapter
+(defn adapter
+  [rows columns]
+  (reset! dimensions {:rows rows :columns columns})
   {:init init
-   :rows rows
-   :columns columns
+   :rows (fn [] rows)
+   :columns (fn [] columns)
    :wait-for-input wait-for-input
    :print-lines print-lines
    :reset #(do)
