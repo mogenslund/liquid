@@ -6,6 +6,7 @@
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
             [dk.salza.liq.adapters.webadapter :as webadapter]
+            [dk.salza.liq.adapters.htmladapter :as htmladapter]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.tools.fileutil :as fileutil]
@@ -110,7 +111,8 @@
 (defn -main
   [& args]
   (let [rows (Integer/parseInt (or (read-arg args "--rows=") "40"))
-        columns (Integer/parseInt (or (read-arg args "--columns=") "140"))]
+        columns (Integer/parseInt (or (read-arg args "--columns=") "140"))
+        port (Integer/parseInt (or (read-arg args "--port=") "8520"))]
     (dosync (ref-set adapter 
       (cond (read-arg args "--jframe") jframeadapter/adapter
             (or (read-arg args "--ghost") (read-arg args "--server")) (ghostadapter/adapter rows columns)
@@ -123,7 +125,8 @@
                          (fileutil/file (System/getProperty "user.home") ".liq")))]
       ((@adapter :init))
       (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
-      (when (or (read-arg args "--web") (read-arg args "--server")) (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns))) :init)))
+      (when (or (read-arg args "--web") (read-arg args "--server")) (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns))) :init) port))
+      (when (read-arg args "--html") (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns))) :init) port))
       (loop []
         (if singlethreaded
           (update-gui)          ; Non threaded version

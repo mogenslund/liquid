@@ -1,4 +1,4 @@
-(ns dk.salza.liq.adapters.webadapter
+(ns dk.salza.liq.adapters.htmladapter
   (:require [dk.salza.liq.tools.util :as util]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.editor :as editor]
@@ -8,33 +8,8 @@
            [java.net InetSocketAddress]
            [com.sun.net.httpserver HttpExchange HttpHandler HttpServer]))
 
-(comment "
-
-Brainsstorm
------------
-
-1. m pressed in browser
-2. Ajax call to liquid with /key/m (or /key/77)
-3. Deliver :m to input promise  
-4. wait-for-input reads input promise
-5. (editor executes)
-6. print-lines delivers delta lines to output promise
-7. Ajax call returns output promise
-
-
-
-Brainstorm - editor approach (Maybe not)
-1. m pressed in browser
-2. Ajax call to liquid with /key/m (or /key/77)
-3. call editor/handle-input :m
-
-
-
-")
 
 (def server (atom nil))
-;(def output (atom (promise)))
-;; (def outputchanges (clojure.lang.PersistentQueue/EMPTY))
 (def input (atom (promise)))
 (def dimensions (atom {:rows 40 :columns 80}))
 
@@ -93,7 +68,6 @@ Brainstorm - editor approach (Maybe not)
         font-size: 16px;
         line-height: 16px;
         white-space: pre;
-        vertical-align: middle;
       }
 
       th, td {
@@ -121,12 +95,6 @@ Brainstorm - editor approach (Maybe not)
 
    var xhttp = new XMLHttpRequest();
    function init() {
-     function updateLine(line) {
-       var parts = line.match(/(w\\d+-r\\d+):(.*)/);
-       document.getElementById(parts[1]).innerHTML = parts[2];
-       console.log(parts[1] + '.......' + parts[2] + '\\n');
-     }
-    
      setInterval(function () {
                    xhttp.abort();
                    xhttp.onreadystatechange = function() {
@@ -201,11 +169,9 @@ Brainstorm - editor approach (Maybe not)
                             xhttp.abort();
                             xhttp.onreadystatechange = function() {
                               if (this.readyState == 4 && this.status == 200) {
-                                this.responseText.split('\\n').forEach(updateLine)
-                                //document.getElementById(\"w0-r4\").innerHTML = this.responseText;
+                                document.getElementById(\"app\").innerHTML = this.responseText;
                               }
                             };
-                            //xhttp.open(\"GET\", \"key/\" + keynum, true);
                             xhttp.open(\"GET\", \"key/\" + mapk(evt.key, evt.ctrlKey, evt.altKey), true);
                             xhttp.send();
                           }}")
@@ -219,78 +185,39 @@ Brainstorm - editor approach (Maybe not)
   []
   (str "<html><head><style>" style "</style><script type=\"text/javascript\">" javascript "</script></head>"
        "  <body onload=\"init();\">"
-       ;"a "
-       ;(System/currentTimeMillis)
-       "<table><tr>"
-       "<td>" (str/join "\n" (map #(row 0 %) (range 1 (inc (@dimensions :rows))))) "</td>"
-       "<td>" (str/join "\n" (map #(row 1 %) (range 1 (inc (@dimensions :rows))))) "</td>"
-       "</tr></table>"
-       "<div id=\"tmp\"></div>"
+       "  <div id=\"app\">"
        "</body></html>"))
-
-; java -cp /home/molu/resources/clojure-1.8.0.jar:/home/molu/m/lib2  clojure.main -m dk.salza.liqscratch.server
-; (slurp "http://localhost:8520")
-; http://www.rgagnon.com/javadetails/java-have-a-simple-http-server.html
-; http://unixpapa.com/js/key.html
-
-;(defn get-output
-;  []
-;  (let [out @@output]
-;    (println out)
-;    (reset! output (promise))
-;    (str/join "<br />" out)))
-
-;(let [path "/key/74"
-;      num (Integer/parseInt (re-find #"(?<=/key/)\d+" path))]
-;  (if num (keyword (str (char (+ num 32))))))
-
-(def old-lines (atom {}))
 
 (defn convert-line
   [line]
-  (let [key (str "w" (if (= (line :column) 1) "0" "1") "-r" (line :row))
-        content (str "<span class=\"bgstatusline\"> </span><span class=\"plain bgplain\">"
-                  (str/join (for [c (line :line)] (if (string? c) c (str "</span><span class=\"" (name (c :face)) " bg" (name (c :bgface)) "\">"))))
-                  "</span>")]
-    (str key ":" content)))
-    ;(if (= (@old-lines key) content)
-    ;  ""
-    ;  (do (swap! old-lines assoc key content)
-    ;      (str key ":" content)))))
+  (str "<span class=\"bgstatusline\"> </span><span class=\"plain bgplain\">"
+    (str/join (for [c (line :line)] (if (string? c) c (str "</span><span class=\"" (name (c :face)) " bg" (name (c :bgface)) "\">"))))
+    "</span>"
+  ))
 
-(defn get-output1
+(defn get-output
   []
   (let [windows (reverse (editor/get-windows))
         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
         lineslist (doall (map #(window/render %1 %2) windows buffers))]
-        ;(spit "/tmp/lines.txt" (pr-str lineslist)) 
-        ;k(when (editor/check-full-gui-update)
-        ;  ((@adapter :reset)))
-        ;(doseq [lines lineslist]
-        ;  ((@adapter :print-lines) lines))))
-        (str/join "\n" 
-          (filter #(not= "" %) (map convert-line (apply concat lineslist))))))
-
-; (numkey2keyword "1110064") -> C-a
-; (nth "abc" 1)
-; (int \Z)
+    (str "<html><head><style>" style "</style><script type=\"text/javascript\">" javascript "</script></head>"
+         "  <body onload=\"init();\">"
+         "<table>"
+         (str/join "\n" (for [lines lineslist] (str "<td>" (map convert-line lines) "</td>")) 
+         "</tr></table>"
+         "<div id=\"tmp\"></div>"
+         "</body></html>"))))
 
 (def handler
   (proxy [HttpHandler] []
     (handle
       [exchange]
       (let [path (.getPath (.getRequestURI exchange))
-            response (cond (= path "/output") (get-output1)
-                           ;(= path "/key/tab") (do (deliver @input :tab) (get-output))
+            response (cond (= path "/output") (get-output)
                            (re-find #"^/key/" path) (let [num (re-find #"(?<=/key/).*" path)
                                                           c (keyword num)] 
                                                       (editor/handle-input c)
-                                                      (get-output1))
-                                                      ;(deliver @input c)
-                                                      ;(get-output))
-                           ;(= path "/key/73") (do (deliver @input :i) (get-output))
-                           ;(= path "/key/77") (do (deliver @input :m) (get-output))
-                           ;(= path "/key/78") (do (deliver @input :n) "aaaaaaaa")
+                                                      (get-output))
                            :else (html))]
         (.sendResponseHeaders exchange 200 (count (.getBytes response)))
         (let [ostream (.getResponseBody exchange)]
@@ -318,26 +245,11 @@ Brainstorm - editor approach (Maybe not)
     (println "Input" r)
     (reset! input (promise))
     r))
-  ;(let [r (read-line)]
-  ;  :i))
 
-(comment 
-; {:column 44, :row 1, :line '( {:face :type1, :bgface :plain} "d" "e" "f" "n" {:face :type2, :bgface :plain} " " "m" "y" "f" "u" "n")}
-; -> "w1-r1:<span class=\"type1 bg-plain\">defn</span><span class=\"type2 bg-plain\">&nbsp;myfun</span>"
-)
-
-
-; (convert-line {:column 44, :row 1, :line '({:face :type1, :bgface :plain} "d" "e" "f" "n" {:face :type2, :bgface :plain} " " "m" "y" "f" "u" "n")})
 
 (defn print-lines
   [lines]
   )
-  ;(deliver @output
-  ;        (map convert-line lines)))
-
-
-;  (let [simple (clojure.string/join "\n" (map #(clojure.string/join "" (filter string? (% :line))) lines))]
-;    (reset! output (str "<pre>" simple "</pre>"))))
 
 (defn adapter
   [rows columns]
