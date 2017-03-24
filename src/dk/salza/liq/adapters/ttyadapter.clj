@@ -41,12 +41,12 @@
     (print (str "\033[" (colorpalette index) "m" (apply str strings)))))
 
 (defn ttyprint-lines
-  [lines]
+  [lineslist]
   ;; Redraw whole screen once in a while
   ;; (when (= (rand-int 100) 0)
   ;;  (reset! old-lines {})
   ;;  (print "\033[0;37m\033[2J"))
-  (doseq [line lines]
+  (doseq [line (apply concat lineslist)]
     (let [row (line :row)
           column (line :column)
           content (line :line)
@@ -76,7 +76,7 @@
                     (= (ch :bgface) :statusline) (print-color 9)
                     :else (print-color 10))
             )))
-        (if (= row (count lines))
+        (if (= row (count (first lineslist)))
           (do
             (print (str "  " padding))
             (print-color 0))

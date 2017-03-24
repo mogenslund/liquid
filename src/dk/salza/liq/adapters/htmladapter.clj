@@ -202,11 +202,11 @@
         lineslist (doall (map #(window/render %1 %2) windows buffers))]
     (str "<html><head><style>" style "</style><script type=\"text/javascript\">" javascript "</script></head>"
          "  <body onload=\"init();\">"
-         "<table>"
-         (str/join "\n" (for [lines lineslist] (str "<td>" (map convert-line lines) "</td>")) 
+         "<table><tr>"
+         (str/join "\n" (for [lines lineslist] (str "<td>" (str/join "<br />\n" (map convert-line lines)) "</td>")))
          "</tr></table>"
          "<div id=\"tmp\"></div>"
-         "</body></html>"))))
+         "</body></html>")))
 
 (def handler
   (proxy [HttpHandler] []

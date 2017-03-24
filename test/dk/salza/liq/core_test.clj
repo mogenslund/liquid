@@ -64,7 +64,7 @@
     (send-input "ggvGdd" :tab) ; Clearing screen. Ready to type
     (apply send-input input)
     (while (not (empty? @ghostadapter/input)) (Thread/sleep 10))
-    (let [windowcontent (ghostadapter/get-display)]
+    (let [windowcontent (apply concat (ghostadapter/get-display))]
       ;(println "DISPLAY:" (short-screen-notation windowcontent))
       (is (.contains (short-screen-notation windowcontent) expected)))))
 

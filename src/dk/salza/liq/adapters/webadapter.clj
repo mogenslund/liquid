@@ -37,6 +37,7 @@ Brainstorm - editor approach (Maybe not)
 ;; (def outputchanges (clojure.lang.PersistentQueue/EMPTY))
 (def input (atom (promise)))
 (def dimensions (atom {:rows 40 :columns 80}))
+(def autoupdate (atom false))
 
 
 (def style
@@ -116,27 +117,17 @@ Brainstorm - editor approach (Maybe not)
         background-color: #181818;
       }")
 
-(def javascript
-  "
+(defn javascript
+  []
+  (str "
 
    var xhttp = new XMLHttpRequest();
    function init() {
      function updateLine(line) {
        var parts = line.match(/(w\\d+-r\\d+):(.*)/);
        document.getElementById(parts[1]).innerHTML = parts[2];
-       console.log(parts[1] + '.......' + parts[2] + '\\n');
+       //console.log(parts[1] + '.......' + parts[2] + '\\n');
      }
-    
-     setInterval(function () {
-                   xhttp.abort();
-                   xhttp.onreadystatechange = function() {
-                     if (this.readyState == 4 && this.status == 200) {
-                       this.responseText.split('\\n').forEach(updateLine)
-                     }
-                   };
-                   xhttp.open(\"GET\", \"output\", true);
-                   xhttp.send();
-                 },200);
 
      function mapk(letter, ctrl, meta) {
       if (letter.length >= 2) {letter = letter.toLowerCase();} 
@@ -193,22 +184,32 @@ Brainstorm - editor approach (Maybe not)
        return ctrlstr + metastr + (keymap[letter] || letter);
      }
 
-     document.onkeydown = function(evt) {
-                            evt.preventDefault();
-                            evt.stopPropagation();
-                            //document.getElementById(\"tmp\").innerHTML = evt.which + ' ' + evt.ctrlKey + ' ' + evt.altKey + ' ' + evt.shiftKey + ' ' + evt.key;
-                            var keynum = 1000000 + 100000 * evt.ctrlKey + 10000 * evt.altKey + 1000 * evt.shiftKey + evt.which
-                            xhttp.abort();
-                            xhttp.onreadystatechange = function() {
-                              if (this.readyState == 4 && this.status == 200) {
-                                this.responseText.split('\\n').forEach(updateLine)
-                                //document.getElementById(\"w0-r4\").innerHTML = this.responseText;
-                              }
-                            };
-                            //xhttp.open(\"GET\", \"key/\" + keynum, true);
-                            xhttp.open(\"GET\", \"key/\" + mapk(evt.key, evt.ctrlKey, evt.altKey), true);
-                            xhttp.send();
-                          }}")
+     function updategui(evt) {
+       if (evt) {
+         evt.preventDefault();
+         evt.stopPropagation();
+         //document.getElementById(\"tmp\").innerHTML = evt.which + ' ' + evt.ctrlKey + ' ' + evt.altKey + ' ' + evt.shiftKey + ' ' + evt.key;
+       }
+       xhttp.abort();
+       xhttp.onreadystatechange = function() {
+         if (this.readyState == 4 && this.status == 200) {
+           this.responseText.split('\\n').forEach(updateLine)
+           //document.getElementById(\"w0-r4\").innerHTML = this.responseText;
+         }
+       };
+       if (evt) {
+         xhttp.open(\"GET\", \"key/\" + mapk(evt.key, evt.ctrlKey, evt.altKey), true);
+       } else {
+         xhttp.open(\"GET\", \"output\", true);
+       }
+       xhttp.send();
+     }
+
+     document.onkeydown = updategui;
+     " (when @autoupdate "setInterval(() => updategui(false), 200);") "
+     updategui(false);
+     
+     }"))
 
 
 (defn row
@@ -217,7 +218,7 @@ Brainstorm - editor approach (Maybe not)
 
 (defn html
   []
-  (str "<html><head><style>" style "</style><script type=\"text/javascript\">" javascript "</script></head>"
+  (str "<html><head><style>" style "</style><script type=\"text/javascript\">" (javascript) "</script></head>"
        "  <body onload=\"init();\">"
        ;"a "
        ;(System/currentTimeMillis)
@@ -258,6 +259,7 @@ Brainstorm - editor approach (Maybe not)
     ;  (do (swap! old-lines assoc key content)
     ;      (str key ":" content)))))
 
+
 (defn get-output1
   []
   (let [windows (reverse (editor/get-windows))
@@ -286,11 +288,6 @@ Brainstorm - editor approach (Maybe not)
                                                           c (keyword num)] 
                                                       (editor/handle-input c)
                                                       (get-output1))
-                                                      ;(deliver @input c)
-                                                      ;(get-output))
-                           ;(= path "/key/73") (do (deliver @input :i) (get-output))
-                           ;(= path "/key/77") (do (deliver @input :m) (get-output))
-                           ;(= path "/key/78") (do (deliver @input :n) "aaaaaaaa")
                            :else (html))]
         (.sendResponseHeaders exchange 200 (count (.getBytes response)))
         (let [ostream (.getResponseBody exchange)]
@@ -340,7 +337,8 @@ Brainstorm - editor approach (Maybe not)
 ;    (reset! output (str "<pre>" simple "</pre>"))))
 
 (defn adapter
-  [rows columns]
+  [rows columns auto]
+  (reset! autoupdate auto)
   (reset! dimensions {:rows rows :columns columns})
   {:init init
    :rows (fn [] rows)

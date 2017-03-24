@@ -75,8 +75,9 @@
         ;(spit "/tmp/lines.txt" (pr-str lineslist)) 
         (when (editor/check-full-gui-update)
           ((@adapter :reset)))
-        (doseq [lines lineslist]
-          ((@adapter :print-lines) lines))))
+         ((@adapter :print-lines) lineslist)))
+        ;(doseq [lines lineslist]
+        ;  ((@adapter :print-lines) lines))))
 
 (def updater (ref (future nil)))
 (def changes (ref 0))
@@ -112,7 +113,8 @@
   [& args]
   (let [rows (Integer/parseInt (or (read-arg args "--rows=") "40"))
         columns (Integer/parseInt (or (read-arg args "--columns=") "140"))
-        port (Integer/parseInt (or (read-arg args "--port=") "8520"))]
+        port (Integer/parseInt (or (read-arg args "--port=") "8520"))
+        autoupdate (if (read-arg args "--autoupdate") true false)]
     (dosync (ref-set adapter 
       (cond (read-arg args "--jframe") jframeadapter/adapter
             (or (read-arg args "--ghost") (read-arg args "--server")) (ghostadapter/adapter rows columns)
@@ -125,7 +127,7 @@
                          (fileutil/file (System/getProperty "user.home") ".liq")))]
       ((@adapter :init))
       (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
-      (when (or (read-arg args "--web") (read-arg args "--server")) (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns))) :init) port))
+      (when (or (read-arg args "--web") (read-arg args "--server")) (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
       (when (read-arg args "--html") (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns))) :init) port))
       (loop []
         (if singlethreaded
