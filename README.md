@@ -11,33 +11,6 @@ I have been using Emacs for many years. I have tweaked it a lot and implemented 
 
 I could tell a lot about the editor, but I think you should see the video below for a demonstration.
 
-## Demo video
-Watch this video to get a sense of how the editor works: [liquid01](https://drive.google.com/file/d/0B5Au3PxHCmgBM2MySHl4aUVWTEE/view?usp=sharing)
-
-## Technical video explaining the core datastructure of the editor
-This video is for technical minded people to get a view of the inside of the construction of the editor. Useful for understanding the idea behind the editor or as inspiration for similar projects or extensions of this: [slider01](https://drive.google.com/file/d/0B5Au3PxHCmgBNjJodzNjQ2w4c2M/view?usp=sharing)
-
-## Use cases
- * <b>Tight integration</b> with Clojure code. It should be easy to have the same code executed from within the editor as well as outside. Using a real language for extensions provides a great advantage compared to a "home made" extension language, that only fits the specific editor.  
-Example: As a QA Engineer I do test automation using Selenium WebDriver. I have included the Selenium jar into my local environment, so now I can execute tests, parts of tests or snippets from within &lambda;iquid.  
-All other tools that I create in Clojure, which are useful as is, are easy to make accessible from within the editor as well.
-
- * <b>Embedding</b> the editor into your your application. Include the &lambda;iquid to your project and use it as part of your program or for debugging and patching, just like you already do with the REPL, but with some advantages: It is easier to open a file with code and execute parts of it, or jump between snippets, do modifications, and execute again.  
-Example: I have a file with snippets like: `(patch "myserver")`, `(status "myserver")` and `(run-test "name-of-test")`. I just modify "myserver", if needed, and press "e" to execute the command.
-
-## Future visions
-
- * <b>Port to ClojureScript</b> Since there are no other dependencies than Clojure itself and not much Java Interop, I don't think it would be that hard, to port parts of the editor to ClojureScript, if there is a use case for that.
-
-## Status of the application
-**The program is not production ready yet**
-
-Most of the basic features I want are in place, but needs to be described further and polished (like checking for unsaved buffers on exit etc.)
-
-The extension system also needs to mature, with best practices and well-defined integration points. I may still have to do changes to some basic structures to accommodate this.
-
-Some pieces, like syntax highlighting, are hardcoded. I did that, to have some syntax highlighting available, while completing the editor. It needs to be refactured and modulized, so customized syntax highlighting will be easier to do.
-
 ## Installation
 
 ### Download and execution
@@ -64,6 +37,28 @@ For running in terminal and as serve at the same time use:
 
 Use --autoupdate for making multiple browser automatically sync content. (For collaborative editing.)
 
+## Demo video
+Watch this video to get a sense of how the editor works: [liquid01](https://drive.google.com/file/d/0B5Au3PxHCmgBM2MySHl4aUVWTEE/view?usp=sharing)
+
+## Technical video explaining the core datastructure of the editor
+This video is for technical minded people to get a view of the inside of the construction of the editor. Useful for understanding the idea behind the editor or as inspiration for similar projects or extensions of this: [slider01](https://drive.google.com/file/d/0B5Au3PxHCmgBNjJodzNjQ2w4c2M/view?usp=sharing)
+
+## Use cases
+ * <b>Tight integration</b> with Clojure code. It should be easy to have the same code executed from within the editor as well as outside. Using a real language for extensions provides a great advantage compared to a "home made" extension language, that only fits the specific editor.  
+Example: As a QA Engineer I do test automation using Selenium WebDriver. I have included the Selenium jar into my local environment, so now I can execute tests, parts of tests or snippets from within &lambda;iquid.  
+All other tools that I create in Clojure, which are useful as is, are easy to make accessible from within the editor as well.
+
+ * <b>Embedding</b> the editor into your your application. Include the &lambda;iquid to your project and use it as part of your program or for debugging and patching, just like you already do with the REPL, but with some advantages: It is easier to open a file with code and execute parts of it, or jump between snippets, do modifications, and execute again.  
+Example: I have a file with snippets like: `(patch "myserver")`, `(status "myserver")` and `(run-test "name-of-test")`. I just modify "myserver", if needed, and press "e" to execute the command.
+
+## Future visions
+
+ * <b>Port to ClojureScript</b> Since there are no other dependencies than Clojure itself and not much Java Interop, I don't think it would be that hard, to port parts of the editor to ClojureScript, if there is a use case for that.
+
+## Status of the application
+Most of the basic features I want are in place, but needs to be described further and polished.
+
+The extension system also needs to mature, with best practices and well-defined integration points. I may still have to do changes to some basic structures to accommodate this.
 
 #### Known bugs
 No known bugs at the moment.
