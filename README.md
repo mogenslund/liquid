@@ -31,6 +31,8 @@ and access using:
 
     http://localhost:8520
 
+(This approach will also work in Windows. Remember to replace ":" with ";" in the "-cp" on Windows. The best performance seems to be in Chrome browser.)
+
 For running in terminal and as serve at the same time use:
 
     java -cp clojure-1.8.0.jar:liquid-0.6.1.jar clojure.main -m dk.salza.liq.core --web --port=8520
