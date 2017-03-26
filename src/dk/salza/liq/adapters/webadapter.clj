@@ -125,8 +125,9 @@ Brainstorm - editor approach (Maybe not)
    function init() {
      function updateLine(line) {
        var parts = line.match(/(w\\d+-r\\d+):(.*)/);
-       document.getElementById(parts[1]).innerHTML = parts[2];
-       //console.log(parts[1] + '.......' + parts[2] + '\\n');
+       if (document.getElementById(parts[1]).innerHTML != parts[2]) {
+         document.getElementById(parts[1]).innerHTML = parts[2];
+       }
      }
 
      function mapk(letter, ctrl, meta) {
