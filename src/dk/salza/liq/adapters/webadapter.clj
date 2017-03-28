@@ -265,14 +265,14 @@ Brainstorm - editor approach (Maybe not)
   []
   (let [windows (reverse (editor/get-windows))
         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
-        lineslist (doall (map #(window/render %1 %2) windows buffers))]
+        lineslist (doall (pmap #(window/render %1 %2) windows buffers))]
         ;(spit "/tmp/lines.txt" (pr-str lineslist)) 
         ;k(when (editor/check-full-gui-update)
         ;  ((@adapter :reset)))
         ;(doseq [lines lineslist]
         ;  ((@adapter :print-lines) lines))))
         (str/join "\n" 
-          (filter #(not= "" %) (map convert-line (apply concat lineslist))))))
+          (filter #(not= "" %) (pmap convert-line (apply concat lineslist))))))
 
 ; (numkey2keyword "1110064") -> C-a
 ; (nth "abc" 1)

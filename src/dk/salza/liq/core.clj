@@ -128,7 +128,7 @@
       ((@adapter :init))
       (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
       (when (or (read-arg args "--web") (read-arg args "--server")) (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
-      (when (read-arg args "--html") (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns))) :init) port))
+      (when (read-arg args "--html") (((htmladapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
       (loop []
         (if singlethreaded
           (update-gui)          ; Non threaded version

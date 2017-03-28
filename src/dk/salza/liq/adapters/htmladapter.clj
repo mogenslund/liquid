@@ -12,6 +12,7 @@
 (def server (atom nil))
 (def input (atom (promise)))
 (def dimensions (atom {:rows 40 :columns 80}))
+(def autoupdate (atom false))
 
 
 (def style
@@ -20,6 +21,10 @@
         background-color: #080808;
         margin: 0;
         margin-top: 50;
+        font-family: monospace;
+        font-size: 16px;
+        line-height: 16px;
+        white-space: pre;
         color: #e4e4ef
       }
 
@@ -68,6 +73,7 @@
         font-size: 16px;
         line-height: 16px;
         white-space: pre;
+        vertical-align: middle;
       }
 
       th, td {
@@ -90,21 +96,13 @@
         background-color: #181818;
       }")
 
-(def javascript
-  "
+(defn javascript
+  []
+  (str "
 
    var xhttp = new XMLHttpRequest();
+
    function init() {
-     setInterval(function () {
-                   xhttp.abort();
-                   xhttp.onreadystatechange = function() {
-                     if (this.readyState == 4 && this.status == 200) {
-                       this.responseText.split('\\n').forEach(updateLine)
-                     }
-                   };
-                   xhttp.open(\"GET\", \"output\", true);
-                   xhttp.send();
-                 },200);
 
      function mapk(letter, ctrl, meta) {
       if (letter.length >= 2) {letter = letter.toLowerCase();} 
@@ -161,21 +159,31 @@
        return ctrlstr + metastr + (keymap[letter] || letter);
      }
 
-     document.onkeydown = function(evt) {
-                            evt.preventDefault();
-                            evt.stopPropagation();
-                            //document.getElementById(\"tmp\").innerHTML = evt.which + ' ' + evt.ctrlKey + ' ' + evt.altKey + ' ' + evt.shiftKey + ' ' + evt.key;
-                            var keynum = 1000000 + 100000 * evt.ctrlKey + 10000 * evt.altKey + 1000 * evt.shiftKey + evt.which
-                            xhttp.abort();
-                            xhttp.onreadystatechange = function() {
-                              if (this.readyState == 4 && this.status == 200) {
-                                document.getElementById(\"app\").innerHTML = this.responseText;
-                              }
-                            };
-                            xhttp.open(\"GET\", \"key/\" + mapk(evt.key, evt.ctrlKey, evt.altKey), true);
-                            xhttp.send();
-                          }}")
+     xhttp.onreadystatechange = function() {
+       if (this.readyState == 4 && this.status == 200) {
+         document.getElementById(\"app\").innerHTML = this.responseText;
+       }
+     };
 
+     function updategui(evt) {
+       if (evt) {
+         evt.preventDefault();
+         evt.stopPropagation();
+       }
+
+       if (evt) {
+         xhttp.open(\"GET\", \"key/\" + mapk(evt.key, evt.ctrlKey, evt.altKey), true);
+       } else {
+         xhttp.open(\"GET\", \"output\", true);
+       }
+       xhttp.send();
+     }
+
+     document.onkeydown = updategui;
+     " (when @autoupdate "setInterval(() => updategui(false), 200);") "
+     updategui(false);
+     
+   }"))
 
 (defn row
   [window r]
@@ -183,16 +191,16 @@
 
 (defn html
   []
-  (str "<html><head><style>" style "</style><script type=\"text/javascript\">" javascript "</script></head>"
+  (str "<html><head><style>" style "</style><script type=\"text/javascript\">" (javascript) "</script></head>"
        "  <body onload=\"init();\">"
        "  <div id=\"app\">"
        "</body></html>"))
 
 (defn convert-line
   [line]
-  (str "<span class=\"bgstatusline\"> </span><span class=\"plain bgplain\">"
+  (str "<div class=\"row\"><span class=\"bgstatusline\"> </span><span class=\"plain bgplain\">"
     (str/join (for [c (line :line)] (if (string? c) c (str "</span><span class=\"" (name (c :face)) " bg" (name (c :bgface)) "\">"))))
-    "</span>"
+    "</span></div>"
   ))
 
 (defn get-output
@@ -200,13 +208,14 @@
   (let [windows (reverse (editor/get-windows))
         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
         lineslist (doall (map #(window/render %1 %2) windows buffers))]
-    (str "<html><head><style>" style "</style><script type=\"text/javascript\">" javascript "</script></head>"
-         "  <body onload=\"init();\">"
+    (str ;"<html><head><style>" style "</style><script type=\"text/javascript\">" javascript "</script></head>"
+         ;"  <body onload=\"init();\">"
          "<table><tr>"
-         (str/join "\n" (for [lines lineslist] (str "<td>" (str/join "<br />\n" (map convert-line lines)) "</td>")))
+         (str/join "\n" (for [lines lineslist] (str "<td>" (str/join "\n" (map convert-line lines)) "</td>")))
          "</tr></table>"
          "<div id=\"tmp\"></div>"
-         "</body></html>")))
+         ;"</body></html>"
+         )))
 
 (def handler
   (proxy [HttpHandler] []
@@ -252,7 +261,8 @@
   )
 
 (defn adapter
-  [rows columns]
+  [rows columns auto]
+  (reset! autoupdate auto)
   (reset! dimensions {:rows rows :columns columns})
   {:init init
    :rows (fn [] rows)
