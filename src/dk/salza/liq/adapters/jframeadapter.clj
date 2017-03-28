@@ -9,6 +9,9 @@
 (def last-key (atom nil))
 (def tmp-keys (atom ""))
 (def old-lines (atom {}))
+(def updater (ref (future nil)))
+(def changes (ref 0))
+
 ; (def g (atom nil))
 ; 
 ; (def crow (atom 1))
@@ -141,12 +144,21 @@
     ;(.repaint @pane)
     ))
 
-(defn update-output
+(defn update-gui
   []
   (let [windows (reverse (editor/get-windows))
         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
         lineslist (doall (pmap #(window/render %1 %2) windows buffers))]
         (jframeprint-lines lineslist)))
+
+(defn request-update-gui
+  []
+  (when (future-done? @updater)
+    (dosync (ref-set updater
+            (future
+              (loop [ch @changes]
+                (update-gui)
+                (when (not= ch @changes) (recur @changes))))))))
 
 (defn jframeinit
   []
@@ -162,7 +174,8 @@
                        (keyReleased [e] (do))
                        ;(keyTyped [e] (reset! last-key (event2keyword e)))
                        (keyTyped [e] (do (editor/handle-input (event2keyword e)))
-                                         (update-output))
+                                         (dosync (alter changes inc))
+                                         (request-update-gui))
                      ))))
   (doto (javax.swing.JFrame. "λiquid")
     (.setDefaultCloseOperation (javax.swing.JFrame/EXIT_ON_CLOSE))
