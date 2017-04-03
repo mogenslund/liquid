@@ -44,7 +44,9 @@
     ;(println "CTRL:      " (.isControlDown e))
     ;(println "CODE:      " code)
     ;(println "PARAM STR: " (.paramString e)); ,primaryLevelUnicode=108,
-    (cond (.isControlDown e) (cond (= code "102") :C-f
+    
+    (cond (= (.getModifiers e) java.awt.event.InputEvent/CTRL_MASK)
+                             (cond (= code "102") :C-f
                                    (= code "103") :C-g
                                    (= code "106") :C-j
                                    (= code "107") :C-k
@@ -63,6 +65,40 @@
           (= ch "#") :hash
           (= ch "$") :dollar
           (= ch "%") :percent
+          (= ch "&") :ampersand
+          (= ch "'") :singlequote
+          (= ch "(") :parenstart
+          (= ch ")") :parenend
+          (= ch "*") :asterisk
+          (= ch "+") :plus
+          (= ch ",") :comma
+          (= ch "-") :dash
+          (= ch ".") :dot
+          (= ch "/") :slash
+          (= ch ":") :colon
+          (= ch ";") :semicolon
+          (= ch "<") :lt
+          (= ch "=") :equal
+          (= ch ">") :gt
+          (= ch "?") :question
+          (= ch "@") :at
+          (= ch "[") :bracketstart
+          (= ch "]") :bracketend
+          (= ch "^") :hat
+          (= ch "{") :bracesstart
+          (= ch "_") :underscore
+          (= ch "\\") :backslash
+          (= ch "|") :pipe
+          (= ch "}") :bracesend
+          (= ch "~") :tilde
+          (= ch "¤") :curren
+          (= ch "´") :backtick
+          (= ch "Å") :caa
+          (= ch "Æ") :cae
+          (= ch "Ø") :coe
+          (= ch "å") :aa
+          (= ch "æ") :ae
+          (= ch "ø") :oe
           :else (keyword (str (.getKeyChar e))))))
 
 (defn jframerows
@@ -94,7 +130,7 @@
   (cond (= c " ") "&nbsp;"
         :else c))
 
-
+;textArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 (defn convert-line
   [line]
   (str "<font face=\"Inconsolata\" color=\"000000\" bgcolor=\"000000\">-</font><font face=\"Inconsolata\" color=\"" (colors :plain) "\" bgcolor=\"" (bgcolors :plain) "\">"
@@ -194,136 +230,3 @@
               :print-lines jframeprint-lines
               :reset (fn [] (do))
               :quit jframequit})
-
-
-; (defn get-output
-;   []
-;   (let [windows (reverse (editor/get-windows))
-;         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
-;         lineslist (doall (map #(window/render %1 %2) windows buffers))]
-;     (str "<html><head><style>" style "</style><script type=\"text/javascript\">" javascript "</script></head>"
-;          "  <body onload=\"init();\">"
-;          "<table>"
-;          (str/join "\n" (for [lines lineslist] (str "<td>" (map convert-line lines) "</td>")) 
-;          "</tr></table>"
-;          "<div id=\"tmp\"></div>"
-;          "</body></html>"))))
-
-; (defn jframeprint-lines2
-;   [lines]
-;   (str "<html><head><style>" style "</style><script type=\"text/javascript\">" javascript "</script></head>"
-;        "  <body onload=\"init();\">"
-;        "<table>"
-;        (str/join "\n" (str "<td>" (map convert-line lines) "</td>")) 
-;        "</tr></table>"
-;        "<div id=\"tmp\"></div>"
-;        "</body></html>"))
-  
-
-; (defn jframeinit
-;   []
-;   (let [html "<html><body><font color=\"red\" bgcolor=\"blue\">RED</font> not<br></body></html>"
-;         editorpane (doto (javax.swing.JEditorPane.)
-;                      (.setContentType "text/html")
-;                      (.setEditable false)
-;                     ;(.setFocusTraversalKeysEnabled false)
-;                      (.setText html)
-;                      (.addKeyListener (proxy [java.awt.event.KeyListener] []
-;                        (keyPressed [e] (do))
-;                        (keyReleased [e] (do))
-;                        (keyTyped [e] (reset! last-key (event2keyword e))))))
-;         ;panel (doto (javax.swing.JPanel.)
-;         ;        ;(.setFocusTraversalKeysEnabled false)
-;         ;        (.addKeyListener (proxy [java.awt.event.KeyListener] []
-;         ;           (keyPressed [e] (println "a"))
-;         ;           (keyReleased [e] (println "b"))
-;         ;           (keyTyped [e] (reset! last-key (event2keyword e))))))
-;         ;tmplabel (javax.swing.JLabel. "<html><body><font color=\"red\" bgcolor=\"blue\">RED</font> not</body></html>")
-;                 ]
-;     (doto (javax.swing.JFrame. "λiquid")
-;       (.add editorpane)
-;       ;(.add panel)
-;       ;(.add tmplabel)
-;       (.setSize 800 600)
-;       (.show))))
-    ;(while (nil? (.getGraphics panel))
-    ;  (Thread/sleep 50))
-    ;(.requestFocus panel)
-    ;(reset! g (.getGraphics panel))))
-    ;(reset! pane editorpane)))
-
-
-; (defn plot
-;   [letter]
-;   (let [h 16
-;         w 8
-;         x (* (- @crow 1) h)
-;         y (* (- @ccolumn 1) w)]
-;     (.setColor @g @cbgcolor)
-;     (.fillRect @g y x w h)
-;     (.setColor @g @ccolor)
-;     (.drawString @g letter y (+ x h -3))
-;     (swap! ccolumn inc)))
-
-; (def old-lines (atom {}))
-
-
-; (defn jframeprint-lines
-;   [lines]
-;   (.setFont @g (java.awt.Font. "monospaced" java.awt.Font/PLAIN 12)); 
-;   (doseq [line lines]
-;     (let [row (line :row)
-;           column (line :column)
-;           content (line :line)
-;           key (str "k" row "-" column)
-;           oldcontent (@old-lines key)
-;           gr @g] 
-;     (when (not= oldcontent content)
-;       (let [diff (max 1 (- (count (filter #(and (string? %) (not= % "")) oldcontent))
-;                            (count (filter #(and (string? %) (not= % "")) content))))
-;             padding (format (str "%" diff "s") " ")]
-;         (reset! crow row)
-;         (reset! ccolumn column)
-;         (doseq [ch (line :line)]
-;           (if (string? ch)
-;             (if (= ch "\t") (plot "-") (plot ch))
-;             ;(do
-;             ;  (cond (= (ch :face) :string) (print "\033[38;5;131m")
-;             ;        (= (ch :face) :comment) (print "\033[38;5;105m")
-;             ;        (= (ch :face) :type1) (print "\033[38;5;11m") ; defn
-;             ;        (= (ch :face) :type2) (print "\033[38;5;40m") ; function
-;             ;        (= (ch :face) :type3) (print "\033[38;5;117m") ; keyword
-;             ;        :else (print "\033[0;37m"))
-;             ;  (cond (= (ch :bgface) :cursor1) (print "\033[42m")
-;             ;        (= (ch :bgface) :cursor2) (print "\033[44m")
-;             ;        (= (ch :bgface) :selection) (print "\033[48;5;52m")
-;             ;        (= (ch :bgface) :statusline) (print "\033[48;5;235m")
-;             ;        :else (print "\033[49m"))
-;             ;)))
-;         ;(if (= row (count lines))
-;         ;  (print (str "  " padding))
-;         ;  (print (str "\033[0;37m\033[49m" padding))))
-;       (swap! old-lines assoc key content))
-;     )))))
-; 
-; 
-; 
-;   ;; (doseq [[x y] (map vector (range 3) (range 3))] (println x "," y))
-; 
-; ;  (doseq [line lines]
-; ;    (let [row (line :row)
-; ;          column (line :column)
-; ;          content (line :line)] 
-; ;        (doseq [ch (line :line)]
-; 
-; ;  (draw-letter @g "a")
-; ;  (draw-letter @g "b")
-; ;  (draw-letter @g "c")
-; ;  (draw-letter @g 2 20 "a" (java.awt.Color. 255 100 0) (java.awt.Color. 0 0 0))
-; ;  (draw-letter @g 2 22 "b" (java.awt.Color. 255 100 0) (java.awt.Color. 0 0 0))
-; ;  (draw-letter @g 2 24 "c" (java.awt.Color. 255 100 0) (java.awt.Color. 0 0 0))
-; ;  (draw-letter @g 3 20 "d" (java.awt.Color. 155 0 0) (java.awt.Color. 0 0 0))
-; ;  (draw-letter @g 3 21 "e" (java.awt.Color. 155 100 0) (java.awt.Color. 0 0 0))
-;   )
-;   ;(.setText @pane (str/join "<br>\n" (doall (map #(apply str (% :line)) lines)))))
-;   ;(.setText @pane (str "abc<b>test</b>" @tmp-keys)))

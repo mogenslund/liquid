@@ -3,6 +3,7 @@
             [dk.salza.liq.modes.textmode :as textmode]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.syntaxhl.javascripthl :as javascripthl]
+            [dk.salza.liq.syntaxhl.pythonhl :as pythonhl]
             [dk.salza.liq.syntaxhl.xmlhl :as xmlhl]
             [dk.salza.liq.coreutil :refer :all]))
 
@@ -14,6 +15,7 @@
                          (re-matches #"^.*\.js$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.java$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.c$" filepath) javascripthl/next-face
+                         (re-matches #"^.*\.py$" filepath) pythonhl/next-face
                          (re-matches #"^.*\.xml$" filepath) xmlhl/next-face
                           :else clojuremdhl/next-face) ;; In other cases use clojure/markdown
           mode (textmode/create syntaxhl)]

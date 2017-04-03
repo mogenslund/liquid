@@ -44,6 +44,7 @@
   (editor/set-global-key :C-r #(editor/prompt-append "test"))
   (editor/set-eval-function "lisp" #(cshell/cmd "clisp" %))
   (editor/set-eval-function "js" #(cshell/cmd "node" %))
+  (editor/set-eval-function "py" #(cshell/cmd "python" %))
   (editor/set-eval-function "c" #(cshell/cmd "tcc" "-run" %))
   (editor/set-eval-function :default #(str (load-file %)))
   (when userfile (load-user-file userfile))
