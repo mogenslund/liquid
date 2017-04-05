@@ -30,15 +30,12 @@
       (do (editor/add-to-setting ::editor/searchpaths "/tmp")
           (editor/add-to-setting ::editor/snippets "(->> \"/tmp\" ls (lrex #\"something\") p)")
           (editor/add-to-setting ::editor/files "/tmp/tmp.clj")))))
-      ;(load-string (slurp (io/resource "liqdefault"))))))
-      ;(user/load-default))))
 
 (defn init-editor
   [rows columns userfile]
   (editor/set-default-mode (textmode/create clojuremdhl/next-face))
   (editor/set-default-app textapp/run)
   (editor/set-global-key :C-space commandapp/run)
-  ;(editor/set-global-key :C-f #(findfileapp/run editor/find-file))
   (editor/set-global-key :C-f #(findfileapp/run textapp/run))
   (editor/set-global-key :C-o editor/other-window)
   (editor/set-global-key :C-r #(editor/prompt-append "test"))
@@ -50,10 +47,8 @@
   (when userfile (load-user-file userfile))
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")
-  ;(editor/set-mode (textmode/create nil))
   (editor/add-window (window/create "main" 1 44 rows (- columns 46) "scratch")) ; todo: Change to percent given by setting. Not hard numbers
   (editor/new-buffer "scratch")
-  ;(editor/set-mode (textmode/create nil))
   (editor/insert (str "# Welcome to λiquid\n"
                       "To quit press C-q. To escape situation press C-g. To undo press u in navigation mode (blue cursor)\n"
                       "Use tab to switch between insert mode (green cursor) and navigation mode (blue cursor).\n\n"
@@ -73,12 +68,9 @@
   (let [windows (reverse (editor/get-windows))
         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
         lineslist (doall (map #(window/render %1 %2) windows buffers))]
-        ;(spit "/tmp/lines.txt" (pr-str lineslist)) 
         (when (editor/check-full-gui-update)
           ((@adapter :reset)))
          ((@adapter :print-lines) lineslist)))
-        ;(doseq [lines lineslist]
-        ;  ((@adapter :print-lines) lines))))
 
 (def updater (ref (future nil)))
 (def changes (ref 0))
@@ -128,8 +120,11 @@
                          (fileutil/file (System/getProperty "user.home") ".liq")))]
       ((@adapter :init))
       (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
-      (when (or (read-arg args "--web") (read-arg args "--server")) (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
-      (when (read-arg args "--html") (((htmladapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
+      (when (or (read-arg args "--web") (read-arg args "--server"))
+        (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
+      (when (read-arg args "--html")
+        (((htmladapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
+      ;; The main loop (webadapter and htmladapter has their own loops or input -> render flow.)
       (loop []
         (if singlethreaded
           (update-gui)          ; Non threaded version
