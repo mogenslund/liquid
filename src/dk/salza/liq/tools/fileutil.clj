@@ -38,6 +38,14 @@
   [filename]
   (str (io/file (System/getProperty "java.io.tmpdir") filename)))
 
+(defn get-roots
+  []
+  (map str (java.io.File/listRoots)))
+
+(defn get-children
+  [filepath]
+  (map str (.listFiles (io/file filepath))))
+
 (defn get-folders
   [filepath]
   (map str (filter #(.isDirectory %) (.listFiles (io/file filepath)))))

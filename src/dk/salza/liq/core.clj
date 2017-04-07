@@ -21,30 +21,47 @@
 
 (def adapter (ref nil))
 
+(defn is-windows
+  []
+  (re-matches #"(?i)win.*" (System/getProperty "os.name")))
+
 (defn load-user-file
   [path]
-  (let [file (fileutil/file path)] ; (fileutil/file (System/getProperty "user.home") ".liq")]
-    (if (and (fileutil/exists? file) (not (fileutil/folder? file)))
+  (let [file (and path (fileutil/file path))] ; (fileutil/file (System/getProperty "user.home") ".liq")]
+    (if (and file (fileutil/exists? file) (not (fileutil/folder? file)))
       (editor/evaluate-file-raw (str file))
       ;; Just some samples in case there is user file specified
-      (do (editor/add-to-setting ::editor/searchpaths "/tmp")
-          (editor/add-to-setting ::editor/snippets "(->> \"/tmp\" ls (lrex #\"something\") p)")
-          (editor/add-to-setting ::editor/files "/tmp/tmp.clj")))))
+      (let [tmpdir (if (is-windows) "C:\\Temp\\" "/tmp/")]
+        (editor/add-to-setting ::editor/searchpaths tmpdir)
+        (editor/add-to-setting ::editor/snippets (str "(->> \"" tmpdir "\" ls (lrex #\"something\") p)"))
+        (editor/add-to-setting ::editor/files (str tmpdir "tmp.clj"))))))
 
 (defn init-editor
   [rows columns userfile]
+
+  ;; Default mode
   (editor/set-default-mode (textmode/create clojuremdhl/next-face))
+
+  ;; Default app
   (editor/set-default-app textapp/run)
+
+  ;; Default global keybindings
   (editor/set-global-key :C-space commandapp/run)
   (editor/set-global-key :C-f #(findfileapp/run textapp/run))
   (editor/set-global-key :C-o editor/other-window)
   (editor/set-global-key :C-r #(editor/prompt-append "test"))
+
+  ;; Default evaluation handling
   (editor/set-eval-function "lisp" #(cshell/cmd "clisp" %))
   (editor/set-eval-function "js" #(cshell/cmd "node" %))
   (editor/set-eval-function "py" #(cshell/cmd "python" %))
   (editor/set-eval-function "c" #(cshell/cmd "tcc" "-run" %))
   (editor/set-eval-function :default #(str (load-file %)))
-  (when userfile (load-user-file userfile))
+
+  ;; Load userfile
+  (load-user-file userfile)
+
+  ;; Setup start windows and scratch buffer
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")
   (editor/add-window (window/create "main" 1 44 rows (- columns 46) "scratch")) ; todo: Change to percent given by setting. Not hard numbers
@@ -98,9 +115,6 @@
                                 %)
                       args))))
 
-(defn is-windows
-  []
-  (re-matches #"(?i)win.*" (System/getProperty "os.name")))
 
 (defn -main
   [& args]
