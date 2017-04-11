@@ -5,6 +5,7 @@
             [dk.salza.liq.syntaxhl.javascripthl :as javascripthl]
             [dk.salza.liq.syntaxhl.pythonhl :as pythonhl]
             [dk.salza.liq.syntaxhl.xmlhl :as xmlhl]
+            [dk.salza.liq.syntaxhl.latexhl :as latexhl]
             [dk.salza.liq.coreutil :refer :all]))
 
 (defn run
@@ -17,6 +18,7 @@
                          (re-matches #"^.*\.c$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.py$" filepath) pythonhl/next-face
                          (re-matches #"^.*\.xml$" filepath) xmlhl/next-face
+                         (re-matches #"^.*\.tex$" filepath) latexhl/next-face
                           :else clojuremdhl/next-face) ;; In other cases use clojure/markdown
           mode (textmode/create syntaxhl)]
       (editor/create-buffer-from-file filepath)

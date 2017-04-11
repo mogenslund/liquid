@@ -56,6 +56,7 @@
   (editor/set-eval-function "js" #(cshell/cmd "node" %))
   (editor/set-eval-function "py" #(cshell/cmd "python" %))
   (editor/set-eval-function "c" #(cshell/cmd "tcc" "-run" %))
+  (editor/set-eval-function "tex" #(cshell/cmd "pdflatex" "-halt-on-error" "-output-directory=/tmp" %))
   (editor/set-eval-function :default #(str (load-file %)))
 
   ;; Load userfile
