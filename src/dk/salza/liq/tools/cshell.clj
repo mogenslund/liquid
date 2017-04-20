@@ -112,6 +112,15 @@
            (filter #(re-find (re-pattern re) %)
                    (str/split-lines (slurp f))))))
 
+(defn flrex
+  "Returns sequence of [filepath line] vectors in files matched
+  by the regular expression."
+  [re s]
+  (apply concat
+         (for [f (filter file? (if (string? s) [s] s))] ; The last part is to convert string to vector with string
+           (map #(do [f %]) (filter #(re-find (re-pattern re) %)
+                    (str/split-lines (slurp f)))))))
+
 (defn cp
   [source-path dest-path]
   (io/copy (io/file source-path) (io/file dest-path)))
