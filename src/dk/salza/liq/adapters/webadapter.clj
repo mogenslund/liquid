@@ -207,7 +207,7 @@ Brainstorm - editor approach (Maybe not)
      }
 
      document.onkeydown = updategui;
-     " (when @autoupdate "setInterval(() => updategui(false), 200);") "
+     " (when @autoupdate "setInterval(() => updategui(false), 20);") "
      updategui(false);
      
      }"))
