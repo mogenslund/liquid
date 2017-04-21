@@ -12,6 +12,7 @@
 (def searchstring (atom ""))
 (def macro-seq (atom '()))
 (def full-gui-update (atom false))
+(def updates (atom 0))
 
 (def macro-record (atom false))
 
@@ -28,6 +29,10 @@
 (defn request-full-gui-update
   []
   (reset! full-gui-update true))
+
+(defn updated
+  []
+  (swap! updates inc))
 
 
 (defn check-full-gui-update
@@ -438,7 +443,8 @@
     (cond (map? action) (reset! submap action)
           action (do (reset! submap nil)
                      (action))
-          :else (reset! submap nil))))
+          :else (reset! submap nil))
+    (updated)))
 
 (defn record-macro
   []

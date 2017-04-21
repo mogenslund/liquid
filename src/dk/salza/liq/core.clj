@@ -1,6 +1,7 @@
 (ns dk.salza.liq.core
   (:require [clojure.java.io :as io]
             [dk.salza.liq.adapters.ttyadapter :as ttyadapter]
+            [dk.salza.liq.adapters.tty :as tty]
             [dk.salza.liq.adapters.winttyadapter :as winttyadapter]
             [clojure.string :as str]
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
@@ -123,39 +124,48 @@
   (let [rows (Integer/parseInt (or (read-arg args "--rows=") "40"))
         columns (Integer/parseInt (or (read-arg args "--columns=") "140"))
         port (Integer/parseInt (or (read-arg args "--port=") "8520"))
-        autoupdate (if (read-arg args "--autoupdate") true false)]
-    (dosync (ref-set adapter 
-      (cond (read-arg args "--jframe") jframeadapter/adapter
-            (or (read-arg args "--ghost") (read-arg args "--server")) (ghostadapter/adapter rows columns)
-            (is-windows) winttyadapter/adapter
-             :else ttyadapter/adapter)))
-    
-    (let [singlethreaded (read-arg args "--no-threads")
-          userfile (when-not (read-arg args "--no-init-file") 
-                     (or (read-arg args "--load=")
-                         (fileutil/file (System/getProperty "user.home") ".liq")))]
-      ((@adapter :init))
-      (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
-      (when (or (read-arg args "--web") (read-arg args "--server"))
-        (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
-      (when (read-arg args "--html")
-        (((htmladapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
-      ;; The main loop (webadapter and htmladapter has their own loops or input -> render flow.)
-      (loop []
-        (if singlethreaded
-          (update-gui)          ; Non threaded version
-          (request-update-gui)) ; Threaded version
-        (let [input ((@adapter :wait-for-input))]
-          (when (= input :C-M-q) ((@adapter :quit)))
-          (when (= input :C-q)
-            (let [dirty (editor/dirty-buffers)]
-              (if (empty? dirty)
-                ((@adapter :quit))
-                (editor/prompt-set (str "There are dirty buffers:\n\n"
-                                        (str/join "\n" dirty) "\n\n"
-                                        "Press C-M-q to quit anyway.")))))
-          (when (= input :C-space) ((@adapter :reset)))
-          (editor/handle-input input)
-          (dosync (alter changes inc)))
-        (recur)))))
+        autoupdate (if (read-arg args "--autoupdate") true false)
+        userfile (when-not (read-arg args "--no-init-file") 
+                   (or (read-arg args "--load=")
+                   (fileutil/file (System/getProperty "user.home") ".liq")))
+        singlethreaded (read-arg args "--no-threads")]
+    (if (read-arg args "--tty")
+      (do
+        (init-editor (- (tty/rows) 1) (tty/columns) userfile)
+        (tty/view-init)
+        (tty/input-handler)
+        (when (or (read-arg args "--web") (read-arg args "--server"))
+          (((webadapter/adapter (tty/rows) (tty/columns) autoupdate) :init) port))
+        )
+      (do
+        (dosync (ref-set adapter 
+          (cond (read-arg args "--jframe") jframeadapter/adapter
+                (or (read-arg args "--ghost") (read-arg args "--server")) (ghostadapter/adapter rows columns)
+                (is-windows) winttyadapter/adapter
+                 :else ttyadapter/adapter)))
+        
+        ((@adapter :init))
+        (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
+        (when (or (read-arg args "--web") (read-arg args "--server"))
+          (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
+        (when (read-arg args "--html")
+          (((htmladapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
+        ;; The main loop (webadapter and htmladapter has their own loops or input -> render flow.)
+        (loop []
+          (if singlethreaded
+            (update-gui)          ; Non threaded version
+            (request-update-gui)) ; Threaded version
+          (let [input ((@adapter :wait-for-input))]
+            (when (= input :C-M-q) ((@adapter :quit)))
+            (when (= input :C-q)
+              (let [dirty (editor/dirty-buffers)]
+                (if (empty? dirty)
+                  ((@adapter :quit))
+                  (editor/prompt-set (str "There are dirty buffers:\n\n"
+                                          (str/join "\n" dirty) "\n\n"
+                                          "Press C-M-q to quit anyway.")))))
+            (when (= input :C-space) ((@adapter :reset)))
+            (editor/handle-input input)
+            (dosync (alter changes inc)))
+          (recur))))))
     
