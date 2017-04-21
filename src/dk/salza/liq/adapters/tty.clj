@@ -118,6 +118,7 @@
                                                  (if (.ready r) (* 256 (+ (.read r) 1)) 0)
                                                  (if (.ready r) (* 256 256 (+ (.read r) 1)) 0))))]
     (loop [input (read-input)]
+      (when (= input :C-space) (reset))
       (when (= input :C-M-q) (quit))
       (when (= input :C-q)
         (let [dirty (editor/dirty-buffers)]
