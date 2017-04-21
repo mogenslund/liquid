@@ -118,7 +118,14 @@
                                                  (if (.ready r) (* 256 (+ (.read r) 1)) 0)
                                                  (if (.ready r) (* 256 256 (+ (.read r) 1)) 0))))]
     (loop [input (read-input)]
-      (when (= input :C-q) (quit)) ; todo: Handle unsaved files
+      (when (= input :C-M-q) (quit))
+      (when (= input :C-q)
+        (let [dirty (editor/dirty-buffers)]
+          (if (empty? dirty)
+            (quit)
+            (editor/prompt-set (str "There are dirty buffers:\n\n"
+                                 (str/join "\n" dirty) "\n\n"
+                                 "Press C-M-q to quit anyway.")))))
       (model-update input)
       (recur (read-input))))))
 
@@ -128,4 +135,5 @@
   (print "\033[0;37m\033[2J")
   (print "\033[?25l") ; Hide cursor
   (print "\033[?7l") ; disable line wrap
+  (view-draw)
   (add-watch editor/editor "tty" view-handler))
