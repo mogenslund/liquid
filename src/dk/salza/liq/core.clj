@@ -1,22 +1,21 @@
 (ns dk.salza.liq.core
   (:require [clojure.java.io :as io]
-            [dk.salza.liq.adapters.ttyadapter :as ttyadapter]
+            [clojure.string :as str]
             [dk.salza.liq.adapters.tty :as tty]
             [dk.salza.liq.adapters.winttyadapter :as winttyadapter]
-            [clojure.string :as str]
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
             [dk.salza.liq.adapters.webadapter :as webadapter]
             [dk.salza.liq.adapters.htmladapter :as htmladapter]
-            [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.window :as window]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.tools.cshell :as cshell]
             [dk.salza.liq.apps.findfileapp :as findfileapp]
             [dk.salza.liq.apps.textapp :as textapp]
-            [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
+            [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
+            [dk.salza.liq.editor :as editor]
+            [dk.salza.liq.window :as window]
             [dk.salza.liq.modes.textmode :as textmode])
   (:gen-class))
 
