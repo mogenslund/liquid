@@ -6,11 +6,8 @@
 
 
 (def pane (atom nil))
-(def last-key (atom nil))
-(def tmp-keys (atom ""))
 (def old-lines (atom {}))
 (def updater (ref (future nil)))
-(def changes (ref 0))
 
 (def colors {:plain "e4e4ef"
              :type1 "ffdd33"
@@ -131,19 +128,6 @@
     "</font>"
   ))
 
-
-
-
-(defn jframewait-for-input
-  []
-  (while (not @last-key)
-    (Thread/sleep 5))
-  (let [res @last-key]
-    ;(println "---")
-    (reset! last-key nil)
-    (swap! tmp-keys #(str % "-" res))
-    res))
-
 (defn set-content
   [id content]
   (.setInnerHTML (.getDocument @pane) (.getElement (.getDocument @pane) id) content)) 
@@ -173,21 +157,28 @@
     ;(.repaint @pane)
     ))
 
-(defn update-gui
+(defn view-draw
   []
   (let [windows (reverse (editor/get-windows))
         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
         lineslist (doall (pmap #(window/render %1 %2) windows buffers))]
         (jframeprint-lines lineslist)))
 
-(defn request-update-gui
-  []
+(defn view-handler
+  [key reference old new]
+  (remove-watch editor/editor key)
   (when (future-done? @updater)
     (dosync (ref-set updater
             (future
-              (loop [ch @changes]
-                (update-gui)
-                (when (not= ch @changes) (recur @changes))))))))
+              (loop [u @editor/updates]
+                (view-draw)
+                (when (not= u @editor/updates)
+                  (recur @editor/updates)))))))
+  (add-watch editor/updates key view-handler))
+
+(defn model-update
+  [input]
+  (future (editor/handle-input input)))
 
 (defn init
   []
@@ -201,16 +192,13 @@
                      (.addKeyListener (proxy [java.awt.event.KeyListener] []
                        (keyPressed [e] (do))
                        (keyReleased [e] (do))
-                       ;(keyTyped [e] (reset! last-key (event2keyword e)))
-                       (keyTyped [e] (do (editor/handle-input (event2keyword e)))
-                                         (dosync (alter changes inc))
-                                         (request-update-gui))
-                     ))))
+                       (keyTyped [e] (model-update (event2keyword e)))))))
   (doto (javax.swing.JFrame. "λiquid")
     (.setDefaultCloseOperation (javax.swing.JFrame/EXIT_ON_CLOSE))
     (.add @pane)
     (.setSize 1200 800)
-    (.show)))
+    (.show))
+  (add-watch editor/updates "jframe" view-handler))
 
 (defn jframequit
   []
