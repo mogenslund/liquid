@@ -20,7 +20,7 @@
             [dk.salza.liq.modes.textmode :as textmode])
   (:gen-class))
 
-(def adapter (ref nil))
+;(def adapter (ref nil))
 
 (defn is-windows
   []
@@ -83,26 +83,26 @@
                      ))
   (editor/end-of-buffer))
 
-(defn update-gui
-  []
-  (let [windows (reverse (editor/get-windows))
-        buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
-        lineslist (doall (map #(window/render %1 %2) windows buffers))]
-        (when (editor/check-full-gui-update)
-          ((@adapter :reset)))
-         ((@adapter :print-lines) lineslist)))
+;(defn update-gui
+;  []
+;  (let [windows (reverse (editor/get-windows))
+;        buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
+;        lineslist (doall (map #(window/render %1 %2) windows buffers))]
+;        (when (editor/check-full-gui-update)
+;          ((@adapter :reset)))
+;         ((@adapter :print-lines) lineslist)))
 
-(def updater (ref (future nil)))
-(def changes (ref 0))
+;(def updater (ref (future nil)))
+;(def changes (ref 0))
 
-(defn request-update-gui
-  []
-  (when (future-done? @updater)
-    (dosync (ref-set updater
-            (future
-              (loop [ch @changes]
-                (update-gui)
-                (when (not= ch @changes) (recur @changes))))))))
+;(defn request-update-gui
+;  []
+;  (when (future-done? @updater)
+;    (dosync (ref-set updater
+;            (future
+;              (loop [ch @changes]
+;                (update-gui)
+;                (when (not= ch @changes) (recur @changes))))))))
 
 (defn read-arg
   "Reads the value of an argument.
@@ -118,54 +118,63 @@
                                 %)
                       args))))
 
+(defn read-arg-int
+  [args arg]
+  (let [strres (read-arg args arg)]
+    (when strres (Integer/parseInt strres))))
+
 
 (defn -main
   [& args]
-  (let [rows (Integer/parseInt (or (read-arg args "--rows=") "40"))
-        columns (Integer/parseInt (or (read-arg args "--columns=") "140"))
-        port (Integer/parseInt (or (read-arg args "--port=") "8520"))
+  (let [usetty (or (read-arg args "--tty") (not (or (read-arg args "--server") (read-arg args "--ghost"))))
+        rows (or (read-arg-int args "--rows=") (and usetty (tty/rows))  40)
+        columns (or (read-arg-int args "--columns=") (and usetty (tty/columns)) 140)
+        port (or (read-arg-int args "--port=") 8520)
         autoupdate (if (read-arg args "--autoupdate") true false)
         userfile (when-not (read-arg args "--no-init-file") 
                    (or (read-arg args "--load=")
                    (fileutil/file (System/getProperty "user.home") ".liq")))
         singlethreaded (read-arg args "--no-threads")]
-    (if (read-arg args "--tty")
-      (do
-        (init-editor (- (tty/rows) 1) (tty/columns) userfile)
-        (tty/view-init)
-        (tty/input-handler)
+        (init-editor (- rows 1) columns userfile)
+        (when usetty
+          (tty/view-init)
+          (tty/input-handler))
         (when (or (read-arg args "--web") (read-arg args "--server"))
-          (((webadapter/adapter (tty/rows) (tty/columns) autoupdate) :init) port))
-        )
-      (do
-        (dosync (ref-set adapter 
-          (cond (read-arg args "--jframe") jframeadapter/adapter
-                (or (read-arg args "--ghost") (read-arg args "--server")) (ghostadapter/adapter rows columns)
-                (is-windows) winttyadapter/adapter
-                 :else ttyadapter/adapter)))
-        
-        ((@adapter :init))
-        (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
-        (when (or (read-arg args "--web") (read-arg args "--server"))
-          (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
+          (((webadapter/adapter rows columns autoupdate) :init) port))
         (when (read-arg args "--html")
-          (((htmladapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
-        ;; The main loop (webadapter and htmladapter has their own loops or input -> render flow.)
-        (loop []
-          (if singlethreaded
-            (update-gui)          ; Non threaded version
-            (request-update-gui)) ; Threaded version
-          (let [input ((@adapter :wait-for-input))]
-            (when (= input :C-M-q) ((@adapter :quit)))
-            (when (= input :C-q)
-              (let [dirty (editor/dirty-buffers)]
-                (if (empty? dirty)
-                  ((@adapter :quit))
-                  (editor/prompt-set (str "There are dirty buffers:\n\n"
-                                          (str/join "\n" dirty) "\n\n"
-                                          "Press C-M-q to quit anyway.")))))
-            (when (= input :C-space) ((@adapter :reset)))
-            (editor/handle-input input)
-            (dosync (alter changes inc)))
-          (recur))))))
+          (((htmladapter/adapter rows columns autoupdate) :init) port))
+        (editor/updated)
+     ))
+;        )
+;      (do
+;        (dosync (ref-set adapter 
+;          (cond (read-arg args "--jframe") jframeadapter/adapter
+;                (or (read-arg args "--ghost") (read-arg args "--server")) (ghostadapter/adapter rows columns)
+;                (is-windows) winttyadapter/adapter
+;                 :else ttyadapter/adapter)))
+;        
+;        ((@adapter :init))
+;        (init-editor (- ((@adapter :rows)) 1) ((@adapter :columns)) userfile)
+;        (when (or (read-arg args "--web") (read-arg args "--server"))
+;          (((webadapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
+;        (when (read-arg args "--html")
+;          (((htmladapter/adapter ((@adapter :rows)) ((@adapter :columns)) autoupdate) :init) port))
+;        ;; The main loop (webadapter and htmladapter has their own loops or input -> render flow.)
+;        (loop []
+;          (if singlethreaded
+;            (update-gui)          ; Non threaded version
+;            (request-update-gui)) ; Threaded version
+;          (let [input ((@adapter :wait-for-input))]
+;            (when (= input :C-M-q) ((@adapter :quit)))
+;            (when (= input :C-q)
+;              (let [dirty (editor/dirty-buffers)]
+;                (if (empty? dirty)
+;                  ((@adapter :quit))
+;                  (editor/prompt-set (str "There are dirty buffers:\n\n"
+;                                          (str/join "\n" dirty) "\n\n"
+;                                          "Press C-M-q to quit anyway.")))))
+;            (when (= input :C-space) ((@adapter :reset)))
+;            (editor/handle-input input)
+;            (dosync (alter changes inc)))
+;          (recur))))))
     

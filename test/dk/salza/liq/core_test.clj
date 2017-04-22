@@ -7,6 +7,7 @@
 (defn- send-input
   [& syms]
   (doseq [s syms]
+    (Thread/sleep 10)
     (if (string? s)
       (doseq [c s] (ghostadapter/send-input
                      (cond (= (str c) " ") :space
@@ -63,7 +64,8 @@
   (let [program (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=90"))]
     (send-input "ggvGdd" :tab) ; Clearing screen. Ready to type
     (apply send-input input)
-    (while (not (empty? @ghostadapter/input)) (Thread/sleep 10))
+    (Thread/sleep 10)
+    ;(while (not (empty? @ghostadapter/input)) (Thread/sleep 10))
     (let [windowcontent (apply concat (ghostadapter/get-display))]
       ;(println "DISPLAY:" (short-screen-notation windowcontent))
       (is (.contains (short-screen-notation windowcontent) expected)))))

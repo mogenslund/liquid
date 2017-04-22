@@ -136,5 +136,4 @@
   (print "\033[0;37m\033[2J")
   (print "\033[?25l") ; Hide cursor
   (print "\033[?7l") ; disable line wrap
-  (view-draw)
-  (add-watch editor/editor "tty" view-handler))
+  (add-watch editor/updates "tty" view-handler))
