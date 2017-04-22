@@ -12,13 +12,6 @@
 (def updater (ref (future nil)))
 (def changes (ref 0))
 
-; (def g (atom nil))
-; 
-; (def crow (atom 1))
-; (def ccolumn (atom 1))
-; (def ccolor (atom (java.awt.Color. 255 100 0)))
-; (def cbgcolor (atom (java.awt.Color. 20 20 20)))
-
 (def colors {:plain "e4e4ef"
              :type1 "ffdd33"
              :type2 "95a99f"
@@ -196,7 +189,7 @@
                 (update-gui)
                 (when (not= ch @changes) (recur @changes))))))))
 
-(defn jframeinit
+(defn init
   []
   (reset! pane (doto (javax.swing.JEditorPane.)
                      ;(javax.swing.JTextPane.)
@@ -222,11 +215,3 @@
 (defn jframequit
   []
   (System/exit 0))
-
-(def adapter {:init jframeinit
-              :rows jframerows
-              :columns jframecolumns
-              :wait-for-input jframewait-for-input
-              :print-lines jframeprint-lines
-              :reset (fn [] (do))
-              :quit jframequit})
