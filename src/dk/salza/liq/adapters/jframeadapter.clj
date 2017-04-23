@@ -130,32 +130,17 @@
 
 (defn set-content
   [id content]
-  (.setInnerHTML (.getDocument @pane) (.getElement (.getDocument @pane) id) content)) 
+  (let [doc (.getDocument @pane)]
+    (.setInnerHTML doc (.getElement doc id) (convert-line content))))
 
 ;; http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/HTMLDocument.html
 (defn jframeprint-lines
   [lineslist]
-  ;(println "Printing lines..")
-  (let [text (str "<html>"
-               "  <body bgcolor=\"" (bgcolors :plain) "\">"
-               "<table><tr>"
-               (str/join "\n" (for [lines lineslist] (str "<td>" (str/join "<br />\n" (map convert-line lines)) "</td>")))
-               "</tr></table>"
-               "<div id=\"tmp\">" "</div>"
-               "</body></html>")]
-    ;(.setText @pane text)
-    (doseq [line (apply concat lineslist)]
-      (let [key (str "w" (if (= (line :column) 1) "0" "1") "-r" (line :row))
-            content (convert-line line)]
-        (when (not= (@old-lines key) content)
-          (swap! old-lines assoc key content)
-          (set-content key (convert-line line)))))
-
-    ;(set-content "tmp" (str "<font color=\"888888\">abc " (System/currentTimeMillis) "</font>"))
-    ;(println (.getText @pane))
-    ;(.setCaretPosition @pane (count text))
-    ;(.repaint @pane)
-    ))
+  (doseq [line (apply concat lineslist)]
+    (let [key (str "w" (if (= (line :column) 1) "0" "1") "-r" (line :row))]
+      (when (not= (@old-lines key) line)
+        (swap! old-lines assoc key line)
+        (set-content key line)))))
 
 (defn view-draw
   []
@@ -183,7 +168,6 @@
 (defn init
   []
   (reset! pane (doto (javax.swing.JEditorPane.)
-                     ;(javax.swing.JTextPane.)
                      (.setContentType "text/html")
                      (.setEditable false)
                      (.setFocusTraversalKeysEnabled false)
