@@ -154,7 +154,9 @@
     (javax.swing.SwingUtilities/invokeLater
       (proxy [Runnable] []
         (run []
-          (.setInnerHTML doc element newcontent))))))
+          (.setInnerHTML doc element newcontent)
+          (.pack @frame)
+          )))))
 
 ;; http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/HTMLDocument.html
 (defn jframeprint-lines
@@ -172,7 +174,6 @@
         lineslist (doall (pmap #(window/render %1 %2) windows buffers))]
         (jframeprint-lines lineslist)
         ;(.setSize @frame (.getSize @pane))
-        
         ))
 
 (defn view-handler
@@ -216,10 +217,7 @@
       ;(.pack)
       (.show)))
   (add-watch editor/updates "jframe" view-handler)
-  (Thread/sleep 1000) ; TODO: Avoid
-  (editor/updated)
-  (Thread/sleep 1000) ; TODO: Avoid
-  (.pack @frame))
+  (editor/updated))
 
 (defn jframequit
   []
