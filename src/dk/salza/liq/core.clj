@@ -115,7 +115,7 @@
         (init-editor (- rows 1) columns userfile)
         (when usetty
           (if (is-windows)
-            (jframeadapter/init)
+            (jframeadapter/init rows columns)
             (do
               (tty/view-init)
               (tty/input-handler))))
