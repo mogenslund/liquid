@@ -100,31 +100,56 @@
   (let [strres (read-arg args arg)]
     (when strres (Integer/parseInt strres))))
 
+(defn print-help-and-exit
+  []
+  (println (str/join "\n" '(
+     ""
+     "Salza Liquid Help"
+     "================="
+     ""
+     "Examples:"
+     "No arguments: Runs in terminal on Linux and Mac and JFrame on Windows."
+     "--tty: Force run in terminal. May be used with parameters that normally would disable tty."
+     "--server: Starts a server on http://localhost:8520"
+     "--server --port=8000: Start a server on http://localhost:8000"
+     "--jframe: Runs in JFrame. On linux it needs Inconsolata font and Console font on Windows."
+     "--rows=50 --columns=80: Sets number of rows and columns."
+     "--no-init-file: Do not read .liq file."
+     "--autoupdate: If there are multiple views they should be syncronised."
+     "--load=<path to file>: Load <path to file> as init file."
+     ""
+     "Some parameters may be combined, like:"
+     "--tty --jframe --server --port=7000 --no-init-file --rows=50 --columns=80"
+  )))
+  (System/exit 0))
+  
 
 (defn -main
   [& args]
-  (let [usetty (or (read-arg args "--tty") (not (or (read-arg args "--server") (read-arg args "--ghost") (read-arg args "--jframe"))))
-        rows (or (read-arg-int args "--rows=") (and usetty (not (is-windows)) (tty/rows))  40)
-        columns (or (read-arg-int args "--columns=") (and usetty (not (is-windows)) (tty/columns)) 140)
-        port (or (read-arg-int args "--port=") 8520)
-        autoupdate (if (read-arg args "--autoupdate") true false)
-        userfile (when-not (read-arg args "--no-init-file") 
-                   (or (read-arg args "--load=")
-                   (fileutil/file (System/getProperty "user.home") ".liq")))
-        singlethreaded (read-arg args "--no-threads")]
-        (init-editor (- rows 1) columns userfile)
-        (when usetty
-          (if (is-windows)
-            (jframeadapter/init rows columns)
-            (do
-              (tty/view-init)
-              (tty/input-handler))))
-        (when (or (read-arg args "--web") (read-arg args "--server"))
-          (((webadapter/adapter rows columns autoupdate) :init) port))
-        (when (read-arg args "--html")
-          (((htmladapter/adapter rows columns autoupdate) :init) port))
-        (when (read-arg args "--jframe")
-          (jframeadapter/init rows columns))
-        (editor/updated)
-     ))
+  (if (read-arg args "--help")
+    (print-help-and-exit)
+    (let [usetty (or (read-arg args "--tty") (not (or (read-arg args "--server") (read-arg args "--ghost") (read-arg args "--jframe"))))
+          rows (or (read-arg-int args "--rows=") (and usetty (not (is-windows)) (tty/rows))  40)
+          columns (or (read-arg-int args "--columns=") (and usetty (not (is-windows)) (tty/columns)) 140)
+          port (or (read-arg-int args "--port=") 8520)
+          autoupdate (if (read-arg args "--autoupdate") true false)
+          userfile (when-not (read-arg args "--no-init-file") 
+                     (or (read-arg args "--load=")
+                     (fileutil/file (System/getProperty "user.home") ".liq")))
+          singlethreaded (read-arg args "--no-threads")]
+          (init-editor (- rows 1) columns userfile)
+          (when usetty
+            (if (is-windows)
+              (jframeadapter/init rows columns)
+              (do
+                (tty/view-init)
+                (tty/input-handler))))
+          (when (or (read-arg args "--web") (read-arg args "--server"))
+            (((webadapter/adapter rows columns autoupdate) :init) port))
+          (when (read-arg args "--html")
+            (((htmladapter/adapter rows columns autoupdate) :init) port))
+          (when (read-arg args "--jframe")
+            (jframeadapter/init rows columns))
+          (editor/updated)
+       )))
     
