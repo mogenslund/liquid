@@ -130,8 +130,13 @@
 
 (defn set-content
   [id content]
-  (let [doc (.getDocument @pane)]
-    (.setInnerHTML doc (.getElement doc id) (convert-line content))))
+  (let [doc (.getDocument @pane)
+        element (.getElement doc id)
+        newcontent (convert-line content)]
+    (javax.swing.SwingUtilities/invokeLater
+      (proxy [Runnable] []
+        (run []
+          (.setInnerHTML doc element newcontent))))))
 
 ;; http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/HTMLDocument.html
 (defn jframeprint-lines
@@ -163,7 +168,8 @@
 
 (defn model-update
   [input]
-  (future (editor/handle-input input)))
+  (future
+    (editor/handle-input input)))
 
 (defn init
   []
