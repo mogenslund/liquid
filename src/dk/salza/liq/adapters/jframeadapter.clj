@@ -12,6 +12,10 @@
 (def rows (atom 46))
 (def columns (atom 160))
 
+(defn is-windows
+  []
+  (re-matches #"(?i)win.*" (System/getProperty "os.name")))
+
 (def colors {:plain "e4e4ef"
              :type1 "ffdd33"
              :type2 "95a99f"
@@ -141,10 +145,11 @@
 ;textArea.setFont(new Font("monospaced", Font.PLAIN, 12));
 (defn convert-line
   [line]
-  (str "<font face=\"Inconsolata\" color=\"000000\" bgcolor=\"000000\">-</font><font face=\"Inconsolata\" color=\"" (colors :plain) "\" bgcolor=\"" (bgcolors :plain) "\">"
-    (str/join (for [c (line :line)] (if (string? c) (escape c) (str "</span><font face=\"Inconsolata\" color=\"" (colors (c :face)) "\" bgcolor=\"" (bgcolors (c :bgface)) "\">"))))
+  (let [font (if (is-windows) "Consolas" "Inconsolata")]
+    (str "<font face=\"" font "\" color=\"000000\" bgcolor=\"000000\">-</font><font face=\"" font "\" color=\"" (colors :plain) "\" bgcolor=\"" (bgcolors :plain) "\">"
+      (str/join (for [c (line :line)] (if (string? c) (escape c) (str "</span><font face=\"" font "\" color=\"" (colors (c :face)) "\" bgcolor=\""   (bgcolors (c :bgface)) "\">"))))
     "</font>"
-  ))
+  )))
 
 (defn set-content
   [id content]
