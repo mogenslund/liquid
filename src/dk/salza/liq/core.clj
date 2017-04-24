@@ -124,7 +124,7 @@
         (when (read-arg args "--html")
           (((htmladapter/adapter rows columns autoupdate) :init) port))
         (when (read-arg args "--jframe")
-          (jframeadapter/init))
+          (jframeadapter/init rows columns))
         (editor/updated)
      ))
     

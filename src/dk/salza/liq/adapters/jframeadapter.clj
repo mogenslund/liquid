@@ -5,9 +5,12 @@
             [clojure.string :as str]))
 
 
+(def frame (atom nil))
 (def pane (atom nil))
 (def old-lines (atom {}))
 (def updater (ref (future nil)))
+(def rows (atom 46))
+(def columns (atom 160))
 
 (def colors {:plain "e4e4ef"
              :type1 "ffdd33"
@@ -28,13 +31,14 @@
 (defn event2keyword
   [e]
   (let [ch (str (.getKeyChar e))
-        code (re-find #"(?<=primaryLevelUnicode=)\d+" (.paramString e))]
+        code (re-find #"(?<=primaryLevelUnicode=)\d+" (.paramString e))
+        rawcode (re-find #"(?<=rawCode=)\d+" (.paramString e))]
     ;(println "----" ch)
-    ;(println "KEYCHAR:   " ch)
-    ;(println "CTRL:      " (.isControlDown e))
-    ;(println "CODE:      " code)
-    ;(println "PARAM STR: " (.paramString e)); ,primaryLevelUnicode=108,
-    
+    ;(println "KEYCHAR:   " ch ", "
+    ;         "CTRL:      " (.isControlDown e) ", "
+    ;         "CODE:      " code ", "
+    ;         "RAW CODE:  " rawcode ", "
+    ;         "PARAM STR: " (.paramString e)) ; ,primaryLevelUnicode=108
     (cond (= (.getModifiers e) java.awt.event.InputEvent/CTRL_MASK)
                              (cond (= code "102") :C-f
                                    (= code "103") :C-g
@@ -47,6 +51,28 @@
                                    (= code "116") :C-t
                                    (= code "32") :C-space
                                    :else :unknown)
+          (= (.getModifiers e) java.awt.event.InputEvent/META_MASK)
+                                   (cond (= code "10") :M-enter
+                                   (= code "97") :M-a
+                                   (= code "98") :M-b
+                                   :else :unknown)
+          (= rawcode "111") :up
+          (= rawcode "116") :down
+          (= rawcode "113") :left
+          (= rawcode "114") :right
+          (= rawcode "67") :f1
+          (= rawcode "68") :f2
+          (= rawcode "69") :f3
+          (= rawcode "70") :f4
+          (= rawcode "71") :f5
+          (= rawcode "72") :f6
+          (= rawcode "73") :f7
+          (= rawcode "74") :f8
+          (= rawcode "75") :f9
+          (= rawcode "76") :f10
+          (= rawcode "95") :f11
+          (= rawcode "96") :f12
+          (= code "8") :backspace
           (= ch "\t") :tab
           (= ch " ") :space
           (= ch "\n") :enter
@@ -91,14 +117,6 @@
           (= ch "ø") :oe
           :else (keyword (str (.getKeyChar e))))))
 
-(defn jframerows
-  []
-  46)
-
-(defn jframecolumns
-  []
-  160)
-
 (defn row
   [window r]
   (str "<p id=\"w" window "-r" r "\"></p>"))
@@ -108,8 +126,8 @@
   (str "<html>" ;<head><style>" style "</style></head>"
        "<body bgcolor=\"" (bgcolors :plain) "\">"
        "<table bgcolor=\"" (bgcolors :plain) "\"><tr>"
-       "<td>" (str/join "" (map #(row 0 %) (range 1 (inc (jframerows))))) "</td>"
-       "<td>" (str/join "" (map #(row 1 %) (range 1 (inc (jframerows))))) "</td>"
+       "<td>" (str/join "" (map #(row 0 %) (range 1 (inc @rows)))) "</td>"
+       "<td>" (str/join "" (map #(row 1 %) (range 1 (inc @rows)))) "</td>"
        "</tr></table>"
        "<div id=\"tmp\"></div>"
        "</body></html>"))
@@ -152,7 +170,10 @@
   (let [windows (reverse (editor/get-windows))
         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
         lineslist (doall (pmap #(window/render %1 %2) windows buffers))]
-        (jframeprint-lines lineslist)))
+        (jframeprint-lines lineslist)
+        ;(.setSize @frame (.getSize @pane))
+        
+        ))
 
 (defn view-handler
   [key reference old new]
@@ -172,23 +193,33 @@
     (editor/handle-input input)))
 
 (defn init
-  []
+  [rowcount columncount]
+  (reset! rows rowcount)
+  (reset! columns columncount)
   (reset! pane (doto (javax.swing.JEditorPane.)
                      (.setContentType "text/html")
                      (.setEditable false)
                      (.setFocusTraversalKeysEnabled false)
                      (.setDoubleBuffered true)
                      (.setText (html))
+                     (.setMargin (java.awt.Insets. 0 0 0 0))
                      (.addKeyListener (proxy [java.awt.event.KeyListener] []
                        (keyPressed [e] (model-update (event2keyword e)))
                        (keyReleased [e] (do))
                        (keyTyped [e] (do))))))
-  (doto (javax.swing.JFrame. "λiquid")
-    (.setDefaultCloseOperation (javax.swing.JFrame/EXIT_ON_CLOSE))
-    (.add @pane)
-    (.setSize 1200 800)
-    (.show))
-  (add-watch editor/updates "jframe" view-handler))
+  (reset! frame 
+    (doto (javax.swing.JFrame. "λiquid")
+      (.setDefaultCloseOperation (javax.swing.JFrame/EXIT_ON_CLOSE))
+      (.setLayout (java.awt.FlowLayout. java.awt.FlowLayout/CENTER 0 0))
+      (.add @pane)
+      ;(.setSize 1200 800)
+      ;(.pack)
+      (.show)))
+  (add-watch editor/updates "jframe" view-handler)
+  (Thread/sleep 1000) ; TODO: Avoid
+  (editor/updated)
+  (Thread/sleep 1000) ; TODO: Avoid
+  (.pack @frame))
 
 (defn jframequit
   []
