@@ -114,8 +114,11 @@
         singlethreaded (read-arg args "--no-threads")]
         (init-editor (- rows 1) columns userfile)
         (when usetty
-          (tty/view-init)
-          (tty/input-handler))
+          (if (is-windows)
+            (jframeadapter/init)
+            (do
+              (tty/view-init)
+              (tty/input-handler))))
         (when (or (read-arg args "--web") (read-arg args "--server"))
           (((webadapter/adapter rows columns autoupdate) :init) port))
         (when (read-arg args "--html")

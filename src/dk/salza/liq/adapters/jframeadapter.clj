@@ -180,9 +180,9 @@
                      (.setDoubleBuffered true)
                      (.setText (html))
                      (.addKeyListener (proxy [java.awt.event.KeyListener] []
-                       (keyPressed [e] (do))
+                       (keyPressed [e] (model-update (event2keyword e)))
                        (keyReleased [e] (do))
-                       (keyTyped [e] (model-update (event2keyword e)))))))
+                       (keyTyped [e] (do))))))
   (doto (javax.swing.JFrame. "λiquid")
     (.setDefaultCloseOperation (javax.swing.JFrame/EXIT_ON_CLOSE))
     (.add @pane)
