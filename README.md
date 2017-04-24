@@ -17,8 +17,12 @@ I could tell a lot about the editor, but I think you should see the video below 
 
 #### Quick start
 Download the single jar (Uberjar containing both Clojure and Liquid) [liq.jar](http://salza.dk/liq.jar)  
-On Windows double click the jar.  
-On Linux and Mac execute "java -jar liq.jar" in a terminal.
+On Windows double click the liq.jar.  
+On Linux and Mac execute
+
+    java -jar liq.jar
+
+in a terminal.
 
 #### Other run configurations
 Download [liquid-0.7.0.jar](https://github.com/mogenslund/liquid/releases/download/v0.7.0/liquid-0.7.0.jar)
