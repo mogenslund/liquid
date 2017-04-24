@@ -104,8 +104,8 @@
 (defn -main
   [& args]
   (let [usetty (or (read-arg args "--tty") (not (or (read-arg args "--server") (read-arg args "--ghost") (read-arg args "--jframe"))))
-        rows (or (read-arg-int args "--rows=") (and usetty (tty/rows))  40)
-        columns (or (read-arg-int args "--columns=") (and usetty (tty/columns)) 140)
+        rows (or (read-arg-int args "--rows=") (and usetty (not (is-windows)) (tty/rows))  40)
+        columns (or (read-arg-int args "--columns=") (and usetty (not (is-windows)) (tty/columns)) 140)
         port (or (read-arg-int args "--port=") 8520)
         autoupdate (if (read-arg args "--autoupdate") true false)
         userfile (when-not (read-arg args "--no-init-file") 
