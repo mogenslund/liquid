@@ -7,7 +7,9 @@
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
 
-(def default-mode (atom nil))
+;(def default-mode (atom nil))
+(def default-highlighter (atom nil))
+(def default-keymap (atom nil))
 (def default-app (atom nil))
 (def searchstring (atom ""))
 (def macro-seq (atom '()))
@@ -41,9 +43,17 @@
     (reset! full-gui-update false)
     res))
 
-(defn set-default-mode
-  [mode]
-  (reset! default-mode mode))
+;(defn set-default-mode
+;  [mode]
+;  (reset! default-mode mode))
+
+(defn set-default-keymap
+  [keymap]
+  (reset! default-keymap keymap))
+
+(defn set-default-highlighter
+  [highlighter]
+  (reset! default-highlighter highlighter))
 
 (defn set-default-app
   [app]
@@ -142,7 +152,7 @@
 (defn beginning-of-buffer [] (doto-buffer buffer/beginning-of-buffer) (update-mem-col))
 (defn end-of-buffer [] (doto-buffer buffer/end-of-buffer) (update-mem-col))
 (defn clear [] (doto-buffer buffer/clear))
-(defn swap-actionmapping [] (doto-buffer buffer/swap-actionmapping))
+;(defn swap-actionmapping [] (doto-buffer buffer/swap-actionmapping))
 (defn selection-set [] (doto-buffer buffer/set-mark "selection"))
 (defn selection-cancel [] (doto-buffer buffer/remove-mark "selection"))
 (defn selection-toggle
@@ -201,13 +211,30 @@
     (switch-to-buffer previous)))
 
 
-(defn set-mode
-  [mode]
-  (doto-buffer buffer/set-mode mode))
+;(defn set-mode
+;  [mode]
+;  (doto-buffer buffer/set-mode mode))
+;
+;(defn get-mode
+;  []
+;  (buffer/get-mode (current-buffer)))
 
-(defn get-mode
+(defn set-keymap
+  [keymap]
+  (doto-buffer buffer/set-keymap keymap))
+
+(defn get-keymap
   []
-  (buffer/get-mode (current-buffer)))
+  (buffer/get-keymap (current-buffer)))
+
+
+(defn set-highlighter
+  [highlighter]
+  (doto-buffer buffer/set-highlighter highlighter))
+
+(defn get-highlighter
+  []
+  (buffer/get-highlighter (current-buffer)))
 
 (defn get-action
   [keyw]
@@ -221,7 +248,9 @@
     (dosync
       (alter editor update ::buffers conj (buffer/create name))))
   (switch-to-buffer name)
-  (set-mode @default-mode))
+  (set-highlighter @default-highlighter)
+  (set-keymap @default-keymap))
+;  (set-mode @default-mode)
 
 (defn find-file
   [filepath]
@@ -234,7 +263,9 @@
       (dosync
         (alter editor update ::buffers conj (buffer/create-from-file filepath)))
       (switch-to-buffer filepath)
-      (set-mode @default-mode))
+      (set-keymap @default-keymap)
+      (set-highlighter @default-highlighter))
+      ;(set-mode @default-mode)
     (switch-to-buffer filepath)))
 
 (defn save-file [] (doto-buffer buffer/save-buffer))

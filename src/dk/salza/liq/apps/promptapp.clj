@@ -1,14 +1,15 @@
 (ns dk.salza.liq.apps.promptapp
   (:require [dk.salza.liq.editor :as editor]
             [clojure.string :as str]
-            [dk.salza.liq.mode :as mode]
+            ;[dk.salza.liq.mode :as mode]
             [dk.salza.liq.keys :as keys]))
 
 (def state (atom {}))
 
 (defn escape
   []
-  (editor/set-mode (@state :old-mode))
+  ;(editor/set-mode (@state :old-mode))
+  (editor/set-keymap (@state :old-keymap))
   (editor/other-window))
 
 (defn process-line
@@ -25,30 +26,44 @@
           (editor/forward-line)
           (editor/end-of-line)))))
 
-(def mode
-  (-> (mode/create "promptmode")
-      (mode/set-actions
-        (merge
-          {:cursor-color :green
-           :right editor/forward-char
-           :left editor/backward-char
-           :space #(editor/insert " ")
-           :enter process-line
-           :backspace editor/delete
-           :C-g escape}
-          (keys/alphanum-mapping editor/insert)
-          (keys/symbols-mapping editor/insert)))))
+;(def mode
+;  (-> (mode/create "promptmode")
+;      (mode/set-actions
+;        (merge
+;          {:cursor-color :green
+;           :right editor/forward-char
+;           :left editor/backward-char
+;           :space #(editor/insert " ")
+;           :enter process-line
+;           :backspace editor/delete
+;           :C-g escape}
+;          (keys/alphanum-mapping editor/insert)
+;          (keys/symbols-mapping editor/insert)))))
+
+(def keymap
+  (merge
+    {:cursor-color :green
+     :right editor/forward-char
+     :left editor/backward-char
+     :space #(editor/insert " ")
+     :enter process-line
+     :backspace editor/delete
+     :C-g escape}
+    (keys/alphanum-mapping editor/insert)
+    (keys/symbols-mapping editor/insert)))
 
 
 (defn run
   [fun parameterlabels]
   (editor/switch-to-buffer "-prompt-")
-  (swap! state assoc :old-mode (editor/get-mode)
+  (swap! state assoc ;:old-mode (editor/get-mode)
+                     :old-keymap (editor/get-keymap)
                      :function fun
                      :parameterlabels parameterlabels
                      :linenr 0
                      :values '())
-  (editor/set-mode mode)
+  ;(editor/set-mode mode)
+  (editor/set-keymap keymap) 
   (editor/end-of-buffer)
   (editor/insert (str "\n" (str/join "\n" (map #(str % ": ") parameterlabels))))
   (editor/beginning-of-line)

@@ -3,7 +3,7 @@
   It needs a list to choose from and a to-string
   function to display and filter the list."
   (:require [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.mode :as mode]
+           ; [dk.salza.liq.mode :as mode]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
@@ -64,6 +64,22 @@
   (swap! state assoc ::selected 0)
   (update-display))
 
+(def keymap
+  (merge
+    {:cursor-color :green
+     :C-g editor/previous-buffer
+     :backspace delete-char
+     :C-k next-res
+     :down next-res
+     :tab prev-res ; tab = C-i in termainal!
+     :up prev-res
+     :enter execute
+     :space #(update-search " ")
+     }
+    (keys/alphanum-mapping update-search)
+    (keys/symbols-mapping update-search)))
+  
+
 (defn run
   "Items is a list of items.
   tostringfun is a function that takes
@@ -81,21 +97,24 @@
                      ::search ""
                      ::hit nil
                      ::selected 0)
-  (let [mode (-> (mode/create "typeaheadmode")
-               (mode/set-actions
-                 (merge
-                   {:cursor-color :green
-                    :C-g editor/previous-buffer
-                    :backspace delete-char
-                    :C-k next-res
-                    :down next-res
-                    :tab prev-res ; tab = C-i in termainal!
-                    :up prev-res
-                    :enter execute
-                    :space #(update-search " ")
-                    }
-                    (keys/alphanum-mapping update-search)
-                    (keys/symbols-mapping update-search))))]
+  (let [
+;        mode (-> (mode/create "typeaheadmode")
+;               (mode/set-actions
+;                 (merge
+;                   {:cursor-color :green
+;                    :C-g editor/previous-buffer
+;                    :backspace delete-char
+;                    :C-k next-res
+;                    :down next-res
+;                    :tab prev-res ; tab = C-i in termainal!
+;                    :up prev-res
+;                    :enter execute
+;                    :space #(update-search " ")
+;                    }
+;                    (keys/alphanum-mapping update-search)
+;                    (keys/symbols-mapping update-search))))]
+    ]
     (editor/new-buffer "-typeaheadapp-")
-    (editor/set-mode mode)
+    (editor/set-keymap keymap)
+;    (editor/set-mode mode)
     (update-display)))

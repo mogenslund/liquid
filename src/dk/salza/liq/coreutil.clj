@@ -10,6 +10,14 @@
     (let [parts (group-by #(= (% keyw) match) li)]
       (concat (parts true) (parts false)))))
 
+(defn rotate
+  "Take the first element of a list and
+  inserts at the end."
+  [li]
+  (if (> 2 (count li))
+    li
+    (concat (rest li) (list (first li)))))
+
 (defn remove-item
   ([li index]
     (if (> (count li) index)

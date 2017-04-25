@@ -10,7 +10,7 @@
 (defn create
   [syntaxhl]
   (-> (mode/create "textmode")
-      (mode/set-highlighter syntaxhl)
+      ;(mode/set-highlighter syntaxhl)
       (mode/set-actions
         (merge
           {:cursor-color :green

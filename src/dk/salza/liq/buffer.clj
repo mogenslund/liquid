@@ -1,7 +1,7 @@
 (ns dk.salza.liq.buffer
   (:require [dk.salza.liq.slider :as slider]
             [dk.salza.liq.sliderutil :as sliderutil]
-            [dk.salza.liq.mode :as mode]
+            ;[dk.salza.liq.mode :as mode]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
@@ -15,7 +15,10 @@
    ::filename nil
    ::dirty false
    ::mem-col 0
-   ::mode nil})
+   ::highlighter nil
+   ::keymap {}
+   ;::mode nil
+   })
 
 (defn create-from-file
   [path]
@@ -27,7 +30,10 @@
      ::filename path
      ::dirty false
      ::mem-col 0
-     ::mode nil}))
+     ::highlighter nil
+     ::keymap {}
+     ;::mode nil
+     }))
 
 (defn- doto-slider
   [buffer fun & args]
@@ -37,9 +43,9 @@
   [buffer columns]
   (assoc buffer ::mem-col (slider/get-visual-column (buffer ::slider) columns)))
 
-(defn- doto-mode
-  [buffer fun & args]
-  (update-in buffer [::mode] #(apply fun (list* % args))))
+;(defn- doto-mode
+;  [buffer fun & args]
+;  (update-in buffer [::mode] #(apply fun (list* % args))))
 
 
 (defn get-slider
@@ -64,9 +70,16 @@
                   ::slider-stack (conj (buffer ::slider-stack) (-> buffer ::slider-undo first))
                   ::slider-undo (rest (buffer ::slider-undo)))))
 
-(defn get-mode [buffer] (buffer ::mode))
-(defn set-mode [buffer mode] (assoc buffer ::mode mode))
-(defn swap-actionmapping [buffer] (doto-mode buffer mode/swap-actionmapping))
+;(defn get-mode [buffer] (buffer ::mode))
+;(defn set-mode [buffer mode] (assoc buffer ::mode mode))
+(defn set-highlighter [buffer highlighter] (assoc buffer ::highlighter highlighter))
+(defn get-highlighter [buffer] (buffer ::highlighter))
+
+(defn set-keymap [buffer keymap] (assoc buffer ::keymap keymap))
+(defn get-keymap [buffer] (buffer ::keymap))
+
+
+;(defn swap-actionmapping [buffer] (doto-mode buffer mode/swap-actionmapping))
 (defn set-dirty ([buffer dirty] (if (buffer ::filename) (assoc buffer ::dirty dirty) buffer))
                 ([buffer] (set-dirty buffer true)))
 (defn get-dirty [buffer] (buffer ::dirty))
@@ -117,10 +130,15 @@
 (defn get-line [buffer] (-> buffer beginning-of-line (set-mark "linestart")
                                    end-of-line (get-region "linestart")))
 
+;(defn get-action1
+;  [buffer keyw]
+;  (when (-> buffer ::mode)
+;    (-> buffer ::mode ::mode/actionmapping first keyw)))
+
 (defn get-action
   [buffer keyw]
-  (when (-> buffer ::mode)
-    (-> buffer ::mode ::mode/actionmapping first keyw)))
+  (when (-> buffer ::keymap)
+    (-> buffer ::keymap keyw)))
 
 (defn end-of-buffer? [buffer] (slider/end? (buffer ::slider)))
 

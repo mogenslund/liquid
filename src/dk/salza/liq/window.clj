@@ -1,5 +1,5 @@
 (ns dk.salza.liq.window
-  (:require [dk.salza.liq.mode :as mode]
+  (:require ;[dk.salza.liq.mode :as mode]
             [dk.salza.liq.buffer :as buffer]
             [dk.salza.liq.tools.fileutil :as futil])
   (:use [dk.salza.liq.slider :as slider :exclude [create]]))
@@ -124,8 +124,9 @@
 
 (defn render
   [window buffer]
-  (let [bmode (buffer/get-mode buffer)
-        cursor-color (-> bmode ::mode/actionmapping first :cursor-color)
+  (let [;bmode (buffer/get-mode buffer)
+        ;cursor-color (-> bmode ::mode/actionmapping first :cursor-color)
+        cursor-color (buffer/get-action buffer :cursor-color)
         rows (window ::rows)
         columns (window ::columns)
         towid (str (window ::name) "-" (window ::buffername))
@@ -135,7 +136,7 @@
         ;tmp (futil/log (get-mark sl "cursor"))
         ;tmp1 (futil/log (get-mark sl0 "cursor"))
         filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
-        syntaxhighlighter  (or (-> bmode ::mode/syntax-highlighter) (fn [face ch pch ppch sl] :plain))
+        syntaxhighlighter  (or (-> buffer ::buffer/highlighter) (fn [face ch pch ppch sl] :plain))
         sl1 (apply-syntax-highlight sl0 rows towid cursor-color  syntaxhighlighter)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
         dirty (buffer/get-dirty buffer)

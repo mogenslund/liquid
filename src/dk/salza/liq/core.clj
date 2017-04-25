@@ -7,16 +7,16 @@
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
             [dk.salza.liq.adapters.webadapter :as webadapter]
             [dk.salza.liq.adapters.htmladapter :as htmladapter]
+            [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.tools.cshell :as cshell]
             [dk.salza.liq.apps.findfileapp :as findfileapp]
             [dk.salza.liq.apps.textapp :as textapp]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
-            [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.window :as window]
-            [dk.salza.liq.modes.textmode :as textmode])
+            [dk.salza.liq.window :as window])
+            ;[dk.salza.liq.modes.textmode :as textmode]
   (:gen-class))
 
 (defn is-windows
@@ -37,8 +37,14 @@
 (defn init-editor
   [rows columns userfile]
 
-  ;; Default mode
-  (editor/set-default-mode (textmode/create clojuremdhl/next-face))
+  ;; Default highlighter
+  (editor/set-default-highlighter clojuremdhl/next-face)
+
+  ;; Default keymap
+  (editor/set-default-keymap textapp/keymap-navigation)
+
+;  ;; Default mode
+;  (editor/set-default-mode (textmode/create clojuremdhl/next-face))
 
   ;; Default app
   (editor/set-default-app textapp/run)
