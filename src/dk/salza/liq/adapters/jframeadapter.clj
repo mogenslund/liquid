@@ -60,6 +60,7 @@
                                    (= code "97") :M-a
                                    (= code "98") :M-b
                                    :else :unknown)
+          (re-matches #"[a-zA-Z0-9]" ch) (keyword ch)
           (= rawcode "111") :up
           (= rawcode "116") :down
           (= rawcode "113") :left
@@ -119,7 +120,7 @@
           (= ch "å") :aa
           (= ch "æ") :ae
           (= ch "ø") :oe
-          :else (keyword (str (.getKeyChar e))))))
+          :else (keyword ch))))
 
 (defn row
   [window r]
