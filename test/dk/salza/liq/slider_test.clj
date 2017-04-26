@@ -209,7 +209,7 @@
   ;;                    01234 5678 9012345678901
   (let [sl (-> (create "abcd\nefg\nhijklmnopqrst")
                (right 6))]
-    (testing "Look behind"
+    (testing "Look ahead"
       (is (= (look-ahead sl 0) "f"))
       (is (= (look-ahead sl 1) "g"))
       (is (= (look-ahead sl 2) "\n"))
@@ -219,6 +219,20 @@
       (is (= (look-ahead sl 26) nil))
     )))
 
+(deftest string-ahead-test
+  ;;                    | | |  C   |            |
+  ;;                    01234 5678 9012345678901
+  (let [sl (-> (create "abcd\nefg\nhijklmnopqrst")
+               (right 6))]
+    (testing "String ahead"
+      (is (= (string-ahead sl 1) "f"))
+      (is (= (string-ahead sl 2) "fg"))
+      (is (= (string-ahead sl 3) "fg\n"))
+      (is (= (string-ahead sl 4) "fg\nh"))
+      (is (= (string-ahead sl 16) "fg\nhijklmnopqrst"))
+      (is (= (string-ahead sl 17) "fg\nhijklmnopqrst"))
+      (is (= (string-ahead sl 27) "fg\nhijklmnopqrst"))
+    )))
 
 (deftest take-lines-test
   (let [sl (create "aaa\n1\n22\n333\n4444\n55555\nbb bb bbb\ncccc cccc ccccc")]

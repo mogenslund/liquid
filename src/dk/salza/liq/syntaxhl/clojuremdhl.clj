@@ -1,10 +1,6 @@
 (ns dk.salza.liq.syntaxhl.clojuremdhl
   (:use [dk.salza.liq.slider :as slider :exclude [create]]))
 
-(defn get-ahead
-  [sl n]
-  (apply str (map get-char (take n (iterate #(right % 1) sl)))))
-
 (defn next-face
   [sl face]
   (let [ch (look-ahead sl 0)
@@ -18,7 +14,7 @@
           (= face :plain)   (cond (and (= ch "\"") (re-matches #"[#\( \[{\n]" pch)) :string
                                   (= ch ";") :comment
                                   (and (= ch "#") (or (= pch "\n") (= pch "") (= (get-point sl) 0))) :comment 
-                                  (and (= pch "(") (re-find #"def(n|n-|test|record|protocol)? " (get-ahead sl 13))) :type1
+                                  (and (= pch "(") (re-find #"def(n|n-|test|record|protocol)? " (string-ahead sl 13))) :type1
                                   (and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
                                   :else face)
           (= face :type1)   (cond (= ch " ") :type2

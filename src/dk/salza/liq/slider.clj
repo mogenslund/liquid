@@ -102,6 +102,13 @@
   [sl amount]
   (first (drop amount (filter string? (sl ::after)))))
 
+(defn string-ahead
+  "Returns next amount of chars as string.
+  Non string will be filtered away."
+  [sl amount]
+  (str/join "" (take amount (filter string? (sl ::after)))))
+  
+
 (defn get-point
   "Returns the point. If at the beginning of the
   slider the result is 0. If at the end of the

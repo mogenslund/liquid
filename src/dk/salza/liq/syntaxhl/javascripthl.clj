@@ -1,10 +1,6 @@
 (ns dk.salza.liq.syntaxhl.javascripthl
   (:use [dk.salza.liq.slider :as slider :exclude [create]]))
 
-(defn get-ahead
-  [sl n]
-  (apply str (map get-char (take n (iterate #(right % 1) sl)))))
-
 (defn next-face
   [sl face]
   (let [ch (look-ahead sl 0)
@@ -20,7 +16,7 @@
                                   (and (= pch "\n") (= ch " ") (= (-> sl (right 1) (get-char)) "*")) :comment
                                   (and (= pch "\n") (= ch "/") (= (-> sl (right 1) (get-char)) "*")) :comment
                                   (and (= pch "") (= ch "/") (= (-> sl (right 1) (get-char)) "*")) :comment
-                                  (and (or (= pch " ") (= pch "\n") (= pch "")) (re-find #"^(var|function)[ \(]" (str (get-ahead sl 9) "    "))) :type1
+                                  (and (or (= pch " ") (= pch "\n") (= pch "")) (re-find #"^(var|function)[ \(]" (str (string-ahead sl 9) "    "))) :type1
                                   ;(and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
                                   :else face)
           (= face :type1)   (cond (= pch " ") :type2

@@ -1,10 +1,6 @@
 (ns dk.salza.liq.syntaxhl.xmlhl
   (:use [dk.salza.liq.slider :as slider :exclude [create]]))
 
-(defn get-ahead
-  [sl n]
-  (apply str (map get-char (take n (iterate #(right % 1) sl)))))
-
 (defn next-face
   [sl face]
   (let [ch (look-ahead sl 0)
