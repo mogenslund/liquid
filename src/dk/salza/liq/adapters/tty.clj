@@ -15,13 +15,23 @@
 
 (defn rows
   []
-  (let [shellinfo (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty"))]
-    (Integer/parseInt (re-find #"^\d+" shellinfo)))) ; (re-find #"\d+$" "50 120")
+  (loop [shellinfo (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty")) n 0]
+    (if (or (re-find #"^\d+" shellinfo) (> n 10)) 
+      (Integer/parseInt (re-find #"^\d+" shellinfo))
+      (do
+        (println n)
+        (Thread/sleep 100)
+        (recur (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty")) (inc n))))))
 
 (defn columns
   []
-  (let [shellinfo (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty"))]
-    (Integer/parseInt (re-find #"\d+$" shellinfo)))) ; (re-find #"\d+$" "50 120")
+  (loop [shellinfo (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty")) n 0]
+    (if (or (re-find #"\d+$" shellinfo) (> n 10)) 
+      (Integer/parseInt (re-find #"\d+$" shellinfo))
+      (do
+        (println n)
+        (Thread/sleep 100)
+        (recur (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty")) (inc n))))))
 
 (defn print-color
   [index & strings] ;   0         1          2        3          4         5        6    7   8        9     10
