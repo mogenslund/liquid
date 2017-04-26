@@ -83,7 +83,7 @@
              p (get-point sl0)
              selection (get-mark sl0 "selection")
              cursor (get-mark sl0 "cursor")
-             nextface (syntaxhighlighter face ch pch ppch sl0)
+             nextface (syntaxhighlighter sl0 face)
              nextbgface (cond (= p cursor) (if (= cursor-color :green) :cursor1 :cursor2)
                               (and selection (>= p (min selection cursor)) (< p (max selection cursor))) :selection
                               (and selection (>= p (max selection cursor))) :plain
@@ -136,7 +136,7 @@
         ;tmp (futil/log (get-mark sl "cursor"))
         ;tmp1 (futil/log (get-mark sl0 "cursor"))
         filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
-        syntaxhighlighter  (or (-> buffer ::buffer/highlighter) (fn [face ch pch ppch sl] :plain))
+        syntaxhighlighter  (or (-> buffer ::buffer/highlighter) (fn [sl face] :plain))
         sl1 (apply-syntax-highlight sl0 rows towid cursor-color  syntaxhighlighter)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
         dirty (buffer/get-dirty buffer)

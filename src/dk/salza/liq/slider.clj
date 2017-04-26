@@ -84,6 +84,24 @@
   [sl]
   (first (sl ::after)))
 
+(defn look-behind
+  "Returns char behind the cursor given amount back.
+  If amount = 1 the char right behind the cursor will be
+  returned.
+  Non strings will be filtered away.
+  If there is no result, nil is returned."
+  [sl amount]
+  (first (drop (- amount 1) (filter string? (sl ::before)))))
+
+(defn look-ahead
+  "Returns char after the cursor given amount forward.
+  If amount = 0 the char right after the cursor will be
+  returned.
+  Non strings will be filtered away.
+  If there is no result, nil is returned."
+  [sl amount]
+  (first (drop amount (filter string? (sl ::after)))))
+
 (defn get-point
   "Returns the point. If at the beginning of the
   slider the result is 0. If at the end of the

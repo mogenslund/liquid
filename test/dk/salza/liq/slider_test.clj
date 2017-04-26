@@ -189,6 +189,36 @@
       (is (= (get-region sl "mend") "mnopqrst"))
     ))) 
 
+(deftest look-behind-test
+  ;;                    | | |      |    C       |
+  ;;                    01234 5678 9012345678901
+  (let [sl (-> (create "abcd\nefg\nhijklmnopqrst")
+               (right 14))]
+    (testing "Look behind"
+      (is (= (look-behind sl 1) "l"))
+      (is (= (look-behind sl 6) "\n"))
+      (is (= (look-behind sl 9) "e"))
+      (is (= (look-behind sl 10) "\n"))
+      (is (= (look-behind sl 14) "a"))
+      (is (= (look-behind sl 15) nil))
+      (is (= (look-behind sl 25) nil))
+    )))
+
+(deftest look-ahead-test
+  ;;                    | | |  C   |            |
+  ;;                    01234 5678 9012345678901
+  (let [sl (-> (create "abcd\nefg\nhijklmnopqrst")
+               (right 6))]
+    (testing "Look behind"
+      (is (= (look-ahead sl 0) "f"))
+      (is (= (look-ahead sl 1) "g"))
+      (is (= (look-ahead sl 2) "\n"))
+      (is (= (look-ahead sl 3) "h"))
+      (is (= (look-ahead sl 15) "t"))
+      (is (= (look-ahead sl 16) nil))
+      (is (= (look-ahead sl 26) nil))
+    )))
+
 
 (deftest take-lines-test
   (let [sl (create "aaa\n1\n22\n333\n4444\n55555\nbb bb bbb\ncccc cccc ccccc")]
