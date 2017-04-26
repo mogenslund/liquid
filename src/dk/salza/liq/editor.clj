@@ -7,7 +7,6 @@
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
 
-;(def default-mode (atom nil))
 (def default-highlighter (atom nil))
 (def default-keymap (atom nil))
 (def default-app (atom nil))
@@ -42,10 +41,6 @@
   (let [res @full-gui-update]
     (reset! full-gui-update false)
     res))
-
-;(defn set-default-mode
-;  [mode]
-;  (reset! default-mode mode))
 
 (defn set-default-keymap
   [keymap]
@@ -152,7 +147,6 @@
 (defn beginning-of-buffer [] (doto-buffer buffer/beginning-of-buffer) (update-mem-col))
 (defn end-of-buffer [] (doto-buffer buffer/end-of-buffer) (update-mem-col))
 (defn clear [] (doto-buffer buffer/clear))
-;(defn swap-actionmapping [] (doto-buffer buffer/swap-actionmapping))
 (defn selection-set [] (doto-buffer buffer/set-mark "selection"))
 (defn selection-cancel [] (doto-buffer buffer/remove-mark "selection"))
 (defn selection-toggle
@@ -210,15 +204,6 @@
   (when-let [previous (first (filter (fn [x] (not (re-find #"^-" x))) (rest (buffer-names))))]
     (switch-to-buffer previous)))
 
-
-;(defn set-mode
-;  [mode]
-;  (doto-buffer buffer/set-mode mode))
-;
-;(defn get-mode
-;  []
-;  (buffer/get-mode (current-buffer)))
-
 (defn set-keymap
   [keymap]
   (doto-buffer buffer/set-keymap keymap))
@@ -226,7 +211,6 @@
 (defn get-keymap
   []
   (buffer/get-keymap (current-buffer)))
-
 
 (defn set-highlighter
   [highlighter]
@@ -239,7 +223,6 @@
 (defn get-action
   [keyw]
   (or (buffer/get-action (current-buffer) keyw)
-  ;(or (-> (get-mode) ::mode/actionmapping first keyw)
       (-> @editor ::global-keymap keyw)))
 
 (defn new-buffer
@@ -250,7 +233,6 @@
   (switch-to-buffer name)
   (set-highlighter @default-highlighter)
   (set-keymap @default-keymap))
-;  (set-mode @default-mode)
 
 (defn find-file
   [filepath]
@@ -265,7 +247,6 @@
       (switch-to-buffer filepath)
       (set-keymap @default-keymap)
       (set-highlighter @default-highlighter))
-      ;(set-mode @default-mode)
     (switch-to-buffer filepath)))
 
 (defn save-file [] (doto-buffer buffer/save-buffer))

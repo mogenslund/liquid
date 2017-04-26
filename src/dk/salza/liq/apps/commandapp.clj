@@ -1,6 +1,5 @@
 (ns dk.salza.liq.apps.commandapp
   (:require [dk.salza.liq.editor :as editor]
-            ;[dk.salza.liq.mode :as mode]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.tools.cshell :as cs]
             [dk.salza.liq.apps.promptapp :as promptapp]
@@ -118,23 +117,7 @@
 (defn run
   []
   (let [functions (editor/get-available-functions)
-;        mode (-> (mode/create "commandmode")
-;               (mode/set-actions
-;                 (merge
-;                   {:cursor-color :green
-;                    :C-g editor/previous-buffer
-;                    :backspace delete-char
-;                    :C-k next-res
-;                    :down next-res
-;                    :tab prev-res ; tab = C-i in termainal!
-;                    :up prev-res
-;                    :enter execute
-;                    :space #(update-search " ")
-;                    }
-;                    (keys/alphanum-mapping update-search)
-;                    (keys/symbols-mapping update-search))))]
       ]
     (editor/new-buffer "-commandapp-")
     (editor/set-keymap keymap)
-;    (editor/set-mode mode)
     (activate functions)))

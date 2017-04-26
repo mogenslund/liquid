@@ -2,7 +2,6 @@
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.editoractions :as editoractions]
             [dk.salza.liq.keys :as keys]
-            ;[dk.salza.liq.modes.textmode :as textmode]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
@@ -98,9 +97,7 @@
                          (re-matches #"^.*\.xml$" filepath) xmlhl/next-face
                          (re-matches #"^.*\.tex$" filepath) latexhl/next-face
                           :else clojuremdhl/next-face) ;; In other cases use clojure/markdown
-          ;mode (textmode/create syntaxhl)
           ]
       (editor/create-buffer-from-file filepath)
       (editor/set-keymap keymap-navigation)
-      ;(editor/set-mode mode)
       (editor/set-highlighter syntaxhl))))

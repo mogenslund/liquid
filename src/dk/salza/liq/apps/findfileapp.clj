@@ -2,7 +2,6 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [dk.salza.liq.editor :as editor]
-            ;[dk.salza.liq.mode :as mode]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]))
@@ -119,29 +118,10 @@
 (defn run
   [fun]
   (let [context (editor/get-context)
-        path (if (and (= (context :type) :file) (re-find #"/.*/" (context :value))) (re-find #"/.*/" (context :value))
-                                                                                    (editor/get-folder))
-;        ffmode (-> (mode/create "findfilemode")
-;                   (mode/set-actions
-;                   (merge
-;                     {:cursor-color :green
-;                      :space #(insert " ")
-;                      :backspace delete
-;                      :C-g editor/previous-buffer
-;                      :C-j up
-;                      :left up
-;                      :C-k next-res
-;                      :down next-res
-;                      :tab prev-res ; tab and C-i are the same in terminal
-;                      :up prev-res
-;                      :enter #(execute fun)
-;                      :M-enter #(execute-search fun)
-;                      }
-;                      (keys/alphanum-mapping insert)
-;                      (keys/symbols-mapping insert))))
-         ]
+        path (if (and (= (context :type) :file) (re-find #"/.*/" (context :value)))
+                 (re-find #"/.*/" (context :value))
+                 (editor/get-folder))]
     (editor/new-buffer "-findfile-")
     (editor/set-keymap (keymap fun))
-;    (editor/set-mode ffmode)
     (reset-state path))
   (update-display))
