@@ -7,6 +7,7 @@
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
 
+(def top-of-window (atom {})) ; Keys are windowname-buffername
 (def default-highlighter (atom nil))
 (def default-keymap (atom nil))
 (def default-app (atom nil))
@@ -177,16 +178,16 @@
 (defn forward-page
   []
   (let [towid (window/get-towid (current-window) (current-buffer))]
-    (doto-buffer buffer/set-point (or (@window/top-of-window towid)  0))
+    (doto-buffer buffer/set-point (or (@top-of-window towid)  0))
     (dotimes [n ((current-window) ::window/rows)] (forward-line))
     (beginning-of-line)
-    (swap! window/top-of-window assoc towid (get-point))))
+    (swap! top-of-window assoc towid (get-point))))
 
 (defn top-align-page
   []
   (let [towid (window/get-towid (current-window) (current-buffer))]
     (beginning-of-line)
-    (swap! window/top-of-window assoc towid (get-point))))
+    (swap! top-of-window assoc towid (get-point))))
 
 
 (defn other-window

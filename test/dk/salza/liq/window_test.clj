@@ -45,19 +45,19 @@
 
 ;(tmp-test)
 
-(deftest insert-token-test
-  (let [sl (-> (slider/create "abc\ndef") (slider/right 2))]
-    ;(println (-> sl (insert-token :xyz) slider/get-visible-content))
-    (testing "Insert token"
-      (is (= (-> sl (insert-token :xyz) slider/get-visible-content)
-             "ab¤c\ndef")))))
+;(deftest insert-token-test
+;  (let [sl (-> (slider/create "abc\ndef") (slider/right 2))]
+;    ;(println (-> sl (insert-token :xyz) slider/get-visible-content))
+;    (testing "Insert token"
+;      (is (= (-> sl (insert-token :xyz) slider/get-visible-content)
+;             "ab¤c\ndef")))))
 
-(deftest render-test
-  (let [buf (-> (buffer/create "mybuffer") (buffer/insert "abc"))
-        window (create "mywindow" 1 1 4 6 "mybuffer")]     ; name top left rows columns buffername
-    (testing "Initial rendering"
-      (is (= ((first (render window buf)) :line)
-             (list "a" "b" "c" {:face :plain, :bgface :cursor2} " " {:face :plain, :bgface :plain})))
-      (is (= ((second (render window (buffer/insert buf "\n"))) :line)
-             (list {:face :plain, :bgface :cursor2} " " {:face :plain, :bgface :plain})))
-    )))
+;(deftest render-test
+;  (let [buf (-> (buffer/create "mybuffer") (buffer/insert "abc"))
+;        window (create "mywindow" 1 1 4 6 "mybuffer")]     ; name top left rows columns buffername
+;    (testing "Initial rendering"
+;      (is (= ((first (render window buf)) :line)
+;             (list "a" "b" "c" {:face :plain, :bgface :cursor2} " " {:face :plain, :bgface :plain})))
+;      (is (= ((second (render window (buffer/insert buf "\n"))) :line)
+;             (list {:face :plain, :bgface :cursor2} " " {:face :plain, :bgface :plain})))
+;    )))

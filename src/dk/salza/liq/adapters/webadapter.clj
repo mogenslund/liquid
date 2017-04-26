@@ -1,6 +1,7 @@
 (ns dk.salza.liq.adapters.webadapter
   (:require [dk.salza.liq.tools.util :as util]
             [dk.salza.liq.keys :as keys]
+            [dk.salza.liq.renderer :as renderer]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
             [clojure.string :as str])
@@ -263,14 +264,7 @@ Brainstorm - editor approach (Maybe not)
 
 (defn get-output1
   []
-  (let [windows (reverse (editor/get-windows))
-        buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
-        lineslist (doall (pmap #(window/render %1 %2) windows buffers))]
-        ;(spit "/tmp/lines.txt" (pr-str lineslist)) 
-        ;k(when (editor/check-full-gui-update)
-        ;  ((@adapter :reset)))
-        ;(doseq [lines lineslist]
-        ;  ((@adapter :print-lines) lines))))
+  (let [lineslist (renderer/render-screen)]
         (str/join "\n" 
           (filter #(not= "" %) (pmap convert-line (apply concat lineslist))))))
 

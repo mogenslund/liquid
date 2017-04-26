@@ -1,5 +1,6 @@
 (ns dk.salza.liq.adapters.jframeadapter
   (:require [dk.salza.liq.tools.util :as util]
+            [dk.salza.liq.renderer :as renderer]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
             [clojure.string :as str]))
@@ -175,12 +176,9 @@
 
 (defn view-draw
   []
-  (let [windows (reverse (editor/get-windows))
-        buffers (map #(editor/get-buffer (window/get-buffername %)) windows)
-        lineslist (doall (pmap #(window/render %1 %2) windows buffers))]
-        (jframeprint-lines lineslist)
-        ;(.setSize @frame (.getSize @pane))
-        ))
+  (jframeprint-lines (renderer/render-screen))
+  ;(.setSize @frame (.getSize @pane))
+  )
 
 (defn view-handler
   [key reference old new]
