@@ -156,7 +156,7 @@
       ::point (- (sl ::point) n)
       ::linenumber (- (sl ::linenumber) linecount))))
 
-(defn right
+(defn right-old
   "Move the point to the right the given amount of times."
   [sl amount]
   (let [tmp (take amount (sl ::after))
@@ -167,6 +167,30 @@
     ::after (drop n (sl ::after))
     ::point (+ (sl ::point) n)
     ::linenumber (+ (sl ::linenumber) linecount))))
+
+(defn right
+  "Move the point to the right the given amount of times."
+  [sl amount]
+  (if (= amount 1)
+    (let [c (first (sl ::after))]
+      (cond (nil? c) sl
+            (not= c "\n") (assoc sl
+                            ::before (conj (sl ::before) c)
+                            ::after (rest (sl ::after))
+                            ::point (inc (sl ::point)))
+            :else (assoc sl
+                    ::before (conj (sl ::before) c)
+                    ::after (rest (sl ::after))
+                    ::point (inc (sl ::point))
+                    ::linenumber (inc (sl ::linenumber)))))
+    (let [tmp (take amount (sl ::after))
+          n (count tmp)
+          linecount (count (filter #(= % "\n") tmp))]
+      (assoc sl
+        ::before (concat (reverse tmp) (sl ::before))
+        ::after (drop n (sl ::after))
+        ::point (+ (sl ::point) n)
+        ::linenumber (+ (sl ::linenumber) linecount)))))
 
 (defn set-point
   "Move point the the given location.

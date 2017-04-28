@@ -66,6 +66,20 @@
     ;(is (= (get-char (right (sample) 1)) "2"))
     ))
 
+(deftest right-1-performance
+  (let [sl0 (create (clojure.string/join "\n" (repeat 2000 "aaaaaaa aaaaaaaa aaaaa aaaaaa aaaaaa")))]
+    ;; Implementation old takes 150 ms 
+    (testing "Performance when doing (right sl 1)"
+      (time
+        (loop [sl sl0]
+          (if (> (get-linenumber sl) 1500)
+            sl
+            (recur (right sl 1))))
+      )
+      
+      ;(is (= "Not implemented yet" ""))
+  )))
+
 (deftest set-point-test
   (testing "Set point"
     (is (= (-> (create "aaa") (set-point 0) get-point) 0))
