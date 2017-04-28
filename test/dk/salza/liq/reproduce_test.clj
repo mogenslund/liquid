@@ -24,5 +24,4 @@
     (is (= 18 (editor/get-point)))
     (editor/handle-input :j)
     (editor/handle-input :j)
-    (is (= 16 (editor/get-point)))
-    (editor/handle-input :C-q))
+    (is (= 16 (editor/get-point))))

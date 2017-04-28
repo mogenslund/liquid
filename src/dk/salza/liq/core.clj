@@ -51,6 +51,8 @@
 
   ;; Default global keybindings
   (editor/set-global-key :C-space commandapp/run)
+  (editor/set-global-key :C-q editor/quit)
+  (editor/set-global-key :C-M-q editor/force-quit)
   (editor/set-global-key :C-f #(findfileapp/run textapp/run))
   (editor/set-global-key :C-o editor/other-window)
   (editor/set-global-key :C-r #(editor/prompt-append "test"))

@@ -20,8 +20,8 @@
   []
   (let [pat (re-pattern (str "(?i)" (str/replace (@state ::search) #" " ".*")))
         filterfun (filter #(re-find pat (str %))) ; transducer
-        folders (filter #(re-find pat %) (conj (sort-by str/upper-case (fileutil/get-folders (@state ::path))) ".."))
-        files (filter #(re-find pat %) (sort-by str/upper-case (fileutil/get-files (@state ::path))))
+        folders (sort-by count (filter #(re-find pat %) (conj (sort-by str/upper-case (fileutil/get-folders (@state ::path))) "..")))
+        files (sort-by count (filter #(re-find pat %) (sort-by str/upper-case (fileutil/get-files (@state ::path)))))
         res (concat (map #(str "    [" (fileutil/filename %) "]") folders) (map #(str "    " (fileutil/filename %) "") files))]
     (if (and (@state ::selected) (> (count res) 0))
       (swap! state assoc ::hit (nth (concat folders files) (min (@state ::selected) (dec (count res)))))
@@ -103,6 +103,7 @@
      :space #(insert " ")
      :backspace delete
      :C-g editor/previous-buffer
+     :esc editor/previous-buffer
      :C-j up
      :left up
      :C-k next-res

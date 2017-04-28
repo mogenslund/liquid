@@ -8,6 +8,7 @@
            (= raw 9) :tab
            (= raw 32) :space
            (= raw 13) :enter
+           (= raw 27) :esc
            (= raw 33) :exclamation
            (= raw 34) :quote
            (= raw 35) :hash

@@ -32,6 +32,7 @@
        :i dk.salza.liq.extensions.headlinenavigator/run}
    :dash editor/top-next-headline
    :C-g editor/escape
+   :esc editor/escape
    :e editor/eval-last-sexp
    :E editor/evaluate-file
    :C-e editor/evaluate-file-raw
@@ -80,6 +81,7 @@
      :C-t #(editor/insert "\t")
      :backspace editor/delete
      :C-g editor/escape
+     :esc editor/escape
      :C-w editor/kill-buffer
      :C-s #(promptapp/run editor/find-next '("SEARCH"))} ;editor/search}
     (keys/alphanum-mapping editor/insert)

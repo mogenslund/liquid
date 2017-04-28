@@ -448,6 +448,27 @@
   (selection-cancel)
   (reset! submap nil))
 
+(defn force-quit
+  []
+  (print "\033[0;37m\033[2J")
+  (print "\033[?25h")
+  (flush)
+  (util/cmd "/bin/sh" "-c" "stty -echo cooked </dev/tty")
+  (util/cmd "/bin/sh" "-c" "stty -echo sane </dev/tty")
+  (Thread/sleep 100)
+  (println "")
+  (Thread/sleep 100)
+  (System/exit 0))
+
+(defn quit
+  []
+  (let [dirty (dirty-buffers)]
+        (if (empty? dirty)
+          (force-quit)
+          (prompt-set (str "There are dirty buffers:\n\n"
+                           (str/join "\n" dirty) "\n\n"
+                           "Press C-M-q to quit anyway.")))))
+
 (defn handle-input
   [keyw]
   (when (and @macro-record (not= keyw :H))

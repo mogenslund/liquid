@@ -103,6 +103,7 @@
   (merge
     {:cursor-color :green
      :C-g editor/previous-buffer
+     :esc editor/previous-buffer
      :backspace delete-char
      :C-k next-res
      :down next-res

@@ -89,16 +89,6 @@
   []
   (print-lines (renderer/render-screen)))
 
-(defn quit
-  []
-  (print "\033[0;37m\033[2J")
-  (print "\033[?25h")
-  (flush)
-  (util/cmd "/bin/sh" "-c" "stty -echo cooked </dev/tty")
-  (util/cmd "/bin/sh" "-c" "stty -echo sane </dev/tty")
-  (println "")
-  (System/exit 0))
-
 (defn view-handler
   [key reference old new]
   (remove-watch editor/editor key)
@@ -124,14 +114,6 @@
                                                  (if (.ready r) (* 256 256 (+ (.read r) 1)) 0))))]
     (loop [input (read-input)]
       (when (= input :C-space) (reset))
-      (when (= input :C-M-q) (quit))
-      (when (= input :C-q)
-        (let [dirty (editor/dirty-buffers)]
-          (if (empty? dirty)
-            (quit)
-            (editor/prompt-set (str "There are dirty buffers:\n\n"
-                                 (str/join "\n" dirty) "\n\n"
-                                 "Press C-M-q to quit anyway.")))))
       (model-update input)
       (recur (read-input))))))
 
