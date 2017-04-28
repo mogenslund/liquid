@@ -147,14 +147,26 @@
   So moving one character left is achieved with
   (left sl 1)."
   [sl amount]
-  (let [tmp (take amount (sl ::before))             ; Characters to be moved from :before to :after
-        n (count tmp)                               ; Might be less than amount, since at most (count :before)
-        linecount (count (filter #(= % "\n") tmp))] ; Checking how many lines are moved
-    (assoc sl
-      ::before (drop n (sl ::before))
-      ::after (concat (reverse tmp) (sl ::after))
-      ::point (- (sl ::point) n)
-      ::linenumber (- (sl ::linenumber) linecount))))
+  (if (= amount 1)
+    (let [c (first (sl ::before))]
+      (cond (nil? c) sl
+            (not= c "\n") (assoc sl
+                            ::before (rest (sl ::before))
+                            ::after (conj (sl ::after) c)
+                            ::point (dec (sl ::point)))
+            :else (assoc sl
+                    ::before (rest (sl ::before))
+                    ::after (conj (sl ::after) c)
+                    ::point (dec (sl ::point))
+                    ::linenumber (dec (sl ::linenumber)))))
+    (let [tmp (take amount (sl ::before))             ; Characters to be moved from :before to :after
+          n (count tmp)                               ; Might be less than amount, since at most (count :before)
+          linecount (count (filter #(= % "\n") tmp))] ; Checking how many lines are moved
+      (assoc sl
+        ::before (drop n (sl ::before))
+        ::after (concat (reverse tmp) (sl ::after))
+        ::point (- (sl ::point) n)
+        ::linenumber (- (sl ::linenumber) linecount)))))
 
 (defn right-old
   "Move the point to the right the given amount of times."
