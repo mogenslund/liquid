@@ -14,6 +14,7 @@
             [dk.salza.liq.apps.textapp :as textapp]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
+            [dk.salza.liq.extensions.vimapp :as vimapp]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window])
             ;[dk.salza.liq.modes.textmode :as textmode]
@@ -34,8 +35,8 @@
         (editor/add-to-setting ::editor/snippets (str "(->> \"" tmpdir "\" ls (lrex #\"something\") p)"))
         (editor/add-to-setting ::editor/files (str tmpdir "tmp.clj"))))))
 
-(defn init-editor
-  [rows columns userfile]
+(defn set-defaults
+  []
 
   ;; Default highlighter
   (editor/set-default-highlighter clojuremdhl/next-face)
@@ -64,11 +65,10 @@
   (editor/set-eval-function "r" #(cshell/cmd "R" "-q" "-f" %))
   (editor/set-eval-function "c" #(cshell/cmd "tcc" "-run" %))
   (editor/set-eval-function "tex" #(cshell/cmd "pdflatex" "-halt-on-error" "-output-directory=/tmp" %))
-  (editor/set-eval-function :default #(str (load-file %)))
+  (editor/set-eval-function :default #(str (load-file %))))
 
-  ;; Load userfile
-  (load-user-file userfile)
-
+(defn init-editor
+  [rows columns]
   ;; Setup start windows and scratch buffer
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")
@@ -145,7 +145,10 @@
                      (or (read-arg args "--load=")
                      (fileutil/file (System/getProperty "user.home") ".liq")))
           singlethreaded (read-arg args "--no-threads")]
-          (init-editor (- rows 1) columns userfile)
+          (set-defaults)
+          (when (read-arg args "--vim") (vimapp/init))
+          (init-editor (- rows 1) columns)
+          (load-user-file userfile)
           (when usetty
             (if (is-windows)
               (jframeadapter/init rows columns)
