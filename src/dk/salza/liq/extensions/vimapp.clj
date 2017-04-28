@@ -20,6 +20,7 @@
    :M editoractions/prompt-to-tmp
    :space #(editor/forward-page)
    ;:C-s editor/search
+   :colon (fn [] (editor/handle-input :C-space) (editor/handle-input :colon))
    :right editor/forward-char
    :left editor/backward-char
    :up editor/backward-line
@@ -108,4 +109,3 @@
   (editor/set-default-app run)
   (editor/set-global-key :C-j #(editor/insert "9"))
   (editor/set-default-keymap keymap-normal))
-

@@ -58,6 +58,12 @@
   (editor/set-global-key :C-o editor/other-window)
   (editor/set-global-key :C-r #(editor/prompt-append "test"))
 
+  ;; Default interactive functions
+  (editor/add-interactive ":w" editor/save-file)
+  (editor/add-interactive ":q!" editor/force-quit)
+  (editor/add-interactive ":q" editor/quit)
+  (editor/add-interactive ":o" editor/find-file)
+
   ;; Default evaluation handling
   (editor/set-eval-function "lisp" #(cshell/cmd "clisp" %))
   (editor/set-eval-function "js" #(cshell/cmd "node" %))
