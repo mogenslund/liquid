@@ -137,4 +137,4 @@
   []
   (let [windows (reverse (editor/get-windows))
         buffers (map #(editor/get-buffer (window/get-buffername %)) windows)]
-     (doall (pmap render-window windows buffers))))
+     (doall (map render-window windows buffers))))

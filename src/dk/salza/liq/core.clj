@@ -15,6 +15,7 @@
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.extensions.vimapp :as vimapp]
+            [dk.salza.liq.extensions.emacsapp :as emacsapp]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window])
             ;[dk.salza.liq.modes.textmode :as textmode]
@@ -153,6 +154,7 @@
           singlethreaded (read-arg args "--no-threads")]
           (set-defaults)
           (when (read-arg args "--vim") (vimapp/init))
+          (when (read-arg args "--emacs") (emacsapp/init))
           (init-editor (- rows 1) columns)
           (load-user-file userfile)
           (when usetty

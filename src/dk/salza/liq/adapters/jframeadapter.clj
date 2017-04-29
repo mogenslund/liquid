@@ -169,6 +169,8 @@
 ;; http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/HTMLDocument.html
 (defn jframeprint-lines
   [lineslist]
+  ;(println (pr-str (first (second lineslist))))
+  ;(println (convert-line (first (second lineslist))))
   (doseq [line (apply concat lineslist)]
     (let [key (str "w" (if (= (line :column) 1) "0" "1") "-r" (line :row))]
       (when (not= (@old-lines key) line)
