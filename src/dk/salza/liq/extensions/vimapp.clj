@@ -64,7 +64,8 @@
    :1 editor/select-sexp-at-point
    :y (fn []
         (if (editor/copy-selection) (editor/selection-cancel)
-        {:y editor/copy-line}))
+          (reset! editor/submap
+          {:y editor/copy-line})))
    :p {:p #(do (editor/insert-line) (editor/paste) (editor/beginning-of-line))
        :h editor/paste}
    :d {:d #(do (or (editor/delete-selection) (editor/delete-line)) (editor/selection-cancel))}

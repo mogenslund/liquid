@@ -15,6 +15,7 @@
 (def macro-seq (atom '()))
 (def full-gui-update (atom false))
 (def updates (atom 0))
+(def submap (atom nil))
 
 (def macro-record (atom false))
 
@@ -108,7 +109,6 @@
   []
   (map ::buffer/name (filter ::buffer/dirty (@editor ::buffers))))
 
-  
 (defn switch-to-buffer
   [buffername]
   (dosync
@@ -443,7 +443,6 @@
   )
 
 
-(def submap (atom nil))
 
 (defn escape
   []
@@ -457,6 +456,7 @@
   (flush)
   (util/cmd "/bin/sh" "-c" "stty -echo cooked </dev/tty")
   (util/cmd "/bin/sh" "-c" "stty -echo sane </dev/tty")
+  (flush)
   (Thread/sleep 100)
   (println "")
   (Thread/sleep 100)
