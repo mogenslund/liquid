@@ -88,7 +88,7 @@
                       "  C-space: Command typeahead (escape with C-g)\n"
                       "  C-f: Find file\n\n"
                       "## Evaluation\n"
-                      "Place cursor between the parenthesis below and type \"e\" in navigation mode, to evaluate the expression:\n"
+                      "Place cursor between the parenthesis below and type \"e\" in navigation mode (f5 when using --vim), to evaluate the expression:\n"
                       "(range 10 30)\n"
                       "(editor/end-of-buffer)\n"
                      ))

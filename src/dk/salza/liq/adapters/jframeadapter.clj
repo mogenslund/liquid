@@ -78,6 +78,7 @@
           (= rawcode "76") :f10
           (= rawcode "95") :f11
           (= rawcode "96") :f12
+          (= code "27") :esc
           (= code "8") :backspace
           (= ch "\t") :tab
           (= ch " ") :space
