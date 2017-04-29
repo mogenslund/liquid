@@ -63,7 +63,7 @@
        :h editor/paste}
    :d {:d #(do (or (editor/delete-selection) (editor/delete-line)) (editor/selection-cancel))}
    :s editor/save-file
-         :u editor/undo
+   :u editor/undo
    :C-w editor/kill-buffer
    :C-t editor/tmp-test
    ;:C-t #(promptapp/run str '("a" "tadaa"))

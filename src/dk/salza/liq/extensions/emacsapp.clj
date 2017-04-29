@@ -3,6 +3,8 @@
             [dk.salza.liq.editoractions :as editoractions]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.apps.promptapp :as promptapp]
+            [dk.salza.liq.apps.commandapp :as commandapp]
+            [dk.salza.liq.apps.findfileapp :as findfileapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.syntaxhl.javascripthl :as javascripthl]
@@ -28,6 +30,19 @@
    :up editor/backward-line
    :down editor/forward-line
    :C-g editor/escape
+   :M-x commandapp/run
+
+   :C-x {:C-f #(findfileapp/run @editor/default-app)
+         :C-s editor/save-file
+         :C-c editor/quit
+         :C-b commandapp/run
+         :C-e editor/eval-last-sexp
+         :u editor/undo
+         :k editor/kill-buffer
+        }
+
+
+
    :C-e editor/evaluate-file-raw
    }
    (keys/alphanum-mapping editor/insert)

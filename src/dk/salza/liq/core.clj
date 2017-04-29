@@ -64,6 +64,7 @@
   (editor/add-interactive ":q!" editor/force-quit)
   (editor/add-interactive ":q" editor/quit)
   (editor/add-interactive ":o" editor/find-file)
+  ;(editor/add-interactive "eval-last-sexp" editor/eval-last-sexp)
 
   ;; Default evaluation handling
   (editor/set-eval-function "lisp" #(cshell/cmd "clisp" %))
@@ -89,7 +90,7 @@
                       "  C-space: Command typeahead (escape with C-g)\n"
                       "  C-f: Find file\n\n"
                       "## Evaluation\n"
-                      "Place cursor between the parenthesis below and type \"e\" in navigation mode (f5 when using --vim), to evaluate the expression:\n"
+                      "Place cursor between the parenthesis below and type \"e\" in navigation mode (f5 when using --vim and C-x C-e using --emacs), to evaluate the expression:\n"
                       "(range 10 30)\n"
                       "(editor/end-of-buffer)\n"
                      ))
