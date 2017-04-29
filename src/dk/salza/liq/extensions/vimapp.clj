@@ -16,7 +16,6 @@
 
 (def keymap-normal
   {:cursor-color :blue
-   :tab #(editor/set-keymap @keymap-insert)
    :M editoractions/prompt-to-tmp
    :space #(editor/forward-page)
    ;:C-s editor/search
@@ -34,16 +33,21 @@
        :i dk.salza.liq.extensions.headlinenavigator/run}
    :dash editor/top-next-headline
    :C-g editor/escape
-   :e editor/eval-last-sexp
+   :e editor/end-of-word
    :E editor/evaluate-file
    :C-e editor/evaluate-file-raw
    :l editor/forward-char
    :h editor/backward-char
    :k editor/backward-line
    :j editor/forward-line
-   :o (fn [] (do (editor/insert-line) (editor/set-keymap @keymap-insert)))
+   :o #(do (editor/insert-line) (editor/set-keymap @keymap-insert))
+   :a #(do (editor/forward-char) (editor/set-keymap @keymap-insert))
+   :A #(do (editor/end-of-line) (editor/set-keymap @keymap-insert))
+   :i #(editor/set-keymap @keymap-insert)
+   :0 editor/beginning-of-line
    :J editor/beginning-of-line
    :G editor/end-of-buffer
+   :dollar editor/end-of-line
    :L editor/end-of-line
    :x editor/delete-char
    :m editor/previous-real-buffer 
@@ -53,12 +57,14 @@
    :O editor/context-action
    :w editor/forward-word
    :K editor/swap-line-down
-   :I editor/swap-line-up
+   :I #(do (editor/beginning-of-line) (editor/set-keymap @keymap-insert))
    :r (merge {:space #(editor/replace-char " ")}
              (keys/alphanum-mapping editor/replace-char)
              (keys/symbols-mapping editor/replace-char))
    :1 editor/select-sexp-at-point
-   :y {:y #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))}
+   :y (fn []
+        (if (editor/copy-selection) (editor/selection-cancel)
+        {:y editor/copy-line}))
    :p {:p #(do (editor/insert-line) (editor/paste) (editor/beginning-of-line))
        :h editor/paste}
    :d {:d #(do (or (editor/delete-selection) (editor/delete-line)) (editor/selection-cancel))}
@@ -72,14 +78,14 @@
 (reset! keymap-insert
   (merge
     {:cursor-color :green
-     :tab #(editor/set-keymap keymap-normal)
+     :esc #(do (editor/set-keymap keymap-normal) (editor/backward-char) (when (= (editor/get-char) "\n") (editor/forward-char)))
      :right editor/forward-char
      :left editor/backward-char
      :up editor/backward-line
      :down editor/forward-line
      :space #(editor/insert " ")
      :enter #(editor/insert "\n")
-     :C-t #(editor/insert "\t")
+     :tab #(editor/insert "\t")
      :backspace editor/delete
      :C-g editor/escape
      :C-w editor/kill-buffer
@@ -108,4 +114,5 @@
   []
   (editor/set-default-app run)
   (editor/set-global-key :C-j #(editor/insert "9"))
+  (editor/set-global-key :f5 editor/eval-last-sexp)
   (editor/set-default-keymap keymap-normal))

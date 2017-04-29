@@ -76,7 +76,8 @@
 
 (defn forward-char [buffer amount] (doto-slider buffer slider/right amount))
 (defn backward-char [buffer amount] (doto-slider buffer slider/left amount))
-(defn forward-word [buffer] (doto-slider buffer #(-> % (slider/right-until #" ") (slider/right 1))))
+(defn forward-word [buffer] (doto-slider buffer #(-> % (slider/right-until #"\s") (slider/right-until #"\S"))))
+(defn end-of-word [buffer] (doto-slider buffer #(-> % (slider/right 1) (slider/right-until #"\S") (slider/right-until #"\s") (slider/left 1))))
 (defn beginning-of-buffer [buffer] (doto-slider buffer slider/beginning))
 (defn end-of-buffer [buffer] (doto-slider buffer slider/end))
 (defn find-next [buffer search] (doto-slider buffer slider/find-next search))
