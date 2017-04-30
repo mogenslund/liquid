@@ -13,7 +13,6 @@
 (def default-app (atom nil))
 (def searchstring (atom ""))
 (def macro-seq (atom '()))
-(def full-gui-update (atom false))
 (def updates (atom 0))
 (def submap (atom nil))
 
@@ -29,20 +28,10 @@
                               ::commands '()
                               ::interactive '()}}))
 
-(defn request-full-gui-update
-  []
-  (reset! full-gui-update true))
-
 (defn updated
   []
   (swap! updates inc))
 
-
-(defn check-full-gui-update
-  []
-  (let [res @full-gui-update]
-    (reset! full-gui-update false)
-    res))
 
 (defn set-default-keymap
   [keymap]
@@ -344,8 +333,7 @@
     (let [output (try
                    (if sexp (with-out-str (println (load-string (str "(do (in-ns 'user) " sexp ")")))) "")
                    (catch Exception e (do (spit "/tmp/liq.log" e) (util/pretty-exception e))))]
-      (when (and (not= output "") (not isprompt)) (prompt-set output))))
-  (request-full-gui-update))
+      (when (and (not= output "") (not isprompt)) (prompt-set output)))))
 
 (defn eval-safe
   [fun]
@@ -353,7 +341,6 @@
                  (with-out-str (fun))
                  (catch Exception e (do (spit "/tmp/liq.log" e) (util/pretty-exception e))))]
       (when output (prompt-set output))))
-
 
 (defn eval-last-sexp
   []
