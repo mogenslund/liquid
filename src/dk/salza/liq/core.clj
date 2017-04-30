@@ -59,7 +59,8 @@
   (editor/set-global-key :C-f #(findfileapp/run textapp/run))
   (editor/set-global-key :C-o editor/other-window)
   (editor/set-global-key :C-r #(editor/prompt-append "test"))
-  (editor/set-global-key :C-h {:f helpapp/help-function
+  (editor/set-global-key :C-h {:a helpapp/help-apropos
+                               :f helpapp/help-function
                                :k helpapp/help-key})
 
   ;; Default interactive functions

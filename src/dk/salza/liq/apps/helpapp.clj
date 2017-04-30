@@ -1,6 +1,7 @@
 (ns dk.salza.liq.apps.helpapp
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.apps.typeaheadapp :as typeaheadapp]
+            [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
 
@@ -12,7 +13,10 @@
 ;    (with-out-str (clojure.repl/dir editor))
 ;    (with-out-str (clojure.repl/doc editor/doto-buffer)))))
 
+(defn help-apropos
+  []
+  (promptapp/run clojure.repl/find-doc '("APROPOS")))
+
 (defn help-key
   []
   (str "Not implemented yet"))
-
