@@ -3,7 +3,7 @@
 ;; http://ascii-table.com/ansi-escape-sequences.php
 (defn raw2keyword
   [raw]
-  (let [k (str (char (min raw 200)))]
+  (let [k (str (char (min raw 400)))]
      (cond (re-matches #"[a-zA-Z0-9]" k) (keyword k)
            (= raw 9) :tab
            (= raw 32) :space
@@ -95,7 +95,7 @@
            (= raw 32561) :f10
            ;(= raw ) :f11
            (= raw 32564) :f12
-           true :unknown)))
+           true (keyword char))))
 
 (defn alphanum-mapping
   [fun]
