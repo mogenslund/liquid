@@ -63,7 +63,7 @@
     (alter editor update ::buffers #(apply doto-first (list* % fun args))))
   nil)
 
-(defn current-buffer [] (-> @editor ::buffers first))
+(defn current-buffer "Returns the current active buffer." [] (-> @editor ::buffers first))
 (defn current-window [] (-> @editor ::windows first))
 
 (defn setting [keyw] (-> @editor ::settings keyw))

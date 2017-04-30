@@ -14,6 +14,7 @@
             [dk.salza.liq.apps.textapp :as textapp]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
+            [dk.salza.liq.apps.helpapp :as helpapp]
             [dk.salza.liq.extensions.vimapp :as vimapp]
             [dk.salza.liq.extensions.emacsapp :as emacsapp]
             [dk.salza.liq.editor :as editor]
@@ -58,6 +59,8 @@
   (editor/set-global-key :C-f #(findfileapp/run textapp/run))
   (editor/set-global-key :C-o editor/other-window)
   (editor/set-global-key :C-r #(editor/prompt-append "test"))
+  (editor/set-global-key :C-h {:f helpapp/help-function
+                               :k helpapp/help-key})
 
   ;; Default interactive functions
   (editor/add-interactive ":w" editor/save-file)
