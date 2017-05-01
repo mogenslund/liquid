@@ -68,6 +68,7 @@
   (editor/add-interactive ":q!" editor/force-quit)
   (editor/add-interactive ":q" editor/quit)
   (editor/add-interactive ":o" editor/find-file)
+  (editor/add-interactive "apropos" clojure.repl/find-doc "APROPOS")
   ;(editor/add-interactive "eval-last-sexp" editor/eval-last-sexp)
 
   ;; Default evaluation handling

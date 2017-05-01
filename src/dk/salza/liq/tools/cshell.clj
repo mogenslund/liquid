@@ -125,6 +125,10 @@
   [source-path dest-path]
   (io/copy (io/file source-path) (io/file dest-path)))
 
+(defn mv
+  [source-path dest-path]
+  (.renameTo (io/file source-path) (io/file dest-path)))
+
 (defn rm
   [path]
   (io/delete-file path))
