@@ -34,14 +34,20 @@
 
 
 (defn set-default-keymap
+  "Set the keymap to be used as default when a
+  new buffer is created."
   [keymap]
   (reset! default-keymap keymap))
 
 (defn set-default-highlighter
+  "Set the highlighter function to be used as
+  default when a new buffer is created."
   [highlighter]
   (reset! default-highlighter highlighter))
 
 (defn set-default-app
+  "Set the default app to be used when a new
+  buffer is created."
   [app]
   (reset! default-app app))
 
@@ -53,9 +59,10 @@
   nil)
 
 (defn current-buffer "Returns the current active buffer." [] (-> @editor ::buffers first))
-(defn current-window [] (-> @editor ::windows first))
+(defn current-window "Get the current active window." [] (-> @editor ::windows first))
 
-(defn setting [keyw] (-> @editor ::settings keyw))
+(defn setting "Get the setting with the given key." [keyw] (-> @editor ::settings keyw))
+
 (defn add-to-setting
   [keyw entry]
   (when (not (some #{entry} (setting keyw)))
@@ -121,7 +128,13 @@
 
 
 (defn get-visible-content [] (-> (current-buffer) buffer/get-visible-content))
-(defn insert [string] (doto-buffer buffer/insert string) (update-mem-col))
+
+(defn insert
+  "Insert a string to the current active buffer
+  at the cursor position."
+  [string]
+  (doto-buffer buffer/insert string) (update-mem-col))
+
 (defn insert-line [] (doto-buffer buffer/insert-line) (update-mem-col))
 (defn forward-char ([amount] (doto-buffer buffer/forward-char amount) (update-mem-col))
                    ([]       (doto-buffer buffer/forward-char 1) (update-mem-col)))
@@ -159,10 +172,14 @@
 (defn end-of-buffer? [] (-> (current-buffer) buffer/end-of-buffer?))
 
 (defn forward-line
+  "Move cursor forward one line
+  in the current active buffer."
   []
   (doto-buffer buffer/forward-visual-line ((current-window) ::window/columns)))
 
 (defn backward-line
+  "Move cursor backward one line
+  in the current active buffer."
   []
   (doto-buffer buffer/backward-visual-line ((current-window) ::window/columns)))
 
