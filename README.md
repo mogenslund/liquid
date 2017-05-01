@@ -17,6 +17,9 @@ I could tell a lot about the editor, but I think you should see the video below 
 
 #### Quick start
 Download the single jar (Uberjar containing both Clojure and Liquid) [liq.jar](http://salza.dk/liq.jar)  
+
+See [Cheatsheet](https://github.com/mogenslund/liquid/wiki/Cheat-Sheet) for basic keymappings.
+
 On Windows double click the liq.jar.  
 On Linux and Mac execute
 
@@ -62,10 +65,6 @@ All other tools that I create in Clojure, which are useful as is, are easy to ma
  * <b>Embedding</b> the editor into your your application. Include the &lambda;iquid to your project and use it as part of your program or for debugging and patching, just like you already do with the REPL, but with some advantages: It is easier to open a file with code and execute parts of it, or jump between snippets, do modifications, and execute again.  
 Example: I have a file with snippets like: `(patch "myserver")`, `(status "myserver")` and `(run-test "name-of-test")`. I just modify "myserver", if needed, and press "e" to execute the command.
 
-## Future visions
-
- * <b>Port to ClojureScript</b> Since there are no other dependencies than Clojure itself and not much Java Interop, I don't think it would be that hard, to port parts of the editor to ClojureScript, if there is a use case for that.
-
 ## Status of the application
 Most of the basic features I want are in place, but needs to be described further and polished.
 
@@ -94,68 +93,6 @@ From Vi I have stolen the concept of normal/insert mode. I really like the abili
 S-expressions in clojure can be evaluated with "e", while the whole file is evaluated with shift+e.
 
 Extending the functionality is done by including the classpath to the wanted code, when starting &lambda;iquid and using the .liq file to require the code or remap keys to use the new code or whatever code that needs to run to integrate the code into the editor..
-
-## Usage
-
-### Basic keymappings
-Keymappings are dependend of the mode in which the buffer is in.
-In plainmode, which is the default mode for regular text, clojure code and markdown, the most central key is TAB:
-
-TAB switches between two keymappings, one for navigation and common commands and one for typing text. (Very similar to vim, but with some differences.)
-Notices that the cursor changes between blue for navigation and green for insert.
-
-When in insertmode most keys just print the character pressed.
-
-Use *C-g* to try to escape from a state.
-Use *C-q* to quit editor.
-
-#### Navigation (blue cursor)
-      C-space: Start command mode (Typeahead to switch buffer, select and do stuff. See ?????????)
-      l:   Right
-      j:   Left
-      i:   Up
-      k:   Down
-      space: Page down
-      m:   Switch to previous buffer (Usefull for swithing forth and back between two buffers)
-      o:   Other window (Move between main and prompt windows)
-      O:   Context action (If the cursor is on a filepath or name Liquid will try to open that file. If it is a function, Liquid will try to navigate to the definition.)
-      C-s: Search
-      n:   Next search result
-
-(Notice it is like cursor keys without moving your hand.)
-
-      J:   Beginning of line
-      L:   End of line
-      w:   Forward word
-      gg:  Beginning of buffer
-      G:   End of buffer
-
-#### Delete and Insert
-      x:   Delete char
-      Backspace: Delete backward
-      yy:  Copy line or selection
-      pp:  Paste on new line
-      ph:  Paste
-      dd:  Delete line or selection
-      o:   Insert line
-      r:   Replace with next char pressed
-      I:   Move line up
-      K:   Move line down
-      v:   Begin or cancel selection
-
-#### Filehandling
-      s:   Save file
-      C-f: Open file
-
-#### Clojure code
-      C-e: Evaluate current file without capturing output (for (re)-loading internal stuff)
-      E:   Evaluate current file
-      e:   Evaluate current s-expression
-      1:   Select current s-expression (Multiple presses will make the cursor switch between begin and end parenthesis.)
-
-#### Macro recording
-      H:   Start and stop recording
-      h:   Play recording
 
 ## Sample .liq file
 Modify the content below and save it to .liq in your home directory:
