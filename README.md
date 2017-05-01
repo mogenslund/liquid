@@ -1,16 +1,6 @@
 # Salza &lambda;iquid text editor
 [![Clojars Project](https://img.shields.io/clojars/v/mogenslund/liquid.svg)](https://clojars.org/mogenslund/liquid)
 
-Salza &lambda;iquid text editor is designed with clojure developers in mind.
-
-The editor is written in pure Clojure. That is, there are no other dependencies, not even curses!
-
-I have been using Emacs for many years. I have tweaked it a lot and implemented modes, to simulate the Vim way of switching between insert mode and normal mode for navigation. I like being able to use the whole keyboard for navigation. As you will see in the video below, I am very inspired by Emacs and Vim, but I have choosen not to try to copy or reimplement Emacs or Vim. I have only stolen the features that I need or like. I hope others will just create plugins or extensions to make the editor support other features that they like.
-
-![Liquid Text Editor](liquid01.png)
-
-I could tell a lot about the editor, but I think you should see the video below for a demonstration.
-
 ## Installation
 
 ### Download and execution
@@ -28,6 +18,19 @@ On Linux and Mac execute
 in a terminal.
 
 **Vim and Emacs user might want to read this:** [Vim and Emacs](https://github.com/mogenslund/liquid/wiki/Vim-And-Emacs)
+
+#### What is is
+Salza &lambda;iquid text editor is designed with clojure developers in mind.
+
+The editor is written in pure Clojure. That is, there are no other dependencies, not even curses!
+
+I have been using Emacs for many years. I have tweaked it a lot and implemented modes, to simulate the Vim way of switching between insert mode and normal mode for navigation. I like being able to use the whole keyboard for navigation. As you will see in the video below, I am very inspired by Emacs and Vim, but I have choosen not to try to copy or reimplement Emacs or Vim. I have only stolen the features that I need or like. I hope others will just create plugins or extensions to make the editor support other features that they like.
+
+![Liquid Text Editor](liquid01.png)
+
+I could tell a lot about the editor, but I think you should see the video below for a demonstration.
+
+
 
 #### Other run configurations
 Download [liquid-0.7.6.jar](https://github.com/mogenslund/liquid/releases/download/v0.7.6/liquid-0.7.6.jar)
