@@ -19,8 +19,7 @@ in a terminal.
 
 **Vim and Emacs user might want to read this:** [Vim and Emacs](https://github.com/mogenslund/liquid/wiki/Vim-And-Emacs)
 
-#### What is is
-Salza &lambda;iquid text editor is designed with clojure developers in mind.
+#### Salza &lambda;iquid text editor is designed with clojure developers in mind.
 
 The editor is written in pure Clojure. That is, there are no other dependencies, not even curses!
 
