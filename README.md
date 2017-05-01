@@ -27,7 +27,7 @@ On Linux and Mac execute
 
 in a terminal.
 
-*Vim and Emacs user might want to read this:* [Vim and Emacs](https://github.com/mogenslund/liquid/wiki/Vim-And-Emacs)
+**Vim and Emacs user might want to read this:** [Vim and Emacs](https://github.com/mogenslund/liquid/wiki/Vim-And-Emacs)
 
 #### Other run configurations
 Download [liquid-0.7.6.jar](https://github.com/mogenslund/liquid/releases/download/v0.7.6/liquid-0.7.6.jar)
