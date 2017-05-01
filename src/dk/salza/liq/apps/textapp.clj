@@ -66,7 +66,6 @@
    :u editor/undo
    :C-w editor/kill-buffer
    :C-t editor/tmp-test
-   ;:C-t #(promptapp/run str '("a" "tadaa"))
    })
 
 (reset! keymap-insert
@@ -102,5 +101,4 @@
                           :else clojuremdhl/next-face) ;; In other cases use clojure/markdown
           ]
       (editor/create-buffer-from-file filepath)
-      (editor/set-keymap keymap-navigation)
       (editor/set-highlighter syntaxhl))))

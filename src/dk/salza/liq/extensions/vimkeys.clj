@@ -1,4 +1,4 @@
-(ns dk.salza.liq.extensions.vimapp
+(ns dk.salza.liq.extensions.vimkeys
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.editoractions :as editoractions]
             [dk.salza.liq.keys :as keys]
@@ -94,26 +94,8 @@
     (keys/alphanum-mapping editor/insert)
     (keys/symbols-mapping editor/insert)))
 
-(defn run
-  [filepath]
-  (if (editor/get-buffer filepath)
-    (editor/switch-to-buffer filepath)
-    (let [syntaxhl (cond (nil? filepath) clojuremdhl/next-face
-                         (re-matches #"^.*\.js$" filepath) javascripthl/next-face
-                         (re-matches #"^.*\.java$" filepath) javascripthl/next-face
-                         (re-matches #"^.*\.c$" filepath) javascripthl/next-face
-                         (re-matches #"^.*\.py$" filepath) pythonhl/next-face
-                         (re-matches #"^.*\.xml$" filepath) xmlhl/next-face
-                         (re-matches #"^.*\.tex$" filepath) latexhl/next-face
-                          :else clojuremdhl/next-face) ;; In other cases use clojure/markdown
-          ]
-      (editor/create-buffer-from-file filepath)
-      (editor/set-keymap keymap-normal)
-      (editor/set-highlighter syntaxhl))))
-
 (defn init
   []
-  (editor/set-default-app run)
   (editor/set-global-key :C-j #(editor/insert "9"))
   (editor/set-global-key :f5 editor/eval-last-sexp)
   (editor/set-default-keymap keymap-normal))

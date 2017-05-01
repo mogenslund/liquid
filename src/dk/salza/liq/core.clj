@@ -15,8 +15,8 @@
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.apps.helpapp :as helpapp]
-            [dk.salza.liq.extensions.vimapp :as vimapp]
-            [dk.salza.liq.extensions.emacsapp :as emacsapp]
+            [dk.salza.liq.extensions.vimkeys :as vimkeys]
+            [dk.salza.liq.extensions.emacskeys :as emacskeys]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window])
             ;[dk.salza.liq.modes.textmode :as textmode]
@@ -45,9 +45,6 @@
 
   ;; Default keymap
   (editor/set-default-keymap textapp/keymap-navigation)
-
-;  ;; Default mode
-;  (editor/set-default-mode (textmode/create clojuremdhl/next-face))
 
   ;; Default app
   (editor/set-default-app textapp/run)
@@ -159,8 +156,8 @@
                      (fileutil/file (System/getProperty "user.home") ".liq")))
           singlethreaded (read-arg args "--no-threads")]
           (set-defaults)
-          (when (read-arg args "--vim") (vimapp/init))
-          (when (read-arg args "--emacs") (emacsapp/init))
+          (when (read-arg args "--vim") (vimkeys/init))
+          (when (read-arg args "--emacs") (emacskeys/init))
           (init-editor (- rows 1) columns)
           (load-user-file userfile)
           (when usetty
