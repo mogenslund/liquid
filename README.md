@@ -17,6 +17,8 @@ On Linux and Mac execute the following in a terminal:
 
 *Vim and Emacs user might want to read this:* [Vim and Emacs](https://github.com/mogenslund/liquid/wiki/Vim-And-Emacs)
 
+Experience the power of Liquid by completing this tutorial: [Using External Libraries with Liquid](https://github.com/mogenslund/liquid/wiki/Tutorial-External-Libraries)
+
 #### Salza &lambda;iquid text editor is designed with clojure developers in mind
 
 The editor is written in pure Clojure. That is, there are no other dependencies, not even curses or lanterna!
