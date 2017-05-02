@@ -11,17 +11,15 @@ Download the single jar (Uberjar containing both Clojure and Liquid) [liq.jar](h
 See [Cheatsheet](https://github.com/mogenslund/liquid/wiki/Cheat-Sheet) for basic keymappings.
 
 On Windows double click the liq.jar.  
-On Linux and Mac execute
+On Linux and Mac execute the following in a terminal:
 
     java -jar liq.jar
 
-in a terminal.
-
-**Vim and Emacs user might want to read this:** [Vim and Emacs](https://github.com/mogenslund/liquid/wiki/Vim-And-Emacs)
+*Vim and Emacs user might want to read this:* [Vim and Emacs](https://github.com/mogenslund/liquid/wiki/Vim-And-Emacs)
 
 #### Salza &lambda;iquid text editor is designed with clojure developers in mind
 
-The editor is written in pure Clojure. That is, there are no other dependencies, not even curses!
+The editor is written in pure Clojure. That is, there are no other dependencies, not even curses or lanterna!
 
 I have been using Emacs for many years. I have tweaked it a lot and implemented modes, to simulate the Vim way of switching between insert mode and normal mode for navigation. I like being able to use the whole keyboard for navigation. As you will see in the video below, I am very inspired by Emacs and Vim, but I have choosen not to try to copy or reimplement Emacs or Vim. I have only stolen the features that I need or like. I hope others will just create plugins or extensions to make the editor support other features that they like.
 
@@ -104,8 +102,7 @@ Modify the content below and save it to .liq in your home directory:
 ```clojure
 (ns user
   (:require [clojure.string :as str]
-            [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.mode :as mode])
+            [dk.salza.liq.editor :as editor])
   (:use [dk.salza.liq.tools.cshell]))
 
 (editor/add-searchpath "/tmp")              ; Files below /tmp will now be chooseable from the Ctrl+Space chooser
