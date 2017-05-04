@@ -140,12 +140,21 @@
      "--tty --jframe --server --port=7000 --no-init-file --rows=50 --columns=80"
   )))
   (System/exit 0))
+
+(defn print-version-and-exit
+  []
+  (let [proj (clojure.java.io/resource "project.clj")]
+    (if proj
+      (println (re-find #"(?<=liquid \")[^\"]*(?=\")" (slurp proj)))
+      (println "Version can only be extracted from jar.")))
+  (System/exit 0))
   
 
 (defn -main
   [& args]
-  (if (read-arg args "--help")
-    (print-help-and-exit)
+  (cond (read-arg args "--help") (print-help-and-exit)
+        (read-arg args "--version") (print-version-and-exit)
+    :else
     (let [usetty (or (read-arg args "--tty") (not (or (read-arg args "--server") (read-arg args "--ghost") (read-arg args "--jframe"))))
           rows (or (read-arg-int args "--rows=") (and usetty (not (is-windows)) (tty/rows))  40)
           columns (or (read-arg-int args "--columns=") (and usetty (not (is-windows)) (tty/columns)) 140)
