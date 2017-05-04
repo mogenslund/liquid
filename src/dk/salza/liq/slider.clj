@@ -437,12 +437,12 @@
   if the line was wrapped or not."
   [sl columns column]
   (let [cur-column (get-visual-column sl columns)]
-    (loop [sl0 (-> sl (left cur-column) (forward-line columns))]
-      (if (or (= (get-visual-column sl0 columns) column)
+    (loop [sl0 (-> sl (left cur-column) (forward-line columns)) n 0]
+      (if (or (= n column)
               (end? sl0)
               (= (get-char sl0) "\n"))
           sl0
-          (recur (right sl0 1))))))
+          (recur (right sl0 1) (inc n))))))
 
 (defn backward-visual-column
   [sl columns column]
