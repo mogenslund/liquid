@@ -92,6 +92,11 @@
   (dosync (alter editor assoc-in [::global-keymap keyw] fun)) nil)
 
 (defn set-eval-function
+  "Associate an extension with a function. The function
+  is assumed to take one input - the filepath.
+  EXAMPLE (To associate files with \"py\" extension with the
+           python command):
+    (editor/set-eval-function \"py\" #(cshell/cmd \"python\" %))"
   [extension fun]
   (dosync (alter editor assoc-in [::file-eval extension] fun)) nil)
 
