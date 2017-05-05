@@ -29,6 +29,9 @@
                               ::interactive '()}}))
 
 (defn updated
+  "Call this function to proclaim that an
+  update has been made to the editor.
+  This can be used by views to check for updates."
   []
   (swap! updates inc))
 
@@ -58,10 +61,20 @@
     (alter editor update ::buffers #(apply doto-first (list* % fun args))))
   nil)
 
-(defn current-buffer "Returns the current active buffer." [] (-> @editor ::buffers first))
-(defn current-window "Get the current active window." [] (-> @editor ::windows first))
+(defn current-buffer
+  "Returns the current active buffer."
+  []
+  (-> @editor ::buffers first))
 
-(defn setting "Get the setting with the given key." [keyw] (-> @editor ::settings keyw))
+(defn current-window
+  "Get the current active window."
+  []
+  (-> @editor ::windows first))
+
+(defn setting
+  "Get the setting with the given key."
+  [keyw]
+  (-> @editor ::settings keyw))
 
 (defn add-to-setting
   [keyw entry]
@@ -69,6 +82,8 @@
     (dosync (alter editor update-in [::settings keyw] conj entry))))
 
 (defn set-setting
+  "Set keyw to value in the
+  settings part of the editor." 
   [keyw value]
   (dosync (alter editor assoc-in [::settings keyw] value)))
 
@@ -98,10 +113,12 @@
   (first (filter #(= (% ::buffer/name) name) (@editor ::buffers))))
 
 (defn buffer-names
+  "The names of the buffers as a list"
   []
   (map ::buffer/name (@editor ::buffers)))
 
 (defn dirty-buffers
+  "The names of the dirty buffers as a list."
   []
   (map ::buffer/name (filter ::buffer/dirty (@editor ::buffers))))
 
@@ -109,19 +126,31 @@
   [buffername]
   (dosync
     (alter editor update ::buffers bump ::buffer/name buffername)
-    ;(when (or (= buffername "commandmode") (not (some #{buffername} (map ::window/buffername (editor ::windows)))))
     (let [win (get-match (get-windows) ::window/buffername buffername)]
       (if win
         (alter editor update ::windows bump ::window/buffername buffername)
         (alter editor update ::windows doto-first assoc ::window/buffername buffername)))))
-    ;)
-  ;; If the buffer is displayed (window ::name) = buffername for some
-  ;; window bump that window. Otherwise choose the top window for display
 
-(defn update-mem-col [] (doto-buffer buffer/update-mem-col ((current-window) ::window/columns)))
+(defn update-mem-col
+  "Stores the current cursor position on the current line.
+  Primarily used for forward-line and backward-line to
+  remember the cursor position when navigation is done
+  past shorter lines.
+  That is what makes the cursor in and out when using
+  arrow down."
+  []
+  (doto-buffer buffer/update-mem-col
+               ((current-window) ::window/columns)))
 
-(defn get-filename [] (-> (current-buffer) buffer/get-filename))
+(defn get-filename
+  "The filename if one is associated with the current
+  buffer, otherwise nil."
+  []
+  (-> (current-buffer) buffer/get-filename))
+
 (defn get-folder
+  "The folder part if a filename is associated with
+  the current buffer, otherwise nil."
   []
   (if-let [filepath (get-filename)]
     (str (.getParent (io/file filepath)))))
