@@ -19,7 +19,6 @@
             [dk.salza.liq.extensions.emacskeys :as emacskeys]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window])
-            ;[dk.salza.liq.modes.textmode :as textmode]
   (:gen-class))
 
 (defn is-windows
@@ -28,9 +27,10 @@
 
 (defn load-user-file
   [path]
-  (let [file (and path (fileutil/file path))] ; (fileutil/file (System/getProperty "user.home") ".liq")]
+  (let [file (and path (fileutil/file path))]
     (if (and file (fileutil/exists? file) (not (fileutil/folder? file)))
       (editor/evaluate-file-raw (str file))
+
       ;; Just some samples in case there is user file specified
       (let [tmpdir (if (is-windows) "C:\\Temp\\" "/tmp/")]
         (editor/add-to-setting ::editor/searchpaths tmpdir)
@@ -66,7 +66,6 @@
   (editor/add-interactive ":q" editor/quit)
   (editor/add-interactive ":o" editor/find-file)
   (editor/add-interactive "apropos" clojure.repl/find-doc "APROPOS")
-  ;(editor/add-interactive "eval-last-sexp" editor/eval-last-sexp)
 
   ;; Default evaluation handling
   (editor/set-eval-function "lisp" #(cshell/cmd "clisp" %))
@@ -82,17 +81,22 @@
   ;; Setup start windows and scratch buffer
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")
-  (editor/add-window (window/create "main" 1 44 rows (- columns 46) "scratch")) ; todo: Change to percent given by setting. Not hard numbers
+  ;; todo: Change to percent given by setting. Not hard numbers
+  (editor/add-window (window/create "main" 1 44 rows (- columns 46) "scratch"))
   (editor/new-buffer "scratch")
   (editor/insert (str "# Welcome to λiquid\n"
-                      "To quit press C-q. To escape situation press C-g. To undo press u in navigation mode (blue cursor)\n"
-                      "Use tab to switch between insert mode (green cursor) and navigation mode (blue cursor).\n\n"
+                      "To quit press C-q. To escape situation press C-g."
+                      "To undo press u in navigation mode (blue cursor)\n"
+                      "Use tab to switch between insert mode (green cursor) "
+                      "and navigation mode (blue cursor).\n\n"
                       "## Basic navigation\nIn navigation mode (blue cursor):\n\n"
                       "  j: Left\n  l: Right\n  i: Up\n  k: Down\n\n"
                       "  C-space: Command typeahead (escape with C-g)\n"
                       "  C-f: Find file\n\n"
                       "## Evaluation\n"
-                      "Place cursor between the parenthesis below and type \"e\" in navigation mode (f5 when using --vim and C-x C-e using --emacs), to evaluate the expression:\n"
+                      "Place cursor between the parenthesis below and type \"e\" "
+                      "in navigation mode (f5 when using --vim and C-x C-e using --emacs), "
+                      "to evaluate the expression:\n"
                       "(range 10 30)\n"
                       "(editor/end-of-buffer)\n"
                      ))
@@ -152,35 +156,60 @@
 
 (defn -main
   [& args]
+  ;; If arguments are --help or --version, just show information
+  ;; and quit.
   (cond (read-arg args "--help") (print-help-and-exit)
         (read-arg args "--version") (print-version-and-exit)
     :else
-    (let [usetty (or (read-arg args "--tty") (not (or (read-arg args "--server") (read-arg args "--ghost") (read-arg args "--jframe"))))
-          rows (or (read-arg-int args "--rows=") (and usetty (not (is-windows)) (tty/rows))  40)
-          columns (or (read-arg-int args "--columns=") (and usetty (not (is-windows)) (tty/columns)) 140)
+    (let [usetty (or (read-arg args "--tty")
+                     (not (or (read-arg args "--server")
+                              (read-arg args "--ghost")
+                              (read-arg args "--jframe"))))
+          rows (or (read-arg-int args "--rows=")
+                   (and usetty (not (is-windows)) (tty/rows))
+                   40)
+          columns (or (read-arg-int args "--columns=")
+                      (and usetty (not (is-windows))
+                      (tty/columns))
+                      140)
           port (or (read-arg-int args "--port=") 8520)
           autoupdate (if (read-arg args "--autoupdate") true false)
           userfile (when-not (read-arg args "--no-init-file") 
                      (or (read-arg args "--load=")
-                     (fileutil/file (System/getProperty "user.home") ".liq")))
+                         (fileutil/file (System/getProperty "user.home") ".liq")))
           singlethreaded (read-arg args "--no-threads")]
+
+          ;; Load the defaults
           (set-defaults)
+
+          ;; Overwrite with emacs or vim key bindings if requested
           (when (read-arg args "--vim") (vimkeys/init))
           (when (read-arg args "--emacs") (emacskeys/init))
+
+          ;; Build editor: Initial windows and buffers
           (init-editor (- rows 1) columns)
+
+          ;; Load userfile if present.
           (load-user-file userfile)
+
+          ;; TTY is used as default view on Linux and Mac
+          ;; JFrame is used on Windows
           (when usetty
             (if (is-windows)
               (jframeadapter/init rows columns)
               (do
                 (tty/view-init)
                 (tty/input-handler))))
+
+          ;; If specified load as web, server, html or JFrame
           (when (or (read-arg args "--web") (read-arg args "--server"))
             (((webadapter/adapter rows columns autoupdate) :init) port))
           (when (read-arg args "--html")
             (((htmladapter/adapter rows columns autoupdate) :init) port))
           (when (read-arg args "--jframe")
             (jframeadapter/init rows columns))
+
+          ;; Post that the editor has updated, to make view update
           (editor/updated)
        )))
     
