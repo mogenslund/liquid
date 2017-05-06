@@ -100,10 +100,37 @@
   [extension fun]
   (dosync (alter editor assoc-in [::file-eval extension] fun)) nil)
 
-(defn add-command [fun] (add-to-setting ::commands fun) nil)
-(defn add-searchpath [s] (add-to-setting ::searchpaths s) nil)
-(defn add-snippet [s] (add-to-setting ::snippets s) nil)
-(defn add-file [f] (add-to-setting ::files f) nil)
+(defn add-command
+  "Add a command to be availble for commandapp typeahead.
+  add-interactive is in most cases more suitable."
+  [fun]
+  (add-to-setting ::commands fun) nil)
+
+(defn add-searchpath
+  "Add a folder to searchpath.
+  When using the commandapp files below
+  folders in the searchpath will be available
+  through typeahead.
+  EXAMPLE: (editor/add-searchpath \"/tmp\")"
+  [s]
+  (add-to-setting ::searchpaths s) nil)
+
+(defn add-snippet
+  "Add a snippet to list of snippets.
+  They will be available through typeahead
+  from the commandapp.
+  When chosen the snippet text will be inserted.
+  EXAMPLE: (editor/add-snippet \"(ns user)\")"
+  [s]
+  (add-to-setting ::snippets s) nil)
+
+(defn add-file
+  "Add a single file to be availalbe through typeahead
+  from the commandapp. When chosen the file will
+  be opened.
+  EXAMPLE: (editor/add-file \"/home/mogens/.liq\")"
+  [f]
+  (add-to-setting ::files f) nil)
 
 (defn add-interactive
   [label fun & arglabels]
