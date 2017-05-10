@@ -262,7 +262,7 @@
 (defn other-window
   []
   (let [buffername (-> @editor ::windows second (window/get-buffername))]
-    (dosync (alter editor update ::windows bump 1)
+    (dosync (alter editor update ::windows rotate)
             (alter editor update ::buffers bump ::buffer/name buffername))))
 
 (defn previous-buffer
