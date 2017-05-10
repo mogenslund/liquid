@@ -18,7 +18,7 @@
 
 (defn update-display
   []
-  (let [pat (re-pattern (str "(?i)" (str/replace (@state ::search) #" " ".*")))
+  (let [pat (re-pattern (str "(?i)" (str/replace (@state ::search) #" " ".*") "[^/]*$"))
         filterfun (filter #(re-find pat (str %))) ; transducer
         folders (sort-by count (filter #(re-find pat %) (conj (sort-by str/upper-case (fileutil/get-folders (@state ::path))) "..")))
         files (sort-by count (filter #(re-find pat %) (sort-by str/upper-case (fileutil/get-files (@state ::path)))))
