@@ -202,29 +202,31 @@
 
 (defn init
   [rowcount columncount]
-  (reset! rows rowcount)
-  (reset! columns columncount)
-  (reset! pane (doto (javax.swing.JEditorPane.)
-                     (.setContentType "text/html")
-                     (.setEditable false)
-                     (.setFocusTraversalKeysEnabled false)
-                     (.setDoubleBuffered true)
-                     (.setText (html))
-                     (.setMargin (java.awt.Insets. 0 0 0 0))
-                     (.addKeyListener (proxy [java.awt.event.KeyListener] []
-                       (keyPressed [e] (model-update (event2keyword e)))
-                       (keyReleased [e] (do))
-                       (keyTyped [e] (do))))))
-  (reset! frame 
-    (doto (javax.swing.JFrame. "λiquid")
-      (.setDefaultCloseOperation (javax.swing.JFrame/EXIT_ON_CLOSE))
-      (.setLayout (java.awt.FlowLayout. java.awt.FlowLayout/CENTER 0 0))
-      (.add @pane)
-      ;(.setSize 1200 800)
-      ;(.pack)
-      (.show)))
-  (add-watch editor/updates "jframe" view-handler)
-  (editor/updated))
+  (let [icon (clojure.java.io/resource "liquid.png")]
+    (reset! rows rowcount)
+    (reset! columns columncount)
+    (reset! pane (doto (javax.swing.JEditorPane.)
+                       (.setContentType "text/html")
+                       (.setEditable false)
+                       (.setFocusTraversalKeysEnabled false)
+                       (.setDoubleBuffered true)
+                       (.setText (html))
+                       (.setMargin (java.awt.Insets. 0 0 0 0))
+                       (.addKeyListener (proxy [java.awt.event.KeyListener] []
+                         (keyPressed [e] (model-update (event2keyword e)))
+                         (keyReleased [e] (do))
+                         (keyTyped [e] (do))))))
+    (reset! frame 
+      (doto (javax.swing.JFrame. "λiquid")
+        (.setDefaultCloseOperation (javax.swing.JFrame/EXIT_ON_CLOSE))
+        (.setLayout (java.awt.FlowLayout. java.awt.FlowLayout/CENTER 0 0))
+        (.add @pane)
+        ;(.setSize 1200 800)
+        ;(.pack)
+        (.setIconImage (when icon (.getImage (javax.swing.ImageIcon. icon))))
+        (.show)))
+    (add-watch editor/updates "jframe" view-handler)
+    (editor/updated)))
 
 (defn jframequit
   []
