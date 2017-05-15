@@ -1,40 +1,40 @@
 # Salza &lambda;iquid text editor
 [![Clojars Project](https://img.shields.io/clojars/v/mogenslund/liquid.svg)](https://clojars.org/mogenslund/liquid)
-```
-        o0o                     
-      o0000                     
-    o000  00                    
-      000  00                * **Fluidable**  -  Embed your code into Liquid or Liquid into your code   
-       000  00               * **Dependency free**  -  Everything is pure Clojure
-        000  00              * **Translateable**  -  Tiny core, simple model, no tricks
-         000  00             * **Destraction Free**  -  Typeahead and completions on demand... Your demand
-          000  00            * **Comfortable keybindings**  -  Most used commands are close at hand
-           000  00           * **Servable**  -  Run as server, local or remote
-            000  00
-             000  00
+
+          o0o                     
+        o0000                     
+      o000  00                    
+        000  00                * **Fluidable**  -  Embed your code into Liquid or Liquid into your code   
+         000  00               * **Dependency free**  -  Everything is pure Clojure
+          000  00              * **Translateable**  -  Tiny core, simple model, no tricks
+           000  00             * **Destraction Free**  -  Typeahead and completions on demand... Your demand
+            000  00            * **Comfortable keybindings**  -  Most used commands are close at hand
+             000  00           * **Servable**  -  Run as server, local or remote
               000  00
-               00   00
-              000    00
-             000      00
-            000        00
-           000  o   o   00
-          000ooo ooo o oo00
-         000  o   o   o   00
-        000   o    o    o  00
-       000  o    o    o  o  00
-      000  o o               00
-     000    o  o     o  o     00
-    000  o       o     o   o  00o
-   o00000000000000000000000000000o
-  
-     o      o              o    o
-    o o                         o
-       o    o   oo   o  o  o   oo
-      o o   o  o  o  o  o  o  o o
-     o   o  o   ooo   oo   o   oo
-                  o
-                  o
-```
+               000  00
+                000  00
+                 00   00
+                000    00
+               000      00
+              000        00
+             000  o   o   00
+            000ooo ooo o oo00
+           000  o   o   o   00
+          000   o    o    o  00
+         000  o    o    o  o  00
+        000  o o               00
+       000    o  o     o  o     00
+      000  o       o     o   o  00o
+     o00000000000000000000000000000o
+    
+       o      o              o    o
+      o o                         o
+         o    o   oo   o  o  o   oo
+        o o   o  o  o  o  o  o  o o
+       o   o  o   ooo   oo   o   oo
+                    o
+                    o
+
 ## Installation
 
 ### Download and execution
