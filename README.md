@@ -8,7 +8,7 @@
         000  00                * <b>Fluidable</b>  -  Embed your code into &lambda;iquid or &lambda;iquid into your code   
          000  00               * <b>Dependency free</b>  -  Everything is pure Clojure
           000  00              * <b>Translateable</b>  -  Tiny core, simple model, no tricks
-           000  00             * <b>Destraction Free</b>  -  Typeahead and completions on demand... Your demand
+           000  00             * <b>Destraction Free</b>  -  Typeahead and completions on demand... Your demand!
             000  00            * <b>Comfortable keybindings</b>  -  Most used commands are close at hand
              000  00           * <b>Servable</b>  -  Run as server, local or remote
               000  00

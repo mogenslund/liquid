@@ -21,6 +21,44 @@
             [dk.salza.liq.window :as window])
   (:gen-class))
 
+(def logo (str/join "\n" '(
+  " "
+  "       o0o"
+  "     o0000"
+  "   o000  00"
+  "     000  00"
+  "      000  00"
+  "       000  00"
+  "        000  00"
+  "         000  00"
+  "          000  00"
+  "           000  00"
+  "            000  00"
+  "             000  00"
+  "              00   00"
+  "             000    00"
+  "            000      00"
+  "           000        00"
+  "          000  o   o   00"
+  "         000ooo ooo o oo00"
+  "        000  o   o   o   00"
+  "       000   o    o    o  00"
+  "      000  o    o    o  o  00"
+  "     000  o o               00"
+  "    000    o  o     o  o     00"
+  "   000  o       o     o   o  00o"
+  "  o00000000000000000000000000000o"
+  " "
+  "    o      o              o    o"
+  "   o o                         o"
+  "      o    o   oo   o  o  o   oo"
+  "     o o   o  o  o  o  o  o  o o"
+  "    o   o  o   ooo   oo   o   oo"
+  "                 o"
+  "                 o"
+  " "
+)))
+
 (defn is-windows
   []
   (re-matches #"(?i)win.*" (System/getProperty "os.name")))
@@ -81,6 +119,7 @@
   ;; Setup start windows and scratch buffer
   (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
   (editor/new-buffer "-prompt-")
+  (editor/insert logo)
   ;; todo: Change to percent given by setting. Not hard numbers
   (editor/add-window (window/create "main" 1 44 rows (- columns 46) "scratch"))
   (editor/new-buffer "scratch")
