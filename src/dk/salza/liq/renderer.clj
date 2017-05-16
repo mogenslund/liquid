@@ -47,7 +47,7 @@
                         s
                         (recur (add-br s))))
                 ;; Now sl2 ends with the cursor
-                sl3 (left-linebreaks sl2 (int (* rows 0.4)))]
+                sl3 (right (left-linebreaks sl2 (int (* rows 0.4))) 1)]
             ;; sl3 now has point at new top of window
             (update-and-restore-point sl3 (get-point sl3))
             (apply-br-and-update-tow sl rows columns towid (get-point sl3))
