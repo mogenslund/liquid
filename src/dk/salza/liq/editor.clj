@@ -18,7 +18,7 @@
 
 (def macro-record (atom false))
 
-(def editor (ref {::buffers '()
+(def empty-editor {::buffers '()
                   ::windows '()
                   ::global-keymap {}
                   ::file-eval {}
@@ -26,7 +26,15 @@
                               ::files '()
                               ::snippets '()
                               ::commands '()
-                              ::interactive '()}}))
+                              ::interactive '()}})
+
+(def editor (ref empty-editor))
+
+(defn reset
+  "Resets the editor. Mostly for testing purposes."
+  []
+  (dosync
+    (ref-set editor empty-editor)))
 
 (defn updated
   "Call this function to proclaim that an
