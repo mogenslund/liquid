@@ -68,16 +68,16 @@ I could tell a lot about the editor, but I think you should see the video below 
 
 
 #### Other run configurations
-Download [liquid-0.7.6.jar](https://github.com/mogenslund/liquid/releases/download/v0.7.6/liquid-0.7.6.jar)
+Download [liquid-0.7.8.jar](https://github.com/mogenslund/liquid/releases/download/v0.7.8/liquid-0.7.8.jar)
 Also download clojure-1.8.0.jar from [clojure.org](http://clojure.org/community/downloads)
 
 Execute the program with:
 
-    java -cp clojure-1.8.0.jar:liquid-0.7.6.jar clojure.main -m dk.salza.liq.core
+    java -cp clojure-1.8.0.jar:liquid-0.7.8.jar clojure.main -m dk.salza.liq.core
 
 To run as webserver use:
 
-    java -cp clojure-1.8.0.jar:liquid-0.7.6.jar clojure.main -m dk.salza.liq.core --server --port=8520
+    java -cp clojure-1.8.0.jar:liquid-0.7.8.jar clojure.main -m dk.salza.liq.core --server --port=8520
 
 and access using:
 
@@ -87,7 +87,7 @@ and access using:
 
 For running in terminal and as serve at the same time use:
 
-    java -cp clojure-1.8.0.jar:liquid-0.7.6.jar clojure.main -m dk.salza.liq.core --web --port=8520
+    java -cp clojure-1.8.0.jar:liquid-0.7.8.jar clojure.main -m dk.salza.liq.core --web --port=8520
 
 Use --autoupdate for making multiple browser automatically sync content. (For collaborative editing.)
 
