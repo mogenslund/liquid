@@ -9,22 +9,30 @@
 
 ;(def top-of-window (atom {})) ; Keys are windowname-buffername
 
+(defn- left-linebreaks
+  "Takes a slider and a number and moves cursor
+  back until the nth linebreak.
+  So the cursor will be placed right after a linebreak."
+  [sl n]
+  (nth (iterate #(-> % (left 1) (left-until #"\n")) sl) n))
+
+(defn- add-br
+  "Goes a visual line forward if the break is soft and insert a hard."
+  [sl columns]
+  (let [s0 (forward-line sl columns)]
+                         (cond (= (-> s0 (left 1) get-char) "\n") s0
+                               (end? s0) s0
+                               (= (get-mark s0 "cursor") (get-point s0)) (-> s0 (insert "\n") (set-mark "cursor"))
+                               :else (insert s0 "\n"))))
+  
+  
+
 (defn- apply-br-and-update-tow
   "Returns a slider where cursor mark has been set,
   linebreaks on long lines created and point moved
   to top of window."
   [sl rows columns towid tow]
   (let [sl0 (-> sl (set-mark "cursor") (set-point tow))
-        left-linebreaks (fn [s n]
-                            (nth
-                              (iterate #(-> % (left 1) (left-until #"\n")) s)
-                              n))
-        ;; add-br goes a visual line forward if the break is soft insert a hard.
-        add-br (fn [s] (let [s0 (forward-line s columns)]
-                         (cond (= (-> s0 (left 1) get-char) "\n") s0
-                               (end? s0) s0
-                               (= (get-mark s0 "cursor") (get-point s0)) (-> s0 (insert "\n") (set-mark "cursor"))
-                               :else (insert s0 "\n"))))
         update-and-restore-point (fn [s newtow]
                                      (when (not= (@editor/top-of-window towid) newtow)
                                         (swap! editor/top-of-window assoc towid newtow))
@@ -33,9 +41,9 @@
       (let [newtow (get-point (left-linebreaks sl0 (inc rows)))]
         (apply-br-and-update-tow sl rows columns towid newtow))
       (let [;; Add rows number of breaks
-            sllist (iterate add-br sl0)
-            slbefore (nth (iterate add-br sl0) (dec rows))
-            sl1 (nth (iterate add-br sl0) rows)]
+            sllist (iterate #(add-br % columns) sl0)
+            slbefore (nth (iterate #(add-br % columns) sl0) (dec rows))
+            sl1 (nth (iterate #(add-br % columns) sl0) rows)]
   
         ;; If original point is on the first rows of lines we are done
         ;; otherwise a recenter should be performed
@@ -45,7 +53,7 @@
           (let [sl2 (loop [s sl1]
                       (if (<= (get-mark s "cursor") (get-point s))
                         s
-                        (recur (add-br s))))
+                        (recur (add-br s columns))))
                 ;; Now sl2 ends with the cursor
                 sl3 (right (left-linebreaks sl2 (int (* rows 0.4))) 1)]
             ;; sl3 now has point at new top of window
