@@ -37,11 +37,7 @@
   linebreaks on long lines created and point moved
   to top of window."
   [sl rows columns towid tow]
-  (let [sl0 (-> sl (set-mark "cursor") (set-point tow))
-        update-and-restore-point (fn [s newtow]
-                                     (when (not= (@editor/top-of-window towid) newtow)
-                                        (swap! editor/top-of-window assoc towid newtow))
-                                     (set-point s newtow))]
+  (let [sl0 (-> sl (set-mark "cursor") (set-point tow))]
     (if (< (get-mark sl0 "cursor") tow) ;; If point is before top of window
       (let [newtow (get-point (left-linebreaks sl0 (inc rows)))]
         (apply-br-and-update-tow sl rows columns towid newtow))
