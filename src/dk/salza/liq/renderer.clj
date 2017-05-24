@@ -25,6 +25,11 @@
                                (= (get-mark s0 "cursor") (get-point s0)) (-> s0 (insert "\n") (set-mark "cursor"))
                                :else (insert s0 "\n"))))
   
+(defn- update-and-restore-point
+  [s towid newtow]
+  (when (not= (@editor/top-of-window towid) newtow)
+    (swap! editor/top-of-window assoc towid newtow))
+  (set-point s newtow))
   
 
 (defn- apply-br-and-update-tow
@@ -49,7 +54,7 @@
         ;; otherwise a recenter should be performed
         ;(futil/log (str (get-mark sl1 "cursor") ", " (get-point sl1) ", " (pr-str sl1)))
         (if ((if (and (end? sl1) (= (get-point slbefore) (get-point sl1))) <= <) (get-mark sl1 "cursor") (get-point sl1))
-          (update-and-restore-point sl1 tow)
+          (update-and-restore-point sl1 towid tow)
           (let [sl2 (loop [s sl1]
                       (if (<= (get-mark s "cursor") (get-point s))
                         s
@@ -57,7 +62,7 @@
                 ;; Now sl2 ends with the cursor
                 sl3 (right (left-linebreaks sl2 (int (* rows 0.4))) 1)]
             ;; sl3 now has point at new top of window
-            (update-and-restore-point sl3 (get-point sl3))
+            (update-and-restore-point sl3 towid (get-point sl3))
             (apply-br-and-update-tow sl rows columns towid (get-point sl3))
             ))))))
 
