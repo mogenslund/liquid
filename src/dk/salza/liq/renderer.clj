@@ -26,6 +26,7 @@
                                :else (insert s0 "\n"))))
   
 (defn- update-and-restore-point
+  "This function has sideeffects"
   [s towid newtow]
   (when (not= (@editor/top-of-window towid) newtow)
     (swap! editor/top-of-window assoc towid newtow))
