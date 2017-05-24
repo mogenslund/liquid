@@ -25,7 +25,7 @@
                                (= (get-mark s0 "cursor") (get-point s0)) (-> s0 (insert "\n") (set-mark "cursor"))
                                :else (insert s0 "\n"))))
   
-(defn- update-and-restore-point
+(defn- update-and-restore-point!
   "This function has sideeffects"
   [s towid newtow]
   (when (not= (@editor/top-of-window towid) newtow)
@@ -33,7 +33,7 @@
   (set-point s newtow))
   
 
-(defn- apply-br-and-update-tow
+(defn- apply-br-and-update-tow!
   "Returns a slider where cursor mark has been set,
   linebreaks on long lines created and point moved
   to top of window."
@@ -41,7 +41,7 @@
   (let [sl0 (-> sl (set-mark "cursor") (set-point tow))]
     (if (< (get-mark sl0 "cursor") tow) ;; If point is before top of window
       (let [newtow (get-point (left-linebreaks sl0 (inc rows)))]
-        (apply-br-and-update-tow sl rows columns towid newtow))
+        (apply-br-and-update-tow! sl rows columns towid newtow))
       (let [;; Add rows number of breaks
             sllist (iterate #(add-br % columns) sl0)
             slbefore (nth (iterate #(add-br % columns) sl0) (dec rows))
@@ -51,7 +51,7 @@
         ;; otherwise a recenter should be performed
         ;(futil/log (str (get-mark sl1 "cursor") ", " (get-point sl1) ", " (pr-str sl1)))
         (if ((if (and (end? sl1) (= (get-point slbefore) (get-point sl1))) <= <) (get-mark sl1 "cursor") (get-point sl1))
-          (update-and-restore-point sl1 towid tow)
+          (update-and-restore-point! sl1 towid tow)
           (let [sl2 (loop [s sl1]
                       (if (<= (get-mark s "cursor") (get-point s))
                         s
@@ -59,8 +59,8 @@
                 ;; Now sl2 ends with the cursor
                 sl3 (right (left-linebreaks sl2 (int (* rows 0.4))) 1)]
             ;; sl3 now has point at new top of window
-            (update-and-restore-point sl3 towid (get-point sl3))
-            (apply-br-and-update-tow sl rows columns towid (get-point sl3))
+            (update-and-restore-point! sl3 towid (get-point sl3))
+            (apply-br-and-update-tow! sl rows columns towid (get-point sl3))
             ))))))
 
 (defn insert-token
@@ -124,7 +124,7 @@
         towid (str (window ::window/name) "-" (window ::window/buffername))
         tow (or (@editor/top-of-window towid) 0)
         sl (set-mark (buffer/get-slider buffer) "cursor")
-        sl0 (apply-br-and-update-tow sl rows columns towid tow)
+        sl0 (apply-br-and-update-tow! sl rows columns towid tow)
         ;tmp (futil/log (get-mark sl "cursor"))
         ;tmp1 (futil/log (get-mark sl0 "cursor"))
         filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
