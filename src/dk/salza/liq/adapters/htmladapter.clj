@@ -61,6 +61,11 @@
         background-color: blue;
       }
 
+      span.bghl {
+        background-color: yellow;
+      }
+
+
       span.bgselection {
         background-color: purple;
       }

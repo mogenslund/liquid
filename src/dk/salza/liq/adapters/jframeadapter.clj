@@ -28,6 +28,7 @@
 (def bgcolors {:plain "181818"
                :cursor1 "00ff00"
                :cursor2 "0000ff"
+               :hl "ffff00"
                :selection "ff0000"
                :statusline "000000"
                :default "333333"})
