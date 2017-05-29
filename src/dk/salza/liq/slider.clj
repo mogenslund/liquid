@@ -379,6 +379,17 @@
         (-> sl0 (point-to-mark "paren-end") (set-mark "selection") (point-to-mark "paren-start")))
       sl)))
 
+(defn highlight-sexp-at-point
+  [sl]
+  (if (get-mark sl "paren-start")
+    (-> sl
+      (remove-mark "paren-start")
+      (remove-mark "paren-end"))
+    (-> sl
+      (set-mark "cursor")
+      (mark-paren-start)
+      (mark-paren-end)
+      (point-to-mark "cursor"))))
   
 
 (defn forward-word

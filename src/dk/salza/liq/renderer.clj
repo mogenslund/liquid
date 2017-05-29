@@ -79,11 +79,15 @@
              p (get-point sl0)
              selection (get-mark sl0 "selection")
              cursor (get-mark sl0 "cursor")
+             paren-start (get-mark sl0 "paren-start")
+             paren-end (get-mark sl0 "paren-end")
              nextface (syntaxhighlighter sl0 face)
              nextbgface (cond (= p cursor) (if (= cursor-color :green) :cursor1 :cursor2)
+                              (= p paren-start) :hl
+                              (= (+ p 1) paren-end) :hl
                               (and selection (>= p (min selection cursor)) (< p (max selection cursor))) :selection
                               (and selection (>= p (max selection cursor))) :plain
-                              (or (= bgface :cursor1) (= bgface :cursor2)) :plain
+                              (or (= bgface :cursor1) (= bgface :cursor2) (= bgface :hl)) :plain
                               :else bgface)
              next (if (and (= nextface face)
                            (= nextbgface bgface)

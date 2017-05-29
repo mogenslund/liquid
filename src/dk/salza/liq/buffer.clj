@@ -98,6 +98,7 @@
 (defn delete-selection [buffer] (doto-slider buffer slider/delete-region "selection"))
 (defn delete-line [buffer] (doto-slider buffer slider/delete-line))
 (defn select-sexp-at-point [buffer] (doto-slider buffer slider/select-sexp-at-point))
+(defn highlight-sexp-at-point [buffer] (doto-slider buffer slider/highlight-sexp-at-point))
 
 
 (defn forward-visual-line

@@ -57,7 +57,8 @@
    :r (merge {:space #(editor/replace-char " ")}
              (keys/alphanum-mapping editor/replace-char)
              (keys/symbols-mapping editor/replace-char))
-   :1 editor/select-sexp-at-point
+   :1 editor/highlight-sexp-at-point
+   :2 editor/select-sexp-at-point
    :y {:y #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))}
    :p {:p #(do (editor/insert-line) (editor/paste) (editor/beginning-of-line))
        :h editor/paste}

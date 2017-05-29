@@ -228,6 +228,7 @@
     (selection-cancel)
     (selection-set)))
 (defn select-sexp-at-point [] (doto-buffer buffer/select-sexp-at-point))
+(defn highlight-sexp-at-point [] (doto-buffer buffer/highlight-sexp-at-point))
 (defn undo [] (doto-buffer buffer/undo))
 
 (defn get-selection [] (-> (current-buffer) buffer/get-selection))
@@ -238,6 +239,10 @@
 (defn get-char [] (-> (current-buffer) buffer/get-char))
 (defn get-name [] (-> (current-buffer) buffer/get-name))
 (defn get-point [] (-> (current-buffer) buffer/get-point))
+(defn set-mark [name] (doto-buffer buffer/set-mark name))
+(defn get-mark [name] (-> (current-buffer) (buffer/get-mark name)))
+(defn remove-mark [name] (doto-buffer buffer/remove-mark name))
+(defn point-to-mark [name] (doto-buffer buffer/point-to-mark name))
 (defn end-of-buffer? [] (-> (current-buffer) buffer/end-of-buffer?))
 
 (defn forward-line
