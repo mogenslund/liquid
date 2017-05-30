@@ -17,7 +17,7 @@
 
 (defn sexp-at-point
   [sl]
-  (let [sl0 (-> sl (mark-paren-start) (mark-paren-end))]
+  (let [sl0 (-> sl (mark-paren-start "paren-start") (mark-paren-end "paren-end"))]
     (if (and (get-mark sl0 "paren-start") (get-mark sl0 "paren-end"))
       (-> sl0 (point-to-mark "paren-start") (get-region "paren-end"))
       nil)))
