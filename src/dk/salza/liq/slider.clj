@@ -341,9 +341,9 @@
   current s-exp. In this case:
   aaa (aaa (aa)  a|aa
   The first paren start is selected."
-  [sl]
-  (loop [sl0 (-> sl (remove-mark "paren-start") (set-mark "mark-paren-curser")) ch (if (= (get-char sl) ")") "" (get-char sl)) level 0]
-    (cond (and (= ch "(") (= level 0)) (-> sl0 (set-mark "paren-start") (point-to-mark "mark-paren-curser"))
+  [sl name]
+  (loop [sl0 (-> sl (remove-mark name) (set-mark "mark-paren-curser")) ch (if (= (get-char sl) ")") "" (get-char sl)) level 0]
+    (cond (and (= ch "(") (= level 0)) (-> sl0 (set-mark name) (point-to-mark "mark-paren-curser"))
           (beginning? sl0) sl
           :else (recur (left sl0 1)
                        (get-char (left sl0 1))
@@ -356,9 +356,9 @@
   current s-exp. In this case:
   aa (aa (aa|aa(aa))
   The last paren will be selected."
-  [sl]
-  (loop [sl0 (-> sl (remove-mark "paren-end") (set-mark "mark-paren-curser")) ch (if (= (get-char sl) "(") "" (get-char sl)) level 0]
-    (cond (and (= ch ")") (= level 0)) (-> sl0 (right 1) (set-mark "paren-end") (point-to-mark "mark-paren-curser"))
+  [sl name]
+  (loop [sl0 (-> sl (remove-mark name) (set-mark "mark-paren-curser")) ch (if (= (get-char sl) "(") "" (get-char sl)) level 0]
+    (cond (and (= ch ")") (= level 0)) (-> sl0 (right 1) (set-mark name) (point-to-mark "mark-paren-curser"))
           (end? sl0) sl
           :else (recur (right sl0 1)
                        (get-char (right sl0 1))
@@ -372,7 +372,7 @@
   account that the parenthesis should be balanced."
   [sl]
   (let [sel (get-mark sl "selection")
-        sl0 (-> sl (mark-paren-start) (mark-paren-end))]
+        sl0 (-> sl (mark-paren-start "paren-start") (mark-paren-end "paren-end"))]
     (if (and (get-mark sl0 "paren-start") (get-mark sl0 "paren-end"))
       (if (= sel (get-mark sl0 "paren-end"))
         (-> sl0 (point-to-mark "paren-start") (set-mark "selection") (point-to-mark "paren-end") (left 1))
@@ -381,14 +381,14 @@
 
 (defn highlight-sexp-at-point
   [sl]
-  (if (get-mark sl "paren-start")
+  (if (get-mark sl "hl0")
     (-> sl
-      (remove-mark "paren-start")
-      (remove-mark "paren-end"))
+      (remove-mark "hl0")
+      (remove-mark "hl1"))
     (-> sl
       (set-mark "cursor")
-      (mark-paren-start)
-      (mark-paren-end)
+      (mark-paren-start "hl0")
+      (mark-paren-end "hl1")
       (point-to-mark "cursor"))))
   
 
