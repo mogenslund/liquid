@@ -25,6 +25,7 @@
    :up editor/backward-line
    :down editor/forward-line
    :C-s #(promptapp/run editor/find-next '("SEARCH"))
+   :M-s #(promptapp/run editoractions/search-files '("SEARCH"))
    :v editor/selection-toggle
    :g {:g editor/beginning-of-buffer
        :t editor/top-align-page

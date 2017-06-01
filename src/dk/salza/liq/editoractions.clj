@@ -4,6 +4,7 @@
   functions."
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.coreutil :refer :all]
+            [dk.salza.liq.tools.cshell :as cshell]
             [clojure.string :as str]))
 
 (defn swap-windows
@@ -24,3 +25,19 @@
     (editor/new-buffer "-tmp-")
     (editor/clear)
     (editor/insert content)))
+
+(defn search-files
+  [search]
+  (editor/new-buffer "-search-files-")
+  (editor/kill-buffer)
+  (when (> (count (editor/get-folder)) 1) ;; Avoid searching from empty or root folder
+    (let [folder (editor/get-folder)
+          result (->> folder
+                      cshell/lsr
+                      (cshell/flrex (re-pattern search))
+                      (map #(str/join " : " %))
+                      (str/join "\n"))]
+      (editor/new-buffer "-search-files-")
+      (editor/insert result)
+  ;(->> (get-folder) lsr (flrex (re-pattern search)) (map #(str/join " : " %)) p)
+  )))

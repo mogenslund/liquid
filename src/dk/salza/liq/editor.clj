@@ -521,7 +521,6 @@
   )
 
 
-
 (defn escape
   []
   (selection-cancel)
