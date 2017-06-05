@@ -4,6 +4,7 @@
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.extensions.headlinenavigator]
+            [dk.salza.liq.extensions.linenavigator]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.syntaxhl.javascripthl :as javascripthl]
             [dk.salza.liq.syntaxhl.pythonhl :as pythonhl]
@@ -31,7 +32,8 @@
        :t editor/top-align-page
        :n editor/top-next-headline
        :c #(editor/prompt-append (str "--" (editor/get-context) "--"))
-       :i dk.salza.liq.extensions.headlinenavigator/run}
+       :i dk.salza.liq.extensions.headlinenavigator/run
+       :l dk.salza.liq.extensions.linenavigator/run}
    :dash editor/top-next-headline
    :C-g editor/escape
    :esc editor/escape
