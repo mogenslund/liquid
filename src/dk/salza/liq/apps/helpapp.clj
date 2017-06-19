@@ -15,8 +15,17 @@
 
 (defn help-apropos
   []
-  (promptapp/run clojure.repl/find-doc '("APROPOS")))
+  (let [context (re-find #"[^/]*$" ((editor/get-context) :value))
+        fd (fn
+             [s]
+             
+             (if (empty? s)
+               (clojure.repl/find-doc context)
+               (clojure.repl/find-doc s)))]
+    (promptapp/run fd (list (str "APROPOS (" context ")")))))
 
 (defn help-key
   []
   (str "Not implemented yet"))
+
+
