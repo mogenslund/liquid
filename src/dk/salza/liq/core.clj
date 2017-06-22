@@ -112,6 +112,7 @@
   (editor/set-eval-function "r" #(cshell/cmd "R" "-q" "-f" %))
   (editor/set-eval-function "c" #(cshell/cmd "tcc" "-run" %))
   (editor/set-eval-function "hs" #(cshell/cmd "stack" %))
+  (editor/set-eval-function "cljs" #(cshell/cmd "lumo" %))
   (editor/set-eval-function "tex" #(cshell/cmd "pdflatex" "-halt-on-error" "-output-directory=/tmp" %))
   (editor/set-eval-function :default #(str (load-file %))))
 
