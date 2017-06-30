@@ -127,7 +127,8 @@
                                                  (if (.ready r) (* 256 (+ (.read r) 1)) 0)
                                                  (if (.ready r) (* 256 256 (+ (.read r) 1)) 0))))]
     (loop [input (read-input)]
-      (when (= input :C-space) (reset))
+      (when (or (= input :C-space) (= input :C-g)) (reset))
+      
       (model-update input)
       (recur (read-input))))))
 
