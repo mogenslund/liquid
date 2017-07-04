@@ -1,5 +1,6 @@
 # Salza &lambda;iquid text editor
 [![Clojars Project](https://img.shields.io/clojars/v/mogenslund/liquid.svg)](https://clojars.org/mogenslund/liquid)
+![Logo](logo.svg)
 <pre>
 
           o0o                     
