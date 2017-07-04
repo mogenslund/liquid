@@ -1,7 +1,7 @@
 # Salza &lambda;iquid text editor
 [![Clojars Project](https://img.shields.io/clojars/v/mogenslund/liquid.svg)](https://clojars.org/mogenslund/liquid)
 
-<img align="left" src="logo.png" width="260" height="360">
+<img align="left" src="logo.png" width="281" height="360">
 <br><br><br>
 
 * <b>Fluidable</b>  -  Embed your code into &lambda;iquid or &lambda;iquid into your code   
