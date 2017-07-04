@@ -11,7 +11,7 @@
 * <b>Comfortable keybindings</b>  -  Most used commands are close at hand
 * <b>Servable</b>  -  Run as server, local or remote
 
-<br><br><br>
+<br><br><br><br><br>
 
 ## Installation
 
