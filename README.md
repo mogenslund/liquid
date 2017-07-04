@@ -1,14 +1,15 @@
 # Salza &lambda;iquid text editor
 [![Clojars Project](https://img.shields.io/clojars/v/mogenslund/liquid.svg)](https://clojars.org/mogenslund/liquid)
 
-<img align="left" src="logo.png">
-
+<img align="left" src="logo.png" style="width:40%;">
+<br><br><br>
 * <b>Fluidable</b>  -  Embed your code into &lambda;iquid or &lambda;iquid into your code   
 * <b>Dependency free</b>  -  Everything is pure Clojure
 * <b>Translateable</b>  -  Tiny core, simple model, no tricks
 * <b>Destraction Free</b>  -  Typeahead and completions on demand... Your demand!
 * <b>Comfortable keybindings</b>  -  Most used commands are close at hand
 * <b>Servable</b>  -  Run as server, local or remote
+<br><br><br>
 
 ## Installation
 
