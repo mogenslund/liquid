@@ -69,7 +69,7 @@
    :s editor/save-file
    :u editor/undo
    :C-w editor/kill-buffer
-   :C-t editor/tmp-test
+   :C-t (fn [] (editor/tmp-test))
    })
 
 (reset! keymap-insert
