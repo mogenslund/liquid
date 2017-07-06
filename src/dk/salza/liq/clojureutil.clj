@@ -20,4 +20,8 @@
       (re-find (re-pattern (str "(?<=\\[)[-a-z\\.]*(?= :as " alias "\\])")) content)
     )))
 
-
+(defn get-namespace
+  [buffer]
+  (let [content (buffer/get-content buffer)]
+    (re-find #"(?<=\(ns )[-a-z0-9\\.]+" content)))
+; (re-pattern "\\(") ;)

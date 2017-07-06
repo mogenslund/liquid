@@ -419,10 +419,13 @@
 
 (defn eval-sexp
   [sexp]
-  (let [isprompt (= (get-name) "-prompt-")]
+  (let [isprompt (= (get-name) "-prompt-")
+        namespace (or (clojureutil/get-namespace (current-buffer)) "user")]
     (when isprompt (other-window))
     (let [output (try
-                   (if sexp (with-out-str (println (load-string (str "(do (in-ns 'user) " sexp ")")))) "")
+                   (if sexp
+                     (with-out-str (println (load-string (str "(do (in-ns '" namespace ") " sexp ")"))))
+                     "")
                    (catch Exception e (do (spit "/tmp/liq.log" e) (util/pretty-exception e))))]
       (when (and (not= output "") (not isprompt)) (prompt-set output)))))
 
@@ -510,6 +513,7 @@
 (defn tmp-test
   []
   (prompt-append "Testing")
+  (prompt-append (str "NS: " (or (clojureutil/get-namespace (current-buffer)) "user")))
   ;(doto-buffer buffer/tmp-buffer ((current-window) ::window/columns))
   ;(prompt-append (clojureutil/get-file-path "dk.salza.liq.editor"))
   ;(prompt-append (clojureutil/get-class-path (current-buffer) "window"))
