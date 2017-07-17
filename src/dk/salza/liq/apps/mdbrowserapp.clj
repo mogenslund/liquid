@@ -1,5 +1,6 @@
 (ns dk.salza.liq.apps.mdbrowserapp
   (:require [clojure.java.io :as io]
+            [dk.salza.liq.buffer :as buffer]
             [dk.salza.liq.slider :refer :all]
             [dk.salza.liq.sliderutil :as sliderutil]
             [dk.salza.liq.editor :as editor]
@@ -81,8 +82,7 @@
                                (= c "]") (state :link2)
                                true (recur (assoc state :link2 (str (state :link2) c)
                                                         :sl (right sl 1)))))))]
-  ;; If exists line: [link]: \w+ return \w+ else return link
-  )
+    (or (re-find (re-pattern (str "(?<=\\[" link "\\]: )[^\n]+")) (get-content sl0)) link)))
 
 
 ;; Links:
@@ -108,12 +108,9 @@
 
 (reset! navigate
   (fn []
-    (let [context (editor/get-context)
-          type (context :type)
-          value (context :value)]
-      (cond (= type :file) (if (.isAbsolute (io/file value))
-                             (run value)
-                             (run (str (io/file (editor/get-folder) value))))
-            (= type :url) (when-let [start-browser (editor/setting :start-browser)]
-                            (start-browser value))
-            (= type :function) (editor/goto-definition value)))))
+    (let [sl (buffer/get-slider (editor/current-buffer))
+          link (markdown-link sl)]
+      (spit "/tmp/a.txt" sl "\n...\n" link)
+      (if (.isAbsolute (io/file link))
+        (run link)
+        (run (str (io/file (editor/get-folder) link)))))))
