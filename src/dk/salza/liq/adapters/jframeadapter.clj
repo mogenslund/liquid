@@ -200,6 +200,7 @@
 
 (defn model-update
   [input]
+  (logging/log "INPUT" input)
   (future
     (editor/handle-input input)))
 
