@@ -13,6 +13,11 @@
 
 <br><br><br><br><br>
 
+## Community
+For discussions, help, tips and support, use
+
+**[#liquid](https://clojurians.slack.com/messages/liquid/)** channel in [Clojure Slack](http://clojurians.net/)
+
 ## Installation
 
 ### Download and execution
