@@ -181,9 +181,10 @@
      "--no-init-file: Do not read .liq file."
      "--autoupdate: If there are multiple views they should be syncronised."
      "--load=<path to file>: Load <path to file> as init file."
+     "--log=<path to file>: Will write log information to the <path to file>."
      ""
      "Some parameters may be combined, like:"
-     "--tty --jframe --server --port=7000 --no-init-file --rows=50 --columns=80"
+     "--tty --jframe --server --port=7000 --no-init-file --rows=50 --columns=80 --log=/tmp/liq.log"
   )))
   (System/exit 0))
 
