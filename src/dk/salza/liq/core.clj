@@ -18,6 +18,7 @@
             [dk.salza.liq.extensions.vimkeys :as vimkeys]
             [dk.salza.liq.extensions.emacskeys :as emacskeys]
             [dk.salza.liq.editor :as editor]
+            [dk.salza.liq.logging :as logging]
             [dk.salza.liq.window :as window])
   (:gen-class))
 
@@ -218,7 +219,12 @@
           userfile (when-not (read-arg args "--no-init-file") 
                      (or (read-arg args "--load=")
                          (fileutil/file (System/getProperty "user.home") ".liq")))
+          logfile (read-arg args "--log=")
           singlethreaded (read-arg args "--no-threads")]
+
+          ;; Enable logging if --log specified
+          (when logfile
+            (logging/enable logfile))
 
           ;; Load the defaults
           (set-defaults)

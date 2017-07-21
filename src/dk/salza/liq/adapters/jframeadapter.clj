@@ -3,6 +3,7 @@
             [dk.salza.liq.renderer :as renderer]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
+            [dk.salza.liq.logging :as logging]
             [clojure.string :as str]))
 
 
@@ -40,11 +41,12 @@
         code (re-find #"(?<=primaryLevelUnicode=)\d+" (.paramString e))
         rawcode (re-find #"(?<=rawCode=)\d+" (.paramString e))]
     ;(println "----" ch)
-    ;(println "KEYCHAR:   " ch ", "
-    ;         "CTRL:      " (.isControlDown e) ", "
-    ;         "CODE:      " code ", "
-    ;         "RAW CODE:  " rawcode ", "
-    ;         "PARAM STR: " (.paramString e)) ; ,primaryLevelUnicode=108
+    (logging/log
+      "KEYCHAR:   " ch "\n"
+      "CTRL:      " (.isControlDown e) "\n"
+      "CODE:      " code "\n"
+      "RAW CODE:  " rawcode "\n"
+      "PARAM STR: " (.paramString e)) ; ,primaryLevelUnicode=108
     (cond (= (.getModifiers e) java.awt.event.InputEvent/CTRL_MASK)
                              (cond (= code "102") :C-f
                                    (= code "103") :C-g

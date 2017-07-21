@@ -1,8 +1,10 @@
-(ns dk.salza.liq.keys)
+(ns dk.salza.liq.keys
+  (:require [dk.salza.liq.logging :as logging]))
 
 ;; http://ascii-table.com/ansi-escape-sequences.php
 (defn raw2keyword
   [raw]
+  (logging/log "RAW" raw)
   (let [k (str (char (min raw 400)))]
      (cond (re-matches #"[a-zA-Z0-9]" k) (keyword k)
            (= raw 9) :tab

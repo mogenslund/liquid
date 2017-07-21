@@ -5,6 +5,7 @@
             [dk.salza.liq.clojureutil :as clojureutil]
             [clojure.java.io :as io]
             [dk.salza.liq.coreutil :refer :all]
+            [dk.salza.liq.logging :as logging]
             [clojure.string :as str]))
 
 (def top-of-window (atom {})) ; Keys are windowname-buffername
@@ -345,6 +346,11 @@
   (when-let [r (get-line)]
     (util/set-clipboard-content r)))
 
+(defn copy-context
+  []
+  (when-let [r ((get-context) :value)]
+    (util/set-clipboard-content r)))
+
 (defn delete-line
   []
   (copy-line)
@@ -426,14 +432,14 @@
                    (if sexp
                      (with-out-str (println (load-string (str "(do (in-ns '" namespace ") " sexp ")"))))
                      "")
-                   (catch Exception e (do (spit "/tmp/liq.log" e) (util/pretty-exception e))))]
+                   (catch Exception e (do (logging/log e) (util/pretty-exception e))))]
       (when (and (not= output "") (not isprompt)) (prompt-set output)))))
 
 (defn eval-safe
   [fun]
   (let [output (try
                  (with-out-str (fun))
-                 (catch Exception e (do (spit "/tmp/liq.log" e) (util/pretty-exception e))))]
+                 (catch Exception e (do (logging/log e) (util/pretty-exception e))))]
       (when output (prompt-set output))))
 
 (defn eval-last-sexp

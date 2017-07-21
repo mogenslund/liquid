@@ -66,9 +66,3 @@
     (with-open [writer (io/writer filepath)]
       (.write writer content))))
   
-
-(defn log
-  [& strings]
-  (let [logfile (tmp-file "liq.log")
-        line (str (str/replace (System/currentTimeMillis) #"(\d{3}$)" "\\.$1 ") (str/join " " strings) "\n")]
-    (spit logfile line :append true)))

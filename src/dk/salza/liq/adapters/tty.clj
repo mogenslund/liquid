@@ -3,6 +3,7 @@
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.renderer :as renderer]
             [dk.salza.liq.editor :as editor]
+            [dk.salza.liq.logging :as logging]
             [clojure.string :as str]))
 
 (def old-lines (atom {}))
@@ -127,6 +128,7 @@
                                                  (if (.ready r) (* 256 (+ (.read r) 1)) 0)
                                                  (if (.ready r) (* 256 256 (+ (.read r) 1)) 0))))]
     (loop [input (read-input)]
+      (logging/log "INPUT" input) 
       (when (or (= input :C-space) (= input :C-g)) (reset))
       
       (model-update input)
