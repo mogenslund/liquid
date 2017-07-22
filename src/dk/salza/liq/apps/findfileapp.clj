@@ -81,14 +81,15 @@
   [fun]
   (let [hit (@state ::hit)]
     (if (fileutil/folder? hit)
-      (do
-        (swap! state assoc ::path hit
-                           ::search ""
-                           ::selected nil
-                           ::hit nil)
-        (update-display))
-      (fun hit)
-      )))
+      (if (= hit "..")
+        (up)
+        (do 
+          (swap! state assoc ::path hit
+                             ::search ""
+                             ::selected nil
+                             ::hit nil)
+          (update-display)))
+      (fun hit))))
 
 (defn execute-search
   [fun]

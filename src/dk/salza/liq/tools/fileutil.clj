@@ -22,6 +22,10 @@
   [filepath]
   (.getAbsolutePath (io/file filepath)))
 
+(defn canonical
+  [filepath]
+  (.getCanonicalPath (io/file filepath)))
+
 (defn folder?
   [filepath]
   (.isDirectory (io/file filepath)))
