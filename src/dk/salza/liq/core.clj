@@ -107,6 +107,10 @@
   (editor/add-interactive ":o" editor/find-file)
   (editor/add-interactive "apropos" clojure.repl/find-doc "APROPOS")
 
+  ;; Default searchpaths
+  (when (fileutil/exists? "project.clj")
+    (editor/add-searchpath (fileutil/canonical ".")))
+
   ;; Default evaluation handling
   (editor/set-eval-function "lisp" #(cshell/cmd "clisp" %))
   (editor/set-eval-function "js" #(cshell/cmd "node" %))
