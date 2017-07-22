@@ -16,5 +16,5 @@
         (str (.format
                (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss ")
                (new java.util.Date))
-          (str/join " " entries) "\n")
+          (str/join " " (map eval entries)) "\n")
         :append true))))
