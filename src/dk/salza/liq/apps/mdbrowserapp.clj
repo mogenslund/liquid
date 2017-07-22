@@ -10,6 +10,7 @@
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
+            [dk.salza.liq.logging :as logging]
             [dk.salza.liq.coreutil :refer :all]))
 
 (def navigate (atom nil))
@@ -110,7 +111,7 @@
   (fn []
     (let [sl (buffer/get-slider (editor/current-buffer))
           link (markdown-link sl)]
-      (spit "/tmp/a.txt" sl "\n...\n" link)
+      (logging/log "MDBROWSERLINK" link)
       (if (.isAbsolute (io/file link))
         (run link)
         (run (str (io/file (editor/get-folder) link)))))))
