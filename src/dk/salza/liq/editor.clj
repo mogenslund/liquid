@@ -430,7 +430,13 @@
     (when isprompt (other-window))
     (let [output (try
                    (if sexp
-                     (with-out-str (println (load-string (str "(do (in-ns '" namespace ") " sexp ")"))))
+                     (with-out-str
+                       (println
+                         (load-string
+                           (str
+                             "(do (ns " namespace ") (in-ns '"
+                             namespace
+                             ") " sexp ")"))))
                      "")
                    (catch Exception e (do (logging/log e) (util/pretty-exception e))))]
       (when (and (not= output "") (not isprompt)) (prompt-set output)))))
