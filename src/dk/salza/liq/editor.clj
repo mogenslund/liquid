@@ -388,7 +388,8 @@
   [string]
   (switch-to-buffer "-prompt-")
   (insert (str string "\n"))
-  (previous-buffer))
+  (previous-buffer)
+  (updated))
 
 (defn prompt-input
   [string]
@@ -402,7 +403,8 @@
   (switch-to-buffer "-prompt-")
   (clear)
   (insert string)
-  (previous-buffer))
+  (previous-buffer)
+  (updated))
 
 (defn evaluate-file-raw
   ([filepath]
@@ -411,6 +413,18 @@
   ([] (when-let [filepath (get-filename)] (evaluate-file-raw filepath))))
 
 (defn evaluate-file
+  ([filepath]
+    (let [extension (or (re-find #"(?<=\.)\w*$" filepath) :empty)
+          fun (or ((@editor ::file-eval) extension) ((@editor ::file-eval) :default))]
+       (when fun
+         (prompt-set "")
+         (with-redefs [println prompt-append]
+           (try
+             (println (fun filepath))
+                (catch Exception e (util/pretty-exception e)))))))
+  ([] (when-let [filepath (get-filename)] (evaluate-file filepath))))
+
+(defn evaluate-file-old
   ([filepath]
     (let [extension (or (re-find #"(?<=\.)\w*$" filepath) :empty)
           fun (or ((@editor ::file-eval) extension) ((@editor ::file-eval) :default))
@@ -424,6 +438,23 @@
   ([] (when-let [filepath (get-filename)] (evaluate-file filepath))))
 
 (defn eval-sexp
+  [sexp]
+  (let [isprompt (= (get-name) "-prompt-")
+        namespace (or (clojureutil/get-namespace (current-buffer)) "user")]
+    (when isprompt (other-window))
+    (prompt-set "")
+    (with-redefs [println prompt-append]
+      (try
+        (println
+          (load-string
+            (str
+              "(do (ns " namespace ") (in-ns '"
+              namespace
+              ") " sexp ")")))
+        (catch Exception e (do (logging/log e) (util/pretty-exception e))))
+      )))
+
+(defn eval-sexp-old
   [sexp]
   (let [isprompt (= (get-name) "-prompt-")
         namespace (or (clojureutil/get-namespace (current-buffer)) "user")]
