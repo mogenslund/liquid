@@ -6,6 +6,7 @@
             [clojure.java.io :as io]
             [dk.salza.liq.coreutil :refer :all]
             [dk.salza.liq.logging :as logging]
+            [dk.salza.liq.tools.cshell :as cshell]
             [clojure.string :as str]))
 
 (def top-of-window (atom {})) ; Keys are windowname-buffername
@@ -594,3 +595,38 @@
 (defn tmp-do-macro
   []
   (doall (map handle-input '(:i :i :j))))
+
+(defn swap-windows
+  []
+  (let [buffer1 (get-name)]
+    (switch-to-buffer "scratch")
+    (other-window)
+    (let [buffer2 (get-name)]
+      (switch-to-buffer buffer1)
+      (other-window)
+      (switch-to-buffer buffer2))))
+
+(defn prompt-to-tmp
+  []
+  (switch-to-buffer "-prompt-")
+  (let [content (get-content)]
+    (other-window)
+    (new-buffer "-tmp-")
+    (clear)
+    (insert content)))
+
+(defn search-files
+  [search]
+  (new-buffer "-search-files-")
+  (kill-buffer)
+  (when (> (count (get-folder)) 1) ;; Avoid searching from empty or root folder
+    (let [folder (get-folder)
+          result (->> folder
+                      cshell/lsr
+                      (cshell/flrex (re-pattern search))
+                      (map #(str/join " : " %))
+                      (str/join "\n"))]
+      (new-buffer "-search-files-")
+      (insert result)
+  ;(->> (get-folder) lsr (flrex (re-pattern search)) (map #(str/join " : " %)) p)
+  )))

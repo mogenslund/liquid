@@ -2,7 +2,6 @@
   (:require [clojure.java.io :as io]
             [dk.salza.liq.buffer :as buffer]
             [dk.salza.liq.slider :refer :all]
-            [dk.salza.liq.sliderutil :as sliderutil]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.editoractions :as editoractions]
             [dk.salza.liq.keys :as keys]
@@ -67,10 +66,10 @@
         (let [sl (state :sl)
               st (state :state)
               c (get-char sl)]
-          (cond (= st 1) (cond (or (= c "\n") (beginning? sl)) ((sliderutil/get-context sl0) :value)
+          (cond (= st 1) (cond (or (= c "\n") (beginning? sl)) ((slider/get-context sl0) :value)
                                (= c "[") (recur (assoc state :state 2 :sl (right sl 1)))
                                true (recur (assoc state :sl (left sl 1))))
-                (= st 2) (cond (or (= c "\n") (end? sl)) ((sliderutil/get-context sl0) :value)
+                (= st 2) (cond (or (= c "\n") (end? sl)) ((slider/get-context sl0) :value)
                                (= c "]") (recur (assoc state :state 3 :sl (right sl 1)))
                                true (recur (assoc state :link1 (str (state :link1) c) :sl (right sl 1))))
                 (= st 3) (cond (= c "(") (recur (assoc state :state 4 :sl (right sl 1)))

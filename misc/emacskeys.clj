@@ -1,6 +1,5 @@
 (ns dk.salza.liq.extensions.emacskeys
   (:require [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.editoractions :as editoractions]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]

@@ -2,11 +2,9 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
             [dk.salza.liq.adapters.tty :as tty]
-            [dk.salza.liq.adapters.winttyadapter :as winttyadapter]
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
             [dk.salza.liq.adapters.webadapter :as webadapter]
-            [dk.salza.liq.adapters.htmladapter :as htmladapter]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.tools.cshell :as cshell]
@@ -15,8 +13,6 @@
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.apps.helpapp :as helpapp]
-            [dk.salza.liq.extensions.vimkeys :as vimkeys]
-            [dk.salza.liq.extensions.emacskeys :as emacskeys]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.logging :as logging]
             [dk.salza.liq.window :as window])
@@ -142,7 +138,7 @@
                       "  C-f: Find file\n\n"
                       "## Evaluation\n"
                       "Place cursor between the parenthesis below and type \"e\" "
-                      "in navigation mode (f5 when using --vim and C-x C-e using --emacs), "
+                      "in navigation mode, "
                       "to evaluate the expression:\n"
                       "(range 10 30)\n"
                       "(editor/end-of-buffer)\n"
@@ -235,10 +231,6 @@
           ;; Load the defaults
           (set-defaults)
 
-          ;; Overwrite with emacs or vim key bindings if requested
-          (when (read-arg args "--vim") (vimkeys/init))
-          (when (read-arg args "--emacs") (emacskeys/init))
-
           ;; Build editor: Initial windows and buffers
           (init-editor (- rows 1) columns)
 
@@ -257,8 +249,6 @@
           ;; If specified load as web, server, html or JFrame
           (when (or (read-arg args "--web") (read-arg args "--server"))
             (((webadapter/adapter rows columns autoupdate) :init) port))
-          (when (read-arg args "--html")
-            (((htmladapter/adapter rows columns autoupdate) :init) port))
           (when (read-arg args "--jframe")
             (jframeadapter/init rows columns))
 

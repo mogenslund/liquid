@@ -1,12 +1,10 @@
 (ns dk.salza.liq.apps.helpapp
   (:require [clojure.java.io :as io]
             [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.editoractions :as editoractions]
             [dk.salza.liq.apps.typeaheadapp :as typeaheadapp]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.buffer :as buffer]
             [dk.salza.liq.slider :refer :all]
-            [dk.salza.liq.sliderutil :as sliderutil]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
@@ -19,7 +17,7 @@
 
 (def keymap
   {:cursor-color :blue
-   :M editoractions/prompt-to-tmp
+   :M editor/prompt-to-tmp
    :enter #(@navigate)
    :tab #(editor/find-next "[")
    :space #(editor/forward-page)

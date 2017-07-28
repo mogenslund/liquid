@@ -1,6 +1,5 @@
 (ns dk.salza.liq.buffer
   (:require [dk.salza.liq.slider :as slider]
-            [dk.salza.liq.sliderutil :as sliderutil]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
@@ -94,7 +93,7 @@
                                buffer
                                (set-dirty (doto-slider (set-undo-point buffer) #(-> % (slider/right 1) (slider/delete 1))))))
 (defn clear [buffer] (set-dirty (doto-slider (set-undo-point buffer) slider/clear)))
-(defn get-context [buffer] (sliderutil/get-context (get-slider buffer)))
+(defn get-context [buffer] (slider/get-context (get-slider buffer)))
 (defn delete-selection [buffer] (doto-slider buffer slider/delete-region "selection"))
 (defn delete-line [buffer] (doto-slider buffer slider/delete-line))
 (defn select-sexp-at-point [buffer] (doto-slider buffer slider/select-sexp-at-point))
@@ -116,7 +115,7 @@
 (defn get-mark [buffer name] (slider/get-mark (buffer ::slider) name))
 (defn get-selection [buffer] (-> buffer (get-region "selection"))) ;(slider/get-region (buffer ::slider) "selection"))
 (defn get-content [buffer] (slider/get-content (buffer ::slider)))
-(defn sexp-at-point [buffer] (sliderutil/sexp-at-point (buffer ::slider)))
+(defn sexp-at-point [buffer] (slider/sexp-at-point (buffer ::slider)))
 (defn get-line [buffer] (-> buffer beginning-of-line (set-mark "linestart")
                                    end-of-line (get-region "linestart")))
 

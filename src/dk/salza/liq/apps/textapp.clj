@@ -1,6 +1,5 @@
 (ns dk.salza.liq.apps.textapp
   (:require [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.editoractions :as editoractions]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.extensions.headlinenavigator]
@@ -17,7 +16,7 @@
 (def keymap-navigation
   {:cursor-color :blue
    :tab #(editor/set-keymap @keymap-insert)
-   :M editoractions/prompt-to-tmp
+   :M editor/prompt-to-tmp
    :space #(editor/forward-page)
    ;:C-s editor/search
    :colon (fn [] (editor/handle-input :C-space) (editor/handle-input :colon))
@@ -26,7 +25,7 @@
    :up editor/backward-line
    :down editor/forward-line
    :C-s #(promptapp/run editor/find-next '("SEARCH"))
-   :M-s #(promptapp/run editoractions/search-files '("SEARCH"))
+   :M-s #(promptapp/run editor/search-files '("SEARCH"))
    :v editor/selection-toggle
    :g {:g editor/beginning-of-buffer
        :t editor/top-align-page

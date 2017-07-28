@@ -1,6 +1,5 @@
 (ns dk.salza.liq.extensions.vimkeys
   (:require [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.editoractions :as editoractions]
             [dk.salza.liq.keys :as keys]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.extensions.headlinenavigator]
@@ -16,7 +15,7 @@
 
 (def keymap-normal
   {:cursor-color :blue
-   :M editoractions/prompt-to-tmp
+   :M editor/prompt-to-tmp
    :space #(editor/forward-page)
    ;:C-s editor/search
    :colon (fn [] (editor/handle-input :C-space) (editor/handle-input :colon))
