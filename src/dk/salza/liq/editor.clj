@@ -42,7 +42,8 @@
   update has been made to the editor.
   This can be used by views to check for updates."
   []
-  (swap! updates inc))
+  (swap! updates inc)
+  nil)
 
 
 (defn set-default-keymap
