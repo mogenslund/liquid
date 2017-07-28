@@ -424,19 +424,6 @@
                 (catch Exception e (util/pretty-exception e)))))))
   ([] (when-let [filepath (get-filename)] (evaluate-file filepath))))
 
-(defn evaluate-file-old
-  ([filepath]
-    (let [extension (or (re-find #"(?<=\.)\w*$" filepath) :empty)
-          fun (or ((@editor ::file-eval) extension) ((@editor ::file-eval) :default))
-          output (when fun
-                   (try
-                     (with-out-str
-                       (println
-                         (fun filepath)))
-                    (catch Exception e (util/pretty-exception e))))]
-        (prompt-set (str/trim (or output "")))))
-  ([] (when-let [filepath (get-filename)] (evaluate-file filepath))))
-
 (defn eval-sexp
   [sexp]
   (let [isprompt (= (get-name) "-prompt-")
@@ -453,24 +440,6 @@
               ") " sexp ")")))
         (catch Exception e (do (logging/log e) (util/pretty-exception e))))
       )))
-
-(defn eval-sexp-old
-  [sexp]
-  (let [isprompt (= (get-name) "-prompt-")
-        namespace (or (clojureutil/get-namespace (current-buffer)) "user")]
-    (when isprompt (other-window))
-    (let [output (try
-                   (if sexp
-                     (with-out-str
-                       (println
-                         (load-string
-                           (str
-                             "(do (ns " namespace ") (in-ns '"
-                             namespace
-                             ") " sexp ")"))))
-                     "")
-                   (catch Exception e (do (logging/log e) (util/pretty-exception e))))]
-      (when (and (not= output "") (not isprompt)) (prompt-set output)))))
 
 (defn eval-safe
   [fun]
