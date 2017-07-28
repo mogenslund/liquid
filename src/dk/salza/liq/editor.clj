@@ -387,10 +387,11 @@
 
 (defn prompt-append
   [string]
-  (switch-to-buffer "-prompt-")
-  (insert (str string "\n"))
-  (previous-buffer)
-  (updated))
+  (when string
+    (switch-to-buffer "-prompt-")
+    (insert (str string "\n"))
+    (previous-buffer)
+    (updated)))
 
 (defn prompt-input
   [string]
