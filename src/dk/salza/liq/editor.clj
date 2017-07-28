@@ -422,7 +422,7 @@
          (with-redefs [println prompt-append]
            (try
              (println (fun filepath))
-                (catch Exception e (util/pretty-exception e)))))))
+                (catch Exception e (println (util/pretty-exception e))))))))
   ([] (when-let [filepath (get-filename)] (evaluate-file filepath))))
 
 (defn eval-sexp
@@ -439,7 +439,7 @@
               "(do (ns " namespace ") (in-ns '"
               namespace
               ") " sexp ")")))
-        (catch Exception e (do (logging/log e) (util/pretty-exception e))))
+        (catch Exception e (do (logging/log e) (println (util/pretty-exception e)))))
       )))
 
 (defn eval-safe
