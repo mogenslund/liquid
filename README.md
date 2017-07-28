@@ -18,6 +18,11 @@ For discussions, help, tips and support, use
 
 **[#liquid](https://clojurians.slack.com/messages/liquid/)** channel in [Clojure Slack](http://clojurians.net/)
 
+## Extensible?
+You Betcha!
+
+Extensions are not addons or plugins, but real code on top of &lambda;iquid. So any Clojure code can be used and any Java jar file for that matter. No special plugin language, just real code. So take your favorite Java library and add it to the classpath. Setup a few shortcuts in the .liq file and now &lambda;iquid integrates with your favorite tool.
+
 ## Installation
 
 ### Download and execution
