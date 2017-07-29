@@ -387,25 +387,25 @@
   (beginning-of-line))
 
 (defn prompt-append
-  [string]
+  [& string]
   (when string
     (switch-to-buffer "-prompt-")
-    (insert (str string "\n"))
+    (insert (str (str/join " " string) "\n"))
     (previous-buffer)
     (updated)))
 
 (defn prompt-input
-  [string]
+  [& string]
   (switch-to-buffer "-prompt-")
   (end-of-buffer)
-  (insert (str "\n" string))
+  (insert (str "\n" (str/join " " string)))
   (backward-char 2))
 
 (defn prompt-set
-  [string]
+  [& string]
   (switch-to-buffer "-prompt-")
   (clear)
-  (insert string)
+  (insert (str/join " " string))
   (previous-buffer)
   (updated))
 
