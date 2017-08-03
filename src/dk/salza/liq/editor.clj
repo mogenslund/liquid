@@ -343,6 +343,12 @@
     (util/set-clipboard-content r)
     true))
 
+(defn copy-file
+  []
+  (when-let [f (get-filename)]
+    (util/set-clipboard-content f)
+    true))
+
 (defn copy-line
   []
   (when-let [r (get-line)]
