@@ -1,5 +1,5 @@
-# docker build -t liquidtest .
-# docker run -i -t --rm=true liquidtest /bin/bash
+# docker build -t liquid .
+# docker run -i -t --rm=true liquid /bin/bash
 # ./lein test
 # ./lein run
 
@@ -25,4 +25,3 @@ ADD . .
 
 RUN ["chmod", "+x", "/workspace/lein"]
 RUN ["/bin/bash", "/workspace/lein", "deps"]
-
