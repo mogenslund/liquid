@@ -117,7 +117,7 @@
 
 (defn run
   []
-  (let [functions (editor/get-available-functions)
+  (let [functions (list); (editor/get-available-functions)
       ]
     (editor/new-buffer "-commandapp-")
     (editor/set-keymap keymap)
