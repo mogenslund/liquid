@@ -13,4 +13,5 @@
   :resource-paths ["resources"]
   :target-path "/tmp/liq/target/%s/"
   :clean-targets ^{:protect false} [:target-path]
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}}
+  :aliases {"dev" ["run" "--load=.liq"]})
