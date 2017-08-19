@@ -59,6 +59,10 @@
   [highlighter]
   (reset! default-highlighter highlighter))
 
+(defn get-default-highlighter
+  []
+  @default-highlighter)
+
 (defn set-default-app
   "Set the default app to be used when a new
   buffer is created."

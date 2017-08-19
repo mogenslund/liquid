@@ -96,14 +96,14 @@
   [filepath]
   (if (editor/get-buffer filepath)
     (editor/switch-to-buffer filepath)
-    (let [syntaxhl (cond (nil? filepath) clojuremdhl/next-face
+    (let [syntaxhl (cond (nil? filepath) (editor/get-default-highlighter)
                          (re-matches #"^.*\.js$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.java$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.c$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.py$" filepath) pythonhl/next-face
                          (re-matches #"^.*\.xml$" filepath) xmlhl/next-face
                          (re-matches #"^.*\.tex$" filepath) latexhl/next-face
-                          :else clojuremdhl/next-face) ;; In other cases use clojure/markdown
+                          :else (editor/get-default-highlighter)) ;; In other cases use clojure/markdown
           ]
       (editor/create-buffer-from-file filepath)
       (editor/set-highlighter syntaxhl))))
