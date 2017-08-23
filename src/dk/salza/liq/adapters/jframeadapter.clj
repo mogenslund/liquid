@@ -65,10 +65,14 @@
                                    (= code "98") :M-b
                                    :else :unknown)
           (re-matches #"[a-zA-Z0-9]" ch) (keyword ch)
+          (= rawcode "110") :home
           (= rawcode "111") :up
+          (= rawcode "115") :end
           (= rawcode "116") :down
           (= rawcode "113") :left
           (= rawcode "114") :right
+          (= rawcode "117") :pagedown
+          (= rawcode "112") :pageup
           (= rawcode "67") :f1
           (= rawcode "68") :f2
           (= rawcode "69") :f3

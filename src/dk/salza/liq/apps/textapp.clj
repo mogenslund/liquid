@@ -22,6 +22,7 @@
    :tab #(editor/set-keymap @keymap-insert)
    :M editor/prompt-to-tmp
    :space #(editor/forward-page)
+   :pagedown #(editor/forward-page)
    ;:C-s editor/search
    :colon (fn [] (editor/handle-input :C-space) (editor/handle-input :colon))
    :right editor/forward-char
@@ -83,6 +84,7 @@
   (merge
     {:cursor-color :green
      :tab #(editor/set-keymap @keymap-navigation)
+     :pagedown #(editor/forward-page)
      :right editor/forward-char
      :left editor/backward-char
      :up editor/backward-line
