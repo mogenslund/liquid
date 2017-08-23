@@ -12,9 +12,13 @@
             [dk.salza.liq.coreutil :refer :all]))
 
 (def keymap-insert (atom {}))
+(def keymap-navigation (atom {}))
 
-(def keymap-navigation
-  {:cursor-color :blue
+(defn set-navigation-key
+  [key fun]
+  (swap! keymap-navigation assoc key fun))
+
+(reset! keymap-navigation {:cursor-color :blue
    :tab #(editor/set-keymap @keymap-insert)
    :M editor/prompt-to-tmp
    :space #(editor/forward-page)
@@ -24,6 +28,8 @@
    :left editor/backward-char
    :up editor/backward-line
    :down editor/forward-line
+   :home editor/beginning-of-line
+   :end editor/end-of-line
    :C-s #(promptapp/run editor/find-next '("SEARCH"))
    :M-s #(promptapp/run editor/search-files '("SEARCH"))
    :v editor/selection-toggle
@@ -76,11 +82,13 @@
 (reset! keymap-insert
   (merge
     {:cursor-color :green
-     :tab #(editor/set-keymap keymap-navigation)
+     :tab #(editor/set-keymap @keymap-navigation)
      :right editor/forward-char
      :left editor/backward-char
      :up editor/backward-line
      :down editor/forward-line
+     :home editor/beginning-of-line
+     :end editor/end-of-line
      :space #(editor/insert " ")
      :enter #(editor/insert "\n")
      :C-t #(editor/insert "\t")
@@ -106,4 +114,5 @@
                           :else (editor/get-default-highlighter)) ;; In other cases use clojure/markdown
           ]
       (editor/create-buffer-from-file filepath)
+      (editor/set-keymap @keymap-navigation)
       (editor/set-highlighter syntaxhl))))

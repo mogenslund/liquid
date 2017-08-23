@@ -79,7 +79,7 @@
   (editor/set-default-highlighter clojuremdhl/next-face)
 
   ;; Default keymap
-  (editor/set-default-keymap textapp/keymap-navigation)
+  (editor/set-default-keymap @textapp/keymap-navigation)
 
   ;; Default app
   (editor/set-default-app textapp/run)

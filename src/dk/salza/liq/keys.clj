@@ -42,6 +42,8 @@
            (= raw 4545563) :left           
            (= raw 4414491) :down           
            (= raw 4480027) :right           
+           (= raw 4807707) :home
+           (= raw 4676635) :end
            (= raw 123) :bracesstart
            (= raw 124) :pipe
            (= raw 125) :bracesend
