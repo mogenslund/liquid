@@ -516,7 +516,7 @@
     (prompt-append (str "VALUE: " "" value))
     (cond (= type :file) (if (.isAbsolute (io/file value))
                            (find-file value)
-                           (find-file (str (io/file (get-folder) value))))
+                           (find-file (str (.getCanonicalPath (io/file (get-folder) value)))))
           (= type :url) (when-let [start-browser (setting :start-browser)]
                           (start-browser value))
           (= type :function) (goto-definition value))))

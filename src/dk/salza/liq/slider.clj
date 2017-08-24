@@ -544,10 +544,10 @@
   [sl]
   (let [sl0 (-> sl (left-until #"[^ \n\"]")
                    (left-until #"[ \n\"]")
-                   (right-until #"[\w(\[/$]")
+                   (right-until #"[\w\.~(\[/$]")
                    (set-mark "contextstart")) ;(right 1) (set-mark "contextstart")) (re-find #"\w" "  x")
         sl1 (-> sl0 (right-until #"[ |\n|\"]"))
-        word (str/replace (get-region sl1 "contextstart") #"\$HOME" (System/getProperty "user.home"))]
+        word (str/replace (get-region sl1 "contextstart") #"(\$HOME|~)" (System/getProperty "user.home"))]
     (cond (re-matches #"https?://.*" word) {:type :url :value word}
           (re-matches #";?#" word) {:type :fold :value "fold"}
           (re-matches #"\(.*" word) {:type :function :value (str/replace word #"(\(|\))" "")}
