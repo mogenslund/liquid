@@ -30,7 +30,7 @@ Extensions are not addons or plugins, but real code on top of &lambda;iquid. So 
 #### Quick start
 Download the single jar (Uberjar containing both Clojure and Liquid) [liq.jar](http://salza.dk/liq.jar)  
 
-See [Cheatsheet](https://github.com/mogenslund/liquid/wiki/Cheat-Sheet) for basic keymappings.
+**IMPORTANT** Please have the [Cheatsheet](https://github.com/mogenslund/liquid/wiki/Cheat-Sheet) nearby when using Liquid for the first time. The keybindings are powerful, but needs to be learned.
 
 On Windows double click the liq.jar.  
 On Linux and Mac execute the following in a terminal:
