@@ -16,7 +16,7 @@
                                   (and (= pch "\n") (= ch " ") (= (-> sl (right 1) (get-char)) "*")) :comment
                                   (and (= pch "\n") (= ch "/") (= (-> sl (right 1) (get-char)) "*")) :comment
                                   (and (= pch "") (= ch "/") (= (-> sl (right 1) (get-char)) "*")) :comment
-                                  (and (or (= pch " ") (= pch "\n") (= pch "")) (re-find #"^(var|function)[ \(]" (str (string-ahead sl 9) "    "))) :type1
+                                  (and (or (= pch " ") (= pch "\n") (= pch "")) (re-find #"^(var|function|const)[ \(]" (str (string-ahead sl 9) "    "))) :type1
                                   ;(and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
                                   :else face)
           (= face :type1)   (cond (= pch " ") :type2
