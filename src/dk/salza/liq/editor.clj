@@ -463,7 +463,7 @@
 
 (defn eval-last-sexp
   []
-  (eval-sexp (sexp-at-point)))
+  (eval-sexp (or (get-selection) (sexp-at-point))))
 
 (defn search
   []
