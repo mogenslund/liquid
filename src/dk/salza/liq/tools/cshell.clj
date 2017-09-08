@@ -69,6 +69,12 @@
   [path]
   (.isFile (io/file (expand-home path))))
 
+(defn size
+  [s]
+  (if (sequential? s)
+    (map size s)
+    (.length (io/file (expand-home s)))))
+
 (defn ls
   "Outputs files and folders in a given
    dir into a vector."
