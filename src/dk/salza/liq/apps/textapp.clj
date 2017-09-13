@@ -94,6 +94,9 @@
      :space #(editor/insert " ")
      :enter #(editor/insert "\n")
      :C-t #(editor/insert "\t")
+     :C-k #(editor/insert "(")
+     :C-l #(editor/insert ")")
+     :C-h #(editor/insert "/")
      :backspace editor/delete
      :C-g editor/escape
      :esc editor/escape
