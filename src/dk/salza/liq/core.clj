@@ -183,6 +183,7 @@
      "--autoupdate: If there are multiple views they should be syncronised."
      "--load=<path to file>: Load <path to file> as init file."
      "--log=<path to file>: Will write log information to the <path to file>."
+     "--minimal: To prevent loading some default settings. Useful for fully cusomizing Liquid."
      ""
      "Some parameters may be combined, like:"
      "--tty --jframe --server --port=7000 --no-init-file --rows=50 --columns=80 --log=/tmp/liq.log"
@@ -197,6 +198,27 @@
       (println "Version can only be extracted from jar.")))
   (System/exit 0))
   
+(defn load-minimal
+  [rows columns userfile]
+  ;; Set defaults
+  (editor/set-default-keymap @textapp/keymap-navigation)
+  (editor/set-default-app textapp/run)
+
+  ;; Set global keymappings
+  (editor/set-global-key :C-space commandapp/run)
+  (editor/set-global-key :C-q editor/quit)
+  (editor/set-global-key :C-M-q editor/force-quit)
+  (editor/set-global-key :C-f #(findfileapp/run textapp/run))
+  (editor/set-global-key :C-o editor/other-window)
+  (editor/set-global-key :C-r #(editor/prompt-append "test"))
+  
+  ;; Create window
+  (editor/add-window (window/create "liquid" 1 1 rows columns "-Liquid-"))
+  (editor/new-buffer "-prompt-")
+  (editor/new-buffer "scratch")
+
+  ;; Load userfile, if specified
+  (when userfile (load-user-file userfile)))
 
 (defn -main
   [& args]
@@ -222,20 +244,24 @@
                      (or (read-arg args "--load=")
                          (fileutil/file (System/getProperty "user.home") ".liq")))
           logfile (read-arg args "--log=")
-          singlethreaded (read-arg args "--no-threads")]
+          singlethreaded (read-arg args "--no-threads")
+          minimal (read-arg args "--minimal")]
 
           ;; Enable logging if --log specified
           (when logfile
             (logging/enable logfile))
 
-          ;; Load the defaults
-          (set-defaults)
+          (if minimal
+            (load-minimal (- rows 1) columns userfile)
+            (do
+              ;; Load the defaults
+              (set-defaults)
 
-          ;; Build editor: Initial windows and buffers
-          (init-editor (- rows 1) columns)
+              ;; Build editor: Initial windows and buffers
+              (init-editor (- rows 1) columns)
 
-          ;; Load userfile if present.
-          (load-user-file userfile)
+              ;; Load userfile if present.
+              (load-user-file userfile)))
 
           ;; TTY is used as default view on Linux and Mac
           ;; JFrame is used on Windows
