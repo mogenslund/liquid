@@ -227,7 +227,8 @@
   (cond (read-arg args "--help") (print-help-and-exit)
         (read-arg args "--version") (print-version-and-exit)
     :else
-    (let [usetty (or (read-arg args "--tty")
+    (let [minimal (read-arg args "--minimal")
+          usetty (or (read-arg args "--tty")
                      (not (or (read-arg args "--server")
                               (read-arg args "--ghost")
                               (read-arg args "--jframe"))))
@@ -242,10 +243,10 @@
           autoupdate (if (read-arg args "--autoupdate") true false)
           userfile (when-not (read-arg args "--no-init-file") 
                      (or (read-arg args "--load=")
-                         (fileutil/file (System/getProperty "user.home") ".liq")))
+                         (and (not minimal)
+                              (fileutil/file (System/getProperty "user.home") ".liq"))))
           logfile (read-arg args "--log=")
-          singlethreaded (read-arg args "--no-threads")
-          minimal (read-arg args "--minimal")]
+          singlethreaded (read-arg args "--no-threads")]
 
           ;; Enable logging if --log specified
           (when logfile
