@@ -21,14 +21,14 @@
 (def macro-record (atom false))
 
 (def empty-editor {::buffers '()
-                  ::windows '()
-                  ::global-keymap {}
-                  ::file-eval {}
-                  ::settings {::searchpaths '()
-                              ::files '()
-                              ::snippets '()
-                              ::commands '()
-                              ::interactive '()}})
+                   ::windows '()
+                   ::global-keymap {}
+                   ::file-eval {}
+                   ::settings {::searchpaths '()
+                               ::files '()
+                               ::snippets '()
+                               ::commands '()
+                               ::interactive '()}})
 
 (def editor (ref empty-editor))
 
@@ -74,6 +74,14 @@
   [fun & args]
   (dosync
     (alter editor update ::buffers #(apply doto-first (list* % fun args))))
+  nil)
+
+(defn doto-window
+  "Apply the given function to the current."
+  [fun & args]
+  (dosync
+    (alter editor update ::windows #(apply doto-first (list* % fun args))))
+  (updated)
   nil)
 
 (defn current-buffer
@@ -284,6 +292,12 @@
   (let [buffername (-> @editor ::windows second (window/get-buffername))]
     (dosync (alter editor update ::windows rotate)
             (alter editor update ::buffers bump ::buffer/name buffername))))
+
+(defn reduce-window-width [] (doto-window window/resize-width -1))
+(defn enlarge-window-width [] (doto-window window/resize-width 1))
+
+(defn reduce-window-height [] (doto-window window/resize-height -1))
+(defn enlarge-window-height [] (doto-window window/resize-height 1))
 
 (defn previous-buffer
   []
