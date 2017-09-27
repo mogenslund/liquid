@@ -299,6 +299,20 @@
 (defn reduce-window-height [] (doto-window window/resize-height -1))
 (defn enlarge-window-height [] (doto-window window/resize-height 1))
 
+(defn window-split-right
+  []
+  (let [curwin (current-window)
+        half (quot (curwin ::window/columns) 2)]
+    (doto-window window/resize-width (- -2 half))
+    (add-window (window/create
+                  (str (curwin ::window/name) "-right")
+                  (curwin ::window/top)
+                  (+ (curwin ::window/left) half 2)
+                  (curwin ::window/rows)
+                  (- (curwin ::window/columns) half 3)
+                  (curwin ::window/buffername))))
+  nil)
+
 (defn previous-buffer
   []
   (switch-to-buffer (-> @editor ::buffers second ::buffer/name)))
