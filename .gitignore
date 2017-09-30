@@ -1,4 +1,5 @@
 pom.xml
 pom.xml.asc
+target
 *~
 .lein-failures

@@ -7,11 +7,11 @@
   :url "https://github.com/mogenslund/liquid"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha14"]]
+  :dependencies [[org.clojure/clojure "1.9.0-beta1"]]
   ;:main ^:skip-aot dk.salza.liq.core
   :main dk.salza.liq.core
   :resource-paths ["resources"]
-  :target-path "/tmp/liq/target/%s/"
+  :target-path "target/%s"
   :clean-targets ^{:protect false} [:target-path]
   :profiles {:uberjar {:aot :all}}
   :aliases {"dev" ["run" "--load=.liq"]})
