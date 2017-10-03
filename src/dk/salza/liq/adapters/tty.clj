@@ -48,7 +48,7 @@
 
 (defn print-color
   [index & strings] ;   0         1          2        3          4         5        6    7   8        9     10    11
-  (let [colorpalette ["0;37" "38;5;131" "38;5;105" "38;5;11" "38;5;40" "38;5;117" "42" "44" "45" "48;5;235" "49" "43"]]
+  (let [colorpalette ["0;40" "38;5;131" "38;5;105" "38;5;11" "38;5;40" "38;5;117" "42" "44" "45" "48;5;235" "49" "43"]]
     (tty-print (str "\033[" (colorpalette index) "m" (apply str strings)))))
 
 (defn print-lines
