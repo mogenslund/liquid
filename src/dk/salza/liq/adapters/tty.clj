@@ -47,8 +47,8 @@
         (recur (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty")) (inc n))))))
 
 (defn print-color
-  [index & strings] ;   0         1          2        3          4         5        6    7   8        9     10    11
-  (let [colorpalette ["0;40" "38;5;131" "38;5;105" "38;5;11" "38;5;40" "38;5;117" "42" "44" "45" "48;5;235" "49" "43"]]
+  [index & strings] ;   0         1          2        3          4         5        6    7   8        9     10    11  12 green  13 yellow 14 red
+  (let [colorpalette ["0;40" "38;5;131" "38;5;105" "38;5;11" "38;5;40" "38;5;117" "42" "44" "45" "48;5;235" "49" "43" "38;5;40" "38;5;11" "38;5;196"]]
     (tty-print (str "\033[" (colorpalette index) "m" (apply str strings)))))
 
 (defn print-lines
@@ -78,6 +78,9 @@
             (do
               (cond (= (ch :face) :string) (print-color 1)
                     (= (ch :face) :comment) (print-color 2)
+                    (= (ch :face) :green) (print-color 12)  
+                    (= (ch :face) :yellow) (print-color 13)  
+                    (= (ch :face) :red) (print-color 14)  
                     (= (ch :face) :type1) (print-color 3) ; defn
                     (= (ch :face) :type2) (print-color 4) ; function
                     (= (ch :face) :type3) (print-color 5) ; keyword
