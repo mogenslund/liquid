@@ -296,20 +296,20 @@
   (-> (current-buffer) buffer/get-visible-content))
 
 (defn insert
-  "Insert a string to the current active buffer
+  "Inserts a string to the current active buffer
   at the cursor position."
   [string]
   (doto-buffer buffer/insert string) (update-mem-col))
 
 (defn insert-line
-  "Insert an empty line below the current
+  "Inserts an empty line below the current
   and move the cursor down."
   []
   (doto-buffer buffer/insert-line)
   (update-mem-col))
 
 (defn forward-char
-  "Move the cursor forward the given amount,
+  "Moves the cursor forward the given amount,
   or 1 step, if no arguments are given."
   ([amount]
     (doto-buffer buffer/forward-char amount)
@@ -318,43 +318,183 @@
     (doto-buffer buffer/forward-char 1)
     (update-mem-col)))
 
-(defn forward-word [] (doto-buffer buffer/forward-word) (update-mem-col))
-(defn end-of-word [] (doto-buffer buffer/end-of-word) (update-mem-col))
-(defn backward-char ([amount] (doto-buffer buffer/backward-char amount) (update-mem-col))
-                    ([]       (doto-buffer buffer/backward-char 1) (update-mem-col)))
-(defn delete ([amount] (doto-buffer buffer/delete amount) (update-mem-col))
-             ([] (doto-buffer buffer/delete 1) (update-mem-col)))
-(defn delete-char [] (doto-buffer buffer/delete-char) (update-mem-col))
-(defn replace-char [s] (delete-char) (insert s) (backward-char))
-(defn end-of-line [] (doto-buffer buffer/end-of-line) (update-mem-col))
-(defn beginning-of-line [] (doto-buffer buffer/beginning-of-line) (update-mem-col))
-(defn beginning-of-buffer [] (doto-buffer buffer/beginning-of-buffer) (update-mem-col))
-(defn end-of-buffer [] (doto-buffer buffer/end-of-buffer) (update-mem-col))
-(defn clear [] (doto-buffer buffer/clear))
-(defn selection-set [] (doto-buffer buffer/set-mark "selection"))
-(defn selection-cancel [] (doto-buffer buffer/remove-mark "selection"))
+(defn forward-word
+  "Moves the cursor to the beginning
+  of the next word."
+  []
+  (doto-buffer buffer/forward-word)
+  (update-mem-col))
+
+(defn end-of-word
+  "Moves the cursor to the end of the current
+  word."
+  []
+  (doto-buffer buffer/end-of-word)
+  (update-mem-col))
+
+(defn backward-char
+  "Moves the cursor backward the given amount,
+  or 1 step, if no arguments are given."
+  ([amount]
+    (doto-buffer buffer/backward-char amount)
+    (update-mem-col))
+  ([]
+    (doto-buffer buffer/backward-char 1)
+    (update-mem-col)))
+
+(defn delete
+  "Deletes given amount of characters backwards.
+  If no amount is supplied just one character
+  will be deleted."
+  ([amount]
+    (doto-buffer buffer/delete amount)
+    (update-mem-col))
+  ([]
+    (doto-buffer buffer/delete 1)
+    (update-mem-col)))
+
+(defn delete-char
+  "Deletes the character after the cursor."
+  []
+  (doto-buffer buffer/delete-char)
+  (update-mem-col))
+
+(defn replace-char
+  "Replaces the char at current point
+  with the given one."
+  [s]
+  (delete-char)
+  (insert s)
+  (backward-char))
+
+(defn end-of-line
+  "Moves the cursor to the end of the
+  current line. The next hard line break."
+  []
+  (doto-buffer buffer/end-of-line)
+  (update-mem-col))
+
+(defn beginning-of-line
+  "Moves the cursor to the beginning
+  of the current line."
+  []
+  (doto-buffer buffer/beginning-of-line)
+  (update-mem-col))
+
+(defn beginning-of-buffer
+  []
+  "Moves the cursor to the beginning of the buffer."
+  (doto-buffer buffer/beginning-of-buffer)
+  (update-mem-col))
+
+(defn end-of-buffer
+  "Moved the cursor to the end of the buffer."
+  []
+  (doto-buffer buffer/end-of-buffer)
+  (update-mem-col))
+
+(defn clear
+  "Clears the whole buffer."
+  []
+  (doto-buffer buffer/clear))
+
+(defn selection-set
+  "Sets selection mark at the current point.
+  This will be the starting point of a selection.
+  Cursor position will be the end point of the
+  selection."
+  []
+  (doto-buffer buffer/set-mark "selection"))
+
+(defn selection-cancel
+  "Removes the selection point.
+  Nothing will be selected afterwards."
+  []
+  (doto-buffer buffer/remove-mark "selection"))
+
 (defn selection-toggle
+  "If something is selected, the selection
+  will be cancelled.
+  If nothing is selected a selection
+  will be initiated."
   []
   (if (buffer/get-mark (current-buffer) "selection")
     (selection-cancel)
     (selection-set)))
-(defn select-sexp-at-point [] (doto-buffer buffer/select-sexp-at-point))
-(defn highlight-sexp-at-point [] (doto-buffer buffer/highlight-sexp-at-point))
-(defn undo [] (doto-buffer buffer/undo))
 
-(defn get-selection [] (-> (current-buffer) buffer/get-selection))
-(defn get-content [] (-> (current-buffer) buffer/get-content))
-(defn sexp-at-point [] (-> (current-buffer) buffer/sexp-at-point))
-(defn get-context [] (-> (current-buffer) buffer/get-context))
-(defn get-line [] (-> (current-buffer) buffer/get-line))
-(defn get-char [] (-> (current-buffer) buffer/get-char))
-(defn get-name [] (-> (current-buffer) buffer/get-name))
-(defn get-point [] (-> (current-buffer) buffer/get-point))
-(defn set-mark [name] (doto-buffer buffer/set-mark name))
-(defn get-mark [name] (-> (current-buffer) (buffer/get-mark name)))
-(defn remove-mark [name] (doto-buffer buffer/remove-mark name))
-(defn point-to-mark [name] (doto-buffer buffer/point-to-mark name))
-(defn end-of-buffer? [] (-> (current-buffer) buffer/end-of-buffer?))
+(defn select-sexp-at-point
+  "Selects the s-expression at the point (cursor)
+  The cursor is moved backwards until the first
+  startparenthesis where selection starts, and then
+  forward until the selection has balanced parenthesis."
+  []
+  (doto-buffer buffer/select-sexp-at-point))
+
+(defn highlight-sexp-at-point
+  "Like select-sexp-at-point but only highlights
+  start and end of s-expression.
+  Toggle this to see current s-expression."
+  []
+  (doto-buffer buffer/highlight-sexp-at-point))
+
+(defn undo
+  "Execute an undo on the current buffer."
+  []
+  (doto-buffer buffer/undo))
+
+(defn get-selection
+  "Get current selected text as a string.
+  Returns nil if nothing is selected."
+  []
+  (-> (current-buffer) buffer/get-selection))
+
+(defn get-content
+  []
+  (-> (current-buffer) buffer/get-content))
+
+(defn sexp-at-point
+  []
+  (-> (current-buffer) buffer/sexp-at-point))
+
+(defn get-context
+  []
+  (-> (current-buffer) buffer/get-context))
+
+(defn get-line
+  []
+  (-> (current-buffer) buffer/get-line))
+
+(defn get-char
+  []
+  (-> (current-buffer) buffer/get-char))
+
+(defn get-name
+  []
+  (-> (current-buffer) buffer/get-name))
+
+(defn get-point
+  []
+  (-> (current-buffer) buffer/get-point))
+
+(defn set-mark
+  [name]
+  (doto-buffer buffer/set-mark name))
+
+(defn get-mark
+  [name]
+  (-> (current-buffer) (buffer/get-mark name)))
+
+(defn remove-mark
+  [name]
+  (doto-buffer buffer/remove-mark name))
+
+(defn point-to-mark
+  [name]
+  (doto-buffer buffer/point-to-mark name))
+
+(defn end-of-buffer?
+  []
+  (-> (current-buffer) buffer/end-of-buffer?))
 
 (defn forward-line
   "Move cursor forward one line
@@ -389,11 +529,21 @@
     (dosync (alter editor update ::windows rotate)
             (alter editor update ::buffers bump ::buffer/name buffername))))
 
-(defn reduce-window-width [] (doto-window window/resize-width -1))
-(defn enlarge-window-width [] (doto-window window/resize-width 1))
+(defn reduce-window-width
+  []
+  (doto-window window/resize-width -1))
 
-(defn reduce-window-height [] (doto-window window/resize-height -1))
-(defn enlarge-window-height [] (doto-window window/resize-height 1))
+(defn enlarge-window-width
+  []
+  (doto-window window/resize-width 1))
+
+(defn reduce-window-height
+  []
+  (doto-window window/resize-height -1))
+
+(defn enlarge-window-height
+  []
+  (doto-window window/resize-height 1))
 
 (defn window-split-right
   []
@@ -463,7 +613,9 @@
       (set-highlighter @default-highlighter))
     (switch-to-buffer filepath)))
 
-(defn save-file [] (doto-buffer buffer/save-buffer))
+(defn save-file
+  []
+  (doto-buffer buffer/save-buffer))
 
 (defn copy-selection
   []
@@ -511,6 +663,8 @@
   (paste)
   (beginning-of-line))
 
+
+
 (defn swap-line-up
   []
   (delete-line)
@@ -520,6 +674,13 @@
   (paste)
   (beginning-of-line))
 
+(defn prompt-input
+  [& string]
+  (switch-to-buffer "-prompt-")
+  (end-of-buffer)
+  (insert (str "\n" (str/join " " string)))
+  (backward-char 2))
+
 (defn prompt-append
   [& string]
   (when string
@@ -527,13 +688,6 @@
     (insert (str (str/join " " string) "\n"))
     (previous-buffer)
     (updated)))
-
-(defn prompt-input
-  [& string]
-  (switch-to-buffer "-prompt-")
-  (end-of-buffer)
-  (insert (str "\n" (str/join " " string)))
-  (backward-char 2))
 
 (defn prompt-set
   [& string]
