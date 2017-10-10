@@ -611,15 +611,26 @@
   (doto-buffer buffer/set-highlighter highlighter))
 
 (defn get-highlighter
+  "Returns the highlighter function from
+  the current buffer."
   []
   (buffer/get-highlighter (current-buffer)))
 
 (defn get-action
+  "If the current buffer has an action for the given
+  keyword the action (function) is return, otherwise,
+  if there is a global action for the given keyword
+  that will be returned."
   [keyw]
   (or (buffer/get-action (current-buffer) keyw)
       (-> @editor ::global-keymap keyw)))
 
 (defn new-buffer
+  "Create a new buffer with the given name.
+  The buffer will be set as the current buffer
+  in the current window.
+  Default highlighter and keymaps are assign.
+  They can be overridden afterwards."
   [name]
   (when (not (get-buffer name))
     (dosync
@@ -629,10 +640,15 @@
   (set-keymap @default-keymap))
 
 (defn find-file
+  "Opens the file with the given name
+  with the default app."
   [filepath]
   (@default-app filepath))
 
 (defn create-buffer-from-file
+  "Creates a new buffer, connects it to the
+  given filepath and loads the content into
+  the buffer."
   [filepath]
   (if (not (get-buffer filepath))
     (do
@@ -644,38 +660,53 @@
     (switch-to-buffer filepath)))
 
 (defn save-file
+  "If the current buffer is connected to a file,
+  saves the content of the buffer to the
+  file."
   []
   (doto-buffer buffer/save-buffer))
 
 (defn copy-selection
+  "If there is a selection, the selected
+  text will be send to clipboard."
   []
   (when-let [r (get-selection)]
     (util/set-clipboard-content r)
     true))
 
 (defn copy-file
+  "If the current buffer is connected to a file,
+  the filename is send to the clipboard."
   []
   (when-let [f (get-filename)]
     (util/set-clipboard-content f)
     true))
 
 (defn copy-line
+  "Sends the current line to the clipboard."
   []
   (when-let [r (get-line)]
     (util/set-clipboard-content r)))
 
 (defn copy-context
+  "Send the context to the clipboard.
+  The context could be a filename, a
+  function, an url depending on how the
+  context is resolved."
   []
   (when-let [r ((get-context) :value)]
     (util/set-clipboard-content r)))
 
 (defn delete-line
+  "Deletes the current line."
   []
   (copy-line)
   (doto-buffer buffer/delete-line)
   (update-mem-col))
 
 (defn delete-selection
+  "If there is a selection, the selected
+  content will be deleted."
   []
   (when (copy-selection)
     (doto-buffer buffer/delete-selection)
@@ -683,10 +714,14 @@
     true))
 
 (defn paste
+  "Insert the text from the clipboard
+  at the current position."
   []
   (insert (util/clipboard-content)))
 
 (defn swap-line-down
+  "Swaps the current line with the one below.
+  The cursor follows the the current line down."
   []
   (delete-line)
   (insert-line)
@@ -694,6 +729,8 @@
   (beginning-of-line))
 
 (defn swap-line-up
+  "Swaps the current line with the line above.
+  The cursor follows the current line up."
   []
   (delete-line)
   (backward-line)
@@ -726,6 +763,10 @@
   (updated))
 
 (defn evaluate-file-raw
+  "Evaluate a given file raw, without using
+  with-out-str or other injected functionality.
+  If no filepath is supplied the path connected
+  to the current buffer will be used."
   ([filepath]
     (try (load-file filepath)
       (catch Exception e (prompt-set (util/pretty-exception e)))))
