@@ -449,6 +449,8 @@
   (-> (current-buffer) buffer/get-selection))
 
 (defn get-content
+  "Return the content of the current buffer
+  as a string."
   []
   (-> (current-buffer) buffer/get-content))
 
@@ -461,54 +463,68 @@
   (-> (current-buffer) buffer/get-context))
 
 (defn get-line
+  "Returns the current line as a string."
   []
   (-> (current-buffer) buffer/get-line))
 
 (defn get-char
+  "Return the char at the point as a string."
   []
   (-> (current-buffer) buffer/get-char))
 
 (defn get-name
+  "Returns the name of the current buffer."
   []
   (-> (current-buffer) buffer/get-name))
 
 (defn get-point
+  "Returns the point as a number."
   []
   (-> (current-buffer) buffer/get-point))
 
 (defn set-mark
+  "Sets a named mark at the current point
+  on the current buffer"
   [name]
   (doto-buffer buffer/set-mark name))
 
 (defn get-mark
+  "Returns the named mark on the current buffer
+  as a number, the position of the mark."
   [name]
   (-> (current-buffer) (buffer/get-mark name)))
 
 (defn remove-mark
+  "Removes the named mark from the current buffer."
   [name]
   (doto-buffer buffer/remove-mark name))
 
 (defn point-to-mark
+  "Move the point to the mark on the current buffer."
   [name]
   (doto-buffer buffer/point-to-mark name))
 
 (defn end-of-buffer?
+  "Returns true of the current point is the
+  end of the current buffer."
   []
   (-> (current-buffer) buffer/end-of-buffer?))
 
 (defn forward-line
-  "Move cursor forward one line
+  "Moves cursor forward one line
   in the current active buffer."
   []
   (doto-buffer buffer/forward-visual-line ((current-window) ::window/columns)))
 
 (defn backward-line
-  "Move cursor backward one line
+  "Moves cursor backward one line
   in the current active buffer."
   []
   (doto-buffer buffer/backward-visual-line ((current-window) ::window/columns)))
 
 (defn forward-page
+  "Moves one page forward on the current buffer.
+  A page is what is visible in the current window."
   []
   (let [towid (window/get-towid (current-window) (current-buffer))]
     (doto-buffer buffer/set-point (or (@top-of-window towid)  0))
@@ -517,6 +533,8 @@
     (swap! top-of-window assoc towid (get-point))))
 
 (defn top-align-page
+  "Scrolls so the current line is at the top
+  of the window."
   []
   (let [towid (window/get-towid (current-window) (current-buffer))]
     (beginning-of-line)
@@ -524,6 +542,8 @@
 
 
 (defn other-window
+  "Navigates to the next window and changes
+  buffer accordingly."
   []
   (let [buffername (-> @editor ::windows second (window/get-buffername))]
     (dosync (alter editor update ::windows rotate)
@@ -560,23 +580,33 @@
   nil)
 
 (defn previous-buffer
+  "Navigates to the previous buffer used."
   []
   (switch-to-buffer (-> @editor ::buffers second ::buffer/name)))
 
 (defn previous-real-buffer
+  "Navigates to the prevous buffer, but skip over
+  buffer with names containing dashes."
   []
   (when-let [previous (first (filter (fn [x] (not (re-find #"^-" x))) (rest (buffer-names))))]
     (switch-to-buffer previous)))
 
 (defn set-keymap
+  "Sets the keymap on the current buffer."
   [keymap]
   (doto-buffer buffer/set-keymap keymap))
 
 (defn get-keymap
+  "Returns the active keymap on from the current buffer.
+  This is used by the editor to determine what action
+  to take."
   []
   (buffer/get-keymap (current-buffer)))
 
 (defn set-highlighter
+  "Set the highlighter function on the current
+  buffer. This determines how the content
+  in the buffer is syntax highlighted."
   [highlighter]
   (doto-buffer buffer/set-highlighter highlighter))
 
@@ -662,8 +692,6 @@
   (insert-line)
   (paste)
   (beginning-of-line))
-
-
 
 (defn swap-line-up
   []
