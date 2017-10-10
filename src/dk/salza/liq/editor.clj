@@ -1,4 +1,18 @@
 (ns dk.salza.liq.editor
+  "The editor is the central point of Liquid.
+  Most of the data is immutable, but the editor has
+  a ref, also called editor. It contains the state of
+  the editor.
+
+  Most actions on the editor will replace content of this state
+  with a transformed content.
+
+  For example:
+
+    When (forward-char 1) is called, the current buffer will be
+    replaced with a new buffer, where the cursor is moved one char
+    ahead.
+  "
   (:require [dk.salza.liq.buffer :as buffer]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.tools.util :as util]
@@ -9,28 +23,53 @@
             [dk.salza.liq.tools.cshell :as cshell]
             [clojure.string :as str]))
 
-(def top-of-window (atom {})) ; Keys are windowname-buffername
-(def default-highlighter (atom nil))
-(def default-keymap (atom nil))
-(def default-app (atom nil))
-(def searchstring (atom ""))
-(def macro-seq (atom '()))
-(def updates (atom 0))
-(def submap (atom nil))
+(def top-of-window
+  "Atom to keep track of the position
+  of the first char visible in a window.
+  Keys are generated from window and buffer
+  names."
+  (atom {}))
 
-(def macro-record (atom false))
+(def ^:private default-highlighter (atom nil))
+(def ^:private default-keymap (atom nil))
+(def ^:private default-app (atom nil))
+(def ^:private searchstring (atom ""))
+(def ^:private macro-seq (atom '()))
 
-(def empty-editor {::buffers '()
-                   ::windows '()
-                   ::global-keymap {}
-                   ::file-eval {}
-                   ::settings {::searchpaths '()
-                               ::files '()
-                               ::snippets '()
-                               ::commands '()
-                               ::interactive '()}})
+(def updates
+  "Variable to be increased when updates
+  are done to the editor, to allow easy
+  check if redraw is needed."
+  (atom 0))
 
-(def editor (ref empty-editor))
+(def ^:private submap (atom nil))
+
+(def ^:private macro-record (atom false))
+
+(def ^:private empty-editor
+  {::buffers '()
+   ::windows '()
+   ::global-keymap {}
+   ::file-eval {}
+   ::settings {::searchpaths '()
+               ::files '()
+               ::snippets '()
+               ::commands '()
+               ::interactive '()}})
+
+(def editor
+  "The ref which contains the editor data, that is
+  
+  * List of buffers
+  * List of windows
+  * Global keymap
+  * Map of functions to evaluate different filetypes
+  * Settings with searchpaths, searchfiles, snippets,
+    commands and interactive commands for typeahead.
+
+  Most functions in the editor namespace manipulates
+  this ref."
+  (ref empty-editor))
 
 (defn reset
   "Resets the editor. Mostly for testing purposes."
@@ -60,6 +99,9 @@
   (reset! default-highlighter highlighter))
 
 (defn get-default-highlighter
+  "Get the default highlighter function.
+  Mostly used to set highlight on buffer
+  until some is set by user or app."
   []
   @default-highlighter)
 
@@ -69,14 +111,14 @@
   [app]
   (reset! default-app app))
 
-(defn doto-buffer
+(defn- doto-buffer
   "Apply the given function to the top-most buffer."
   [fun & args]
   (dosync
     (alter editor update ::buffers #(apply doto-first (list* % fun args))))
   nil)
 
-(defn doto-window
+(defn- doto-window
   "Apply the given function to the current."
   [fun & args]
   (dosync
@@ -85,21 +127,34 @@
   nil)
 
 (defn current-buffer
-  "Returns the current active buffer."
+  "Returns the current active buffer.
+  Since buffers are immutable, this will
+  be a copy of the actual buffer."
   []
   (-> @editor ::buffers first))
 
 (defn current-window
-  "Get the current active window."
+  "Get the current active window.
+  Mostly used to get the dimensions
+  for the related buffer."
   []
   (-> @editor ::windows first))
 
 (defn setting
-  "Get the setting with the given key."
+  "Get the setting with the given key.
+
+  Settings are used as a key value store
+  in the editor.
+
+  Items like snippets or search paths are
+  store in this."
   [keyw]
   (-> @editor ::settings keyw))
 
 (defn add-to-setting
+  "When a setting with a given key is a list,
+  items can be added to that list using this
+  function."
   [keyw entry]
   (when (not (some #{entry} (setting keyw)))
     (dosync (alter editor update-in [::settings keyw] conj entry))))
@@ -111,6 +166,9 @@
   (dosync (alter editor assoc-in [::settings keyw] value)))
 
 (defn set-global-key
+  "Define a global keybinding.
+  It takes a keyword like :f5 and a function
+  to call when that key is pressed."
   [keyw fun]
   (dosync (alter editor assoc-in [::global-keymap keyw] fun)) nil)
 
@@ -156,14 +214,34 @@
   (add-to-setting ::files f) nil)
 
 (defn add-interactive
+  "Add an interactive function.
+  The label will be shown in typeahead.
+  The user will be prompted to provide and
+  input for each of the lables in arglabels.
+  The function will be called with the input
+  values as arguments."
   [label fun & arglabels]
   (add-to-setting ::interactive [label fun arglabels])
   nil)
 
-(defn add-window [window] (dosync (alter editor update ::windows conj window)))
-(defn get-windows [] (@editor ::windows))
+(defn add-window
+  "Add a window to the editor.
+  It takes as input a window created using
+  dk.salza.liq.window/create function."
+  [window]
+  (dosync (alter editor update ::windows conj window)))
+
+(defn get-windows
+  "Returns the list of windows in the editor.
+  Used by views to get the dimensions of the
+  visible buffers."
+  []
+  (@editor ::windows))
 
 (defn get-buffer
+  "Get a buffer by its name.
+  Since buffers are immutable, the buffer given
+  will be a copy of the buffer."
   [name]
   (first (filter #(= (% ::buffer/name) name) (@editor ::buffers))))
 
@@ -178,6 +256,7 @@
   (map ::buffer/name (filter ::buffer/dirty (@editor ::buffers))))
 
 (defn switch-to-buffer
+  "Switch to the buffer with the given name."
   [buffername]
   (dosync
     (alter editor update ::buffers bump ::buffer/name buffername)
@@ -210,8 +289,11 @@
   (if-let [filepath (get-filename)]
     (str (.getParent (io/file filepath)))))
 
-
-(defn get-visible-content [] (-> (current-buffer) buffer/get-visible-content))
+(defn- get-visible-content
+  "Not in use yet, since there is no functionality
+  for hiding lines, yet."
+  []
+  (-> (current-buffer) buffer/get-visible-content))
 
 (defn insert
   "Insert a string to the current active buffer
@@ -219,9 +301,23 @@
   [string]
   (doto-buffer buffer/insert string) (update-mem-col))
 
-(defn insert-line [] (doto-buffer buffer/insert-line) (update-mem-col))
-(defn forward-char ([amount] (doto-buffer buffer/forward-char amount) (update-mem-col))
-                   ([]       (doto-buffer buffer/forward-char 1) (update-mem-col)))
+(defn insert-line
+  "Insert an empty line below the current
+  and move the cursor down."
+  []
+  (doto-buffer buffer/insert-line)
+  (update-mem-col))
+
+(defn forward-char
+  "Move the cursor forward the given amount,
+  or 1 step, if no arguments are given."
+  ([amount]
+    (doto-buffer buffer/forward-char amount)
+    (update-mem-col))
+  ([]
+    (doto-buffer buffer/forward-char 1)
+    (update-mem-col)))
+
 (defn forward-word [] (doto-buffer buffer/forward-word) (update-mem-col))
 (defn end-of-word [] (doto-buffer buffer/end-of-word) (update-mem-col))
 (defn backward-char ([amount] (doto-buffer buffer/backward-char amount) (update-mem-col))

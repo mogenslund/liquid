@@ -1,10 +1,31 @@
 (ns dk.salza.liq.buffer
+  "A buffer could be considered a slider (see slider) with
+  some extra attributes, besides attributes to keep track
+  of name, filename, dirtyness, undo information it consists
+  of
+
+    * A slider
+    * A highlighter function
+    * A keymap
+
+  The slider is used to keep track of the text, the highlighter
+  function is used by the view to apply highlight and the
+  keymap is used to decide which function a keypress should
+  be mapped to.
+
+  On runtime the highlighter function and the keymap can be
+  replaced.
+  
+  The buffer structure is immutable, so every operation that
+  changes the buffer will return a new one."
   (:require [dk.salza.liq.slider :as slider]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
 
 (defn create
+  "Creates an empty buffer with the given
+  name."
   [name]
   {::name name
    ::slider (slider/create)
@@ -36,6 +57,17 @@
   (update-in buffer [::slider] #(apply fun (list* % args))))
 
 (defn update-mem-col
+  "The mem-col is the column position of the cursor,
+  from the last time the cursor was moved not up and
+  down.
+
+  When moving the cursor up and down and passing by
+  shorter lines the column position, when reaching a
+  longer line again, should be restored.
+  
+  This allows one to keep the current column and
+  avoid the cursor from staying at the beginning of
+  the line when passing an empty line."
   [buffer columns]
   (assoc buffer ::mem-col (slider/get-visual-column (buffer ::slider) columns)))
 
@@ -44,16 +76,19 @@
   (buffer ::slider))
 
 (defn get-visible-content
+  "Not in use yet, since there is no functionality
+  for hiding lines, yet."
   [buffer]
   (-> buffer ::slider slider/get-visible-content)) 
 
-(defn set-undo-point
+(defn- set-undo-point
   [buffer]
   (let [newstack (conj (buffer ::slider-stack) (buffer ::slider))]
     (assoc buffer ::slider-stack newstack
                   ::slider-undo newstack)))
 
 (defn undo
+  "Undo action on the buffer."
   [buffer]
   (if (empty? (buffer ::slider-undo))
     buffer
@@ -61,7 +96,10 @@
                   ::slider-stack (conj (buffer ::slider-stack) (-> buffer ::slider-undo first))
                   ::slider-undo (rest (buffer ::slider-undo)))))
 
-(defn set-highlighter [buffer highlighter] (assoc buffer ::highlighter highlighter))
+(defn set-highlighter
+  [buffer highlighter]
+  (assoc buffer ::highlighter highlighter))
+
 (defn get-highlighter [buffer] (buffer ::highlighter))
 
 (defn set-keymap [buffer keymap] (assoc buffer ::keymap keymap))

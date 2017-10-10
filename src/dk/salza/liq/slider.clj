@@ -1,9 +1,11 @@
 (ns dk.salza.liq.slider
   "The slider is a basic construction resembling the most
   fundamental actions of a text edtior.
+
   The slider is immutable, so every slider function in this
   namespace will take a slider as input together with some
   parameters and evaluate to a new slider.
+
   By having the slider as first parameter a series of actions
   can be performed by using the threading operator \"->\",
   like:
@@ -14,6 +16,7 @@
     (forward-char 3))
 
   Some of the basic operations are:
+
   * Moving cursor
   * Inserting and removing content
   * Setting marks and moving cursor to marks
@@ -27,18 +30,26 @@
 (defn create
   "Creates a new slider with given text as text.
   The point will be placed at the beginning.
+
   A slider basically consists of two lists:
+
   before: A list of characters (strings) before the point,
-  where the first element is the character just before the point.
+          where the first element is the character just before the point.
   after:  A list of characters (strings) after the point,
-  where the first element is the character just after the point.
+          where the first element is the character just after the point.
+
   So moving the point is more or less to take characters from one
   of the lists and put into the other.
+
   This text: abc|def
+
   will look like this:
-  before = (c b a), after = (d e f).
+
+      before = (c b a), after = (d e f).
+
   Moving the curser to the right will result in:
-  before = (d c b a), after = (e f)."
+
+      before = (d c b a), after = (e f)."
   ([text]
     (let [after (if (string? text) (map str text) text)] ; Creating with a list '("a" "b") should also work
      {::before '()    ; The list of characters before the cursor in reverse order
@@ -143,7 +154,7 @@
     (reduce #(assoc %1 %2 (max point (+ (%1 %2) amount))) marks ks)))
 
 (defn left
-  "Move the point to the left the given amount of times.
+  "Moves the point to the left the given amount of times.
   So moving one character left is achieved with
   (left sl 1)."
   [sl amount]
@@ -168,8 +179,8 @@
         ::point (- (sl ::point) n)
         ::linenumber (- (sl ::linenumber) linecount)))))
 
-(defn right-old
-  "Move the point to the right the given amount of times."
+(defn- right-old
+  "Moves the point to the right the given amount of times."
   [sl amount]
   (let [tmp (take amount (sl ::after))
         n (count tmp)
@@ -181,7 +192,7 @@
     ::linenumber (+ (sl ::linenumber) linecount))))
 
 (defn right
-  "Move the point to the right the given amount of times."
+  "Moves the point to the right (forward) the given amount of times."
   [sl amount]
   (if (= amount 1)
     (let [c (first (sl ::after))]
@@ -205,7 +216,7 @@
         ::linenumber (+ (sl ::linenumber) linecount)))))
 
 (defn set-point
-  "Move point the the given location.
+  "Moves point the the given location.
   Not further than beginning of the slider
   and the end of the slider."
   [sl newpoint]
@@ -380,6 +391,9 @@
       sl)))
 
 (defn highlight-sexp-at-point
+  "Setting marks hl0 and hl1 on parenthesis matching the
+  current s-expression for a view to use to highlight the
+  the boundries of the s-expression."
   [sl]
   (if (get-mark sl "hl0")
     (-> sl
@@ -393,12 +407,12 @@
   
 
 (defn forward-word
-  "Move to beginning of next word or end-of-buffer"
+  "Moves the point to beginning of next word or end-of-buffer"
   [sl]
   (-> sl (right-until #"\s") (right 1) (right-until #"\S"))) ; (not (not (re-matches #"\S" "\n")))
 
 (defn end-of-line
-  "Moves point to the end of the line. Right before the
+  "Moves the point to the end of the line. Right before the
   next line break."
   [sl]
   (right-until sl #"\n"))
@@ -456,6 +470,13 @@
           (recur (right sl0 1) (inc n))))))
 
 (defn backward-visual-column
+  "Moves the point backward one line, where
+  the lines are wrapped. The parameter columns is
+  how many chars are allowed on one line. The parameter
+  column is the current selected column.
+  The visual result of this function is the cursor will
+  be located on the same column on the previous line, nomatter
+  if the line was wrapped or not."
   [sl columns column]
   (let [vc (get-visual-column sl columns)
         sl0 (left sl (+ vc 1))
@@ -500,7 +521,7 @@
          (delete-region "deleteline")))
 
 (defn get-content
-  "The full content of the slider"
+  "The full content of the slider as text."
   [sl]
   (apply str (-> sl beginning ::after)))
 
@@ -528,6 +549,8 @@
             :else (recur (right sl0 1))))))
 
 (defn sexp-at-point
+  "Returns the sexp at the current point. If there is no
+  s-expression nil will be returned."
   [sl]
   (let [sl0 (-> sl (mark-paren-start "paren-start") (mark-paren-end "paren-end"))]
     (if (and (get-mark sl0 "paren-start") (get-mark sl0 "paren-end"))
