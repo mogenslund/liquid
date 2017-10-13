@@ -30,11 +30,10 @@
   names."
   (atom {}))
 
-(def ^:private default-highlighter (atom nil))
-(def ^:private default-keymap (atom nil))
-(def ^:private default-app (atom nil))
-(def ^:private searchstring (atom ""))
-(def ^:private macro-seq (atom '()))
+(def ^:private macro-seq (atom '())) ; Macrofunctionality might belong to input handler.
+(def ^:private macro-record (atom false))
+(def ^:private submap (atom nil))
+
 
 (def updates
   "Variable to be increased when updates
@@ -42,16 +41,17 @@
   check if redraw is needed."
   (atom 0))
 
-(def ^:private submap (atom nil))
-
-(def ^:private macro-record (atom false))
 
 (def ^:private empty-editor
   {::buffers '()
    ::windows '()
    ::global-keymap {}
    ::file-eval {}
-   ::settings {::searchpaths '()
+   ::settings {::default-keymap nil
+               ::default-highlighter nil
+               ::default-app nil
+               ::searchstring ""
+               ::searchpaths '()
                ::files '()
                ::snippets '()
                ::commands '()
@@ -86,30 +86,55 @@
   nil)
 
 
+(defn setting
+  "Get the setting with the given key.
+
+  Settings are used as a key value store
+  in the editor.
+
+  Items like snippets or search paths are
+  store in this."
+  [keyw]
+  (-> @editor ::settings keyw))
+
+(defn add-to-setting
+  "When a setting with a given key is a list,
+  items can be added to that list using this
+  function."
+  [keyw entry]
+  (when (not (some #{entry} (setting keyw)))
+    (dosync (alter editor update-in [::settings keyw] conj entry))))
+
+(defn set-setting
+  "Set keyw to value in the
+  settings part of the editor." 
+  [keyw value]
+  (dosync (alter editor assoc-in [::settings keyw] value)))
+
 (defn set-default-keymap
   "Set the keymap to be used as default when a
   new buffer is created."
   [keymap]
-  (reset! default-keymap keymap))
+  (set-setting ::default-keymap keymap))
 
 (defn set-default-highlighter
   "Set the highlighter function to be used as
   default when a new buffer is created."
   [highlighter]
-  (reset! default-highlighter highlighter))
+  (set-setting ::default-highlighter highlighter))
 
 (defn get-default-highlighter
   "Get the default highlighter function.
   Mostly used to set highlight on buffer
   until some is set by user or app."
   []
-  @default-highlighter)
+  (setting ::default-highlighter))
 
 (defn set-default-app
   "Set the default app to be used when a new
   buffer is created."
   [app]
-  (reset! default-app app))
+  (set-setting ::default-app app))
 
 (defn- doto-buffer
   "Apply the given function to the top-most buffer."
@@ -139,31 +164,6 @@
   for the related buffer."
   []
   (-> @editor ::windows first))
-
-(defn setting
-  "Get the setting with the given key.
-
-  Settings are used as a key value store
-  in the editor.
-
-  Items like snippets or search paths are
-  store in this."
-  [keyw]
-  (-> @editor ::settings keyw))
-
-(defn add-to-setting
-  "When a setting with a given key is a list,
-  items can be added to that list using this
-  function."
-  [keyw entry]
-  (when (not (some #{entry} (setting keyw)))
-    (dosync (alter editor update-in [::settings keyw] conj entry))))
-
-(defn set-setting
-  "Set keyw to value in the
-  settings part of the editor." 
-  [keyw value]
-  (dosync (alter editor assoc-in [::settings keyw] value)))
 
 (defn set-global-key
   "Define a global keybinding.
@@ -641,14 +641,14 @@
     (dosync
       (alter editor update ::buffers conj (buffer/create name))))
   (switch-to-buffer name)
-  (set-highlighter @default-highlighter)
-  (set-keymap @default-keymap))
+  (set-highlighter (setting ::default-highlighter))
+  (set-keymap (setting ::default-keymap)))
 
 (defn find-file
   "Opens the file with the given name
   with the default app."
   [filepath]
-  (@default-app filepath))
+  ((setting ::default-app) filepath))
 
 (defn create-buffer-from-file
   "Creates a new buffer, connects it to the
@@ -660,8 +660,8 @@
       (dosync
         (alter editor update ::buffers conj (buffer/create-from-file filepath)))
       (switch-to-buffer filepath)
-      (set-keymap @default-keymap)
-      (set-highlighter @default-highlighter))
+      (set-keymap (setting ::default-keymap))
+      (set-highlighter (setting ::default-highlighter)))
     (switch-to-buffer filepath)))
 
 (defn save-file
@@ -823,11 +823,11 @@
 
 (defn find-next
   ([search]
-    (reset! searchstring search)
+    (set-setting ::searchstring search)
     (doto-buffer buffer/find-next search)
     (update-mem-col))
   ([]
-    (doto-buffer buffer/find-next @searchstring)
+    (doto-buffer buffer/find-next (setting ::searchstring))
     (update-mem-col)))
 
 (defn top-next-headline
