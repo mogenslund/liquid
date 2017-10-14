@@ -31,6 +31,12 @@
     (when (realized? coll)
       (cons (first coll) (take-realized (rest coll))))))
 
+(defn cmdseq
+  [& args]
+  (let [builder (ProcessBuilder. args)
+        process (.start builder)]
+    (line-seq (io/reader (.getInputStream process)))))
+
 (defn cmd
   "Execute a native command.
   Adding :timeout 60 or similar as last command will
@@ -95,6 +101,13 @@
   [s]
   (if (sequential? s)
     (println (str/join "\n" s))
+    (println s)))
+
+(defn pp
+  "Prints a sequence line by line."
+  [s]
+  (if (sequential? s)
+    (doseq [l s] (println l))
     (println s)))
 
 (defn rex
