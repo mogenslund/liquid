@@ -21,6 +21,7 @@
   (:require [dk.salza.liq.slider :as slider]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]
+            [clojure.java.io :as io]
             [clojure.string :as str]))
 
 (defn create
@@ -38,22 +39,30 @@
    ::keymap {}
    })
 
+(defn create-slider-from-file
+  [path]
+  (if (and (.exists (io/file path)) (.isFile (io/file path)))
+    (let [r (io/reader path)]
+      (loop [c (.read r) sl (slider/create)]
+        (if (not= c -1)
+          (recur (.read r) (slider/insert sl (str (char c))))
+          (slider/beginning sl))))
+    (slider/create)))
+
 (defn create-from-file
   "Creates a buffer and loads the content of a given file.
   The filename is stored also, to be used for save
   functionality."
   [path]
-  (when-let [content (or (fileutil/read-file-to-list path) "")]
-    {::name path
-     ::slider (slider/create content)
-     ::slider-undo '()  ;; Conj slider into this when doing changes
-     ::slider-stack '() ;; To use in connection with undo
-     ::filename path
-     ::dirty false
-     ::mem-col 0
-     ::highlighter nil
-     ::keymap {}
-     }))
+  {::name path
+   ::slider (create-slider-from-file path)
+   ::slider-undo '()  ;; Conj slider into this when doing changes
+   ::slider-stack '() ;; To use in connection with undo
+   ::filename path
+   ::dirty false
+   ::mem-col 0
+   ::highlighter nil
+   ::keymap {}})
 
 (defn- doto-slider
   [buffer fun & args]
