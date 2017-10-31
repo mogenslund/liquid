@@ -1,4 +1,4 @@
-(defproject mogenslund/liquid "0.8.2" ;"0.4.6-SNAPSHOT"
+(defproject mogenslund/liquid "0.8.3-SNAPSHOT" ;"0.4.6-SNAPSHOT"
   :description "This project is an attempt to create a text editor for editing
                Clojure files and Markdown files. It operates primarily in a
                terminal, but with dynamics and extensibilities inspired by

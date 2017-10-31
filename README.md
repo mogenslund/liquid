@@ -60,7 +60,7 @@ I could tell a lot about the editor, but I think you should see the video below 
 
 #### Other run configurations
 Download [liquid-0.8.2.jar](https://github.com/mogenslund/liquid/releases/download/v0.8.2/liquid-0.8.2.jar)
-Also download clojure-1.8.2.jar from [clojure.org](http://clojure.org/community/downloads)
+Also download clojure-1.8.0.jar from [clojure.org](http://clojure.org/community/downloads)
 
 Execute the program with:
 
