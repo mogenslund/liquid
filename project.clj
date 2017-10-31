@@ -1,4 +1,4 @@
-(defproject mogenslund/liquid "0.8.2-SNAPSHOT" ;"0.4.6-SNAPSHOT"
+(defproject mogenslund/liquid "0.8.2" ;"0.4.6-SNAPSHOT"
   :description "This project is an attempt to create a text editor for editing
                Clojure files and Markdown files. It operates primarily in a
                terminal, but with dynamics and extensibilities inspired by
@@ -7,7 +7,7 @@
   :url "https://github.com/mogenslund/liquid"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-beta1"]]
+  :dependencies [[org.clojure/clojure "1.9.0-beta3"]]
   ;:main ^:skip-aot dk.salza.liq.core
   :main dk.salza.liq.core
   :resource-paths ["resources"]
