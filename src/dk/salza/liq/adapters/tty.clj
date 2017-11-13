@@ -85,7 +85,8 @@
                     (= (ch :face) :type2) (print-color 4) ; function
                     (= (ch :face) :type3) (print-color 5) ; keyword
                     :else (print-color 0))
-              (cond (= (ch :bgface) :cursor1) (print-color 6)
+              (cond (= (ch :bgface) :cursor0) (print-color 10)
+                    (= (ch :bgface) :cursor1) (print-color 6)
                     (= (ch :bgface) :cursor2) (print-color 7)
                     (= (ch :bgface) :hl) (print-color 11)
                     (= (ch :bgface) :selection) (print-color 8)

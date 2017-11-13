@@ -71,7 +71,7 @@
     ::slider/marks (slide-marks (sl ::slider/marks) (+ (sl ::slider/point) 0) 1)))
 
 (defn apply-syntax-highlight
-  [sl rows towid cursor-color syntaxhighlighter]
+  [sl rows towid cursor-color syntaxhighlighter active]
   (loop [sl0 sl n 0 face :plain bgface :plain pch "" ppch ""]
      (if (> n rows)
        (set-point sl0 (@editor/top-of-window towid))
@@ -82,18 +82,21 @@
              paren-start (get-mark sl0 "hl0")
              paren-end (get-mark sl0 "hl1")
              nextface (syntaxhighlighter sl0 face)
-             nextbgface (cond (= p cursor) (if (= cursor-color :green) :cursor1 :cursor2)
+             nextbgface (cond (and (= p cursor) (not= cursor-color :off))
+                                (cond (not active) :cursor0
+                                      (= cursor-color :green) :cursor1
+                                      :else :cursor2)
                               (= p paren-start) :hl
                               (= (+ p 1) paren-end) :hl
                               (and selection (>= p (min selection cursor)) (< p (max selection cursor))) :selection
                               (and selection (>= p (max selection cursor))) :plain
-                              (or (= bgface :cursor1) (= bgface :cursor2) (= bgface :hl)) :plain
+                              (or (= bgface :cursor0) (= bgface :cursor1) (= bgface :cursor2) (= bgface :hl)) :plain
                               :else bgface)
              next (if (and (= nextface face)
                            (= nextbgface bgface)
                            (not (and (= pch "\n") (or (= nextface :string) (= nextbgface :selection)))))
                       sl0
-                      (if (and (or (= nextbgface :cursor1) (= nextbgface :cursor2)) (or (= ch "\n") (end? sl0)))
+                      (if (and (or (= nextbgface :cursor0) (= nextbgface :cursor1) (= nextbgface :cursor2)) (or (= ch "\n") (end? sl0)))
                           (insert (insert-token sl0 {:face nextface :bgface nextbgface}) " ")
                           (insert-token sl0 {:face nextface :bgface nextbgface})))
                       ]
@@ -133,7 +136,8 @@
         ;tmp1 (futil/log (get-mark sl0 "cursor"))
         filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
         syntaxhighlighter  (or (-> buffer ::buffer/highlighter) (fn [sl face] :plain))
-        sl1 (apply-syntax-highlight sl0 rows towid cursor-color  syntaxhighlighter)
+        active (= window (editor/current-window))
+        sl1 (apply-syntax-highlight sl0 rows towid cursor-color  syntaxhighlighter active)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
         dirty (buffer/get-dirty buffer)
         statuslinecontent (str "L" (format "%-6s" (buffer/get-linenumber buffer))
