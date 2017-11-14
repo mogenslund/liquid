@@ -57,6 +57,10 @@
                                    (= code "113") :C-q
                                    (= code "115") :C-s
                                    (= code "116") :C-t
+                                   (= code "117") :C-u
+                                   (= code "118") :C-v
+                                   (= code "119") :C-w
+                                   (= code "120") :C-x
                                    (= code "32") :C-space
                                    :else :unknown)
           (= (.getModifiers e) java.awt.event.InputEvent/META_MASK)

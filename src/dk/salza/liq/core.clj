@@ -85,7 +85,7 @@
   (editor/set-default-app textapp/run)
 
   ;; Default global keybindings
-  (editor/set-global-key :C-space commandapp/run)
+  (editor/set-global-key :C-space #(do (editor/request-fullupdate) (commandapp/run)))
   (editor/set-global-key :C-q editor/quit)
   (editor/set-global-key :C-M-q editor/force-quit)
   (editor/set-global-key :C-f #(findfileapp/run textapp/run))
@@ -95,6 +95,12 @@
                                :a helpapp/help-apropos
                                :f helpapp/help-function
                                :k helpapp/help-key})
+  (editor/set-global-key :C-x :C-c editor/quit)
+  (editor/set-global-key :C-x :2 editor/split-window-below)
+  (editor/set-global-key :C-x :3 editor/split-window-right)
+  (editor/set-global-key :C-x :C-f #(findfileapp/run textapp/run))
+  (editor/set-global-key :C-x :o editor/other-window)
+  (editor/set-global-key :C-x :0 editor/delete-window)
 
   ;; Default interactive functions
   (editor/add-interactive ":w" editor/save-file)

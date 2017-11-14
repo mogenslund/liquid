@@ -41,6 +41,8 @@
   check if redraw is needed."
   (atom 0))
 
+(def ^:private fullupdate (atom false))
+
 
 (def ^:private empty-editor
   {::buffers '()
@@ -85,6 +87,15 @@
   (swap! updates inc)
   nil)
 
+(defn fullupdate?
+  []
+  (when @fullupdate
+    (reset! fullupdate false)
+    true))
+
+(defn request-fullupdate
+  []
+  (reset! fullupdate true))
 
 (defn setting
   "Get the setting with the given key.
@@ -143,6 +154,15 @@
     (alter editor update ::buffers #(apply doto-first (list* % fun args))))
   nil)
 
+(defn- doto-windows
+  "Apply the given function to the windowlist."
+  [fun & args]
+  (dosync
+    (alter editor update ::windows #(apply fun (list* % args))))
+  (request-fullupdate)
+  (updated)
+  nil)
+
 (defn- doto-window
   "Apply the given function to the current."
   [fun & args]
@@ -169,8 +189,13 @@
   "Define a global keybinding.
   It takes a keyword like :f5 and a function
   to call when that key is pressed."
-  [keyw fun]
-  (dosync (alter editor assoc-in [::global-keymap keyw] fun)) nil)
+  ([keyw fun]
+   (dosync (alter editor assoc-in [::global-keymap keyw] fun)) nil)
+  ([keyw1 keyw2 fun]
+   (dosync
+     (when (not (editor ::global-keymap keyw1))
+       (alter editor assoc-in [::global-keymap keyw1] {}))
+     (alter editor assoc-in [::global-keymap keyw1 keyw2] fun)) nil))
 
 (defn set-eval-function
   "Associate an extension with a function. The function
@@ -570,19 +595,21 @@
   []
   (doto-window window/resize-height 1))
 
-(defn window-split-right
+(defn split-window-right
+  ([amount] 
+   (doto-windows window/split-window-right amount))
+  ([]
+   (split-window-right 0.5)))
+
+(defn split-window-below
+  ([amount] 
+   (doto-windows window/split-window-below amount))
+  ([]
+   (split-window-below 0.5)))
+
+(defn delete-window
   []
-  (let [curwin (current-window)
-        half (quot (curwin ::window/columns) 2)]
-    (doto-window window/resize-width (- -2 half))
-    (add-window (window/create
-                  (str (curwin ::window/name) "-right")
-                  (curwin ::window/top)
-                  (+ (curwin ::window/left) half 2)
-                  (curwin ::window/rows)
-                  (- (curwin ::window/columns) half 3)
-                  (curwin ::window/buffername))))
-  nil)
+  (doto-windows window/delete-window))
 
 (defn previous-buffer
   "Navigates to the previous buffer used."
@@ -905,7 +932,8 @@
 (defn escape
   []
   (selection-cancel)
-  (reset! submap nil))
+  (reset! submap nil)
+  (request-fullupdate))
 
 (defn force-quit
   []

@@ -111,6 +111,7 @@
 (defn view-handler
   [key reference old new]
   (remove-watch editor/editor key)
+  (when (editor/fullupdate?) (reset))
   (when (future-done? @updater)
     (dosync (ref-set updater
             (future
@@ -133,8 +134,6 @@
                                                  (if (.ready r) (* 256 256 (+ (.read r) 1)) 0))))]
     (loop [input (read-input)]
       (logging/log "INPUT" input) 
-      (when (or (= input :C-space) (= input :C-g)) (reset))
-      
       (model-update input)
       (recur (read-input))))))
 
