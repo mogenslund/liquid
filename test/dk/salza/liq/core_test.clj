@@ -64,20 +64,21 @@
   (let [program (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=90"))]
     (send-input "ggvGdd" :tab) ; Clearing screen. Ready to type
     (apply send-input input)
-    (Thread/sleep 10)
+    (Thread/sleep 100)
     ;(while (not (empty? @ghostadapter/input)) (Thread/sleep 10))
     (let [windowcontent (apply concat (ghostadapter/get-display))]
-      ;(println "DISPLAY:" (short-screen-notation windowcontent))
+      ;(println "DISPLAY E:" expected)
+      ;(println "DISPLAY 1:" (str/replace (short-screen-notation windowcontent) #"BR" "\n"))
       (is (.contains (short-screen-notation windowcontent) expected)))))
 
 (deftest defn-highlight
   (testing "Checking highlight of defn"
     (screen-check ["(defn myfun" :enter " []" :enter " (do))"]
-                  "¤44(¤1Pdefn¤2P myfun¤BR¤44¤PP []¤BR¤44 (do))¤PG ¤PP¤BR¤"))) 
+                  "¤22(¤1Pdefn¤2P myfun¤BR¤22¤PP []¤BR¤22 (do))¤PG ¤PP¤BR¤"))) 
 
 (deftest reproduce-findfile-slash
   (testing "Reproduce error when typing /a in findfile mode"
-    (screen-check [:C-f :slash :a]
+    (screen-check [:C-o :C-f :slash :a]
                   "findfile")))
 
 ; (deftest temporary

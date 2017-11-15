@@ -14,8 +14,7 @@
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.apps.helpapp :as helpapp]
             [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.logging :as logging]
-            [dk.salza.liq.window :as window])
+            [dk.salza.liq.logging :as logging])
   (:gen-class))
 
 (def logo (str/join "\n" '(
@@ -101,6 +100,11 @@
   (editor/set-global-key :C-x :C-f #(findfileapp/run textapp/run))
   (editor/set-global-key :C-x :o editor/other-window)
   (editor/set-global-key :C-x :0 editor/delete-window)
+  (editor/set-global-key :C-x :plus (partial editor/enlarge-window-right 5))
+  (editor/set-global-key :C-x :dash (partial editor/shrink-window-right 5))
+  (editor/set-global-key :C-x :down (partial editor/enlarge-window-below 1))
+  (editor/set-global-key :C-x :up (partial editor/shrink-window-below 1))
+
 
   ;; Default interactive functions
   (editor/add-interactive ":w" editor/save-file)
@@ -127,11 +131,8 @@
 (defn init-editor
   [rows columns]
   ;; Setup start windows and scratch buffer
-  (editor/add-window (window/create "prompt" 1 1 rows 40 "-prompt-"))
-  (editor/new-buffer "-prompt-")
-  (editor/insert logo)
-  ;; todo: Change to percent given by setting. Not hard numbers
-  (editor/add-window (window/create "main" 1 44 rows (- columns 46) "scratch"))
+  (editor/add-window "scratch" 1 1 rows columns "scratch")
+  (editor/split-window-right 0.22)
   (editor/new-buffer "scratch")
   (editor/insert (str "# Welcome to λiquid\n"
                       "To quit press C-q. To escape situation press C-g."
@@ -149,6 +150,9 @@
                       "(range 10 30)\n"
                       "(editor/end-of-buffer)\n"
                      ))
+  (editor/new-buffer "-prompt-")
+  (editor/insert logo)
+  (editor/other-window)
   (editor/end-of-buffer))
 
 
@@ -219,7 +223,7 @@
   (editor/set-global-key :C-r #(editor/prompt-append "test"))
   
   ;; Create window
-  (editor/add-window (window/create "liquid" 1 1 rows columns "-Liquid-"))
+  (editor/add-window "liquid" 1 1 rows columns "-Liquid-")
   (editor/new-buffer "-prompt-")
   (editor/new-buffer "scratch")
 

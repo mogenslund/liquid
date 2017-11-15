@@ -253,8 +253,10 @@
   "Add a window to the editor.
   It takes as input a window created using
   dk.salza.liq.window/create function."
-  [window]
-  (dosync (alter editor update ::windows conj window)))
+  ([window]
+   (dosync (alter editor update ::windows conj window)))
+  ([name top left rows columns buffername]
+   (add-window (window/create name top left rows columns buffername))))
 
 (defn get-windows
   "Returns the list of windows in the editor.
@@ -579,21 +581,21 @@
     (dosync (alter editor update ::windows rotate)
             (alter editor update ::buffers bump ::buffer/name buffername))))
 
-(defn reduce-window-width
-  []
-  (doto-window window/resize-width -1))
+(defn enlarge-window-right
+  [amount] 
+   (doto-windows window/enlarge-window-right amount))
 
-(defn enlarge-window-width
-  []
-  (doto-window window/resize-width 1))
+(defn shrink-window-right
+  [amount] 
+   (doto-windows window/shrink-window-right amount))
 
-(defn reduce-window-height
-  []
-  (doto-window window/resize-height -1))
+(defn enlarge-window-below
+  [amount] 
+  (doto-windows window/enlarge-window-below amount))
 
-(defn enlarge-window-height
-  []
-  (doto-window window/resize-height 1))
+(defn shrink-window-below
+  [amount] 
+  (doto-windows window/shrink-window-below amount))
 
 (defn split-window-right
   ([amount] 
@@ -609,7 +611,8 @@
 
 (defn delete-window
   []
-  (doto-windows window/delete-window))
+  (doto-windows window/delete-window)
+  (switch-to-buffer (-> (get-windows) first window/get-buffername)))
 
 (defn previous-buffer
   "Navigates to the previous buffer used."
