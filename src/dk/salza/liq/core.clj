@@ -265,13 +265,13 @@
             (logging/enable logfile))
 
           (if minimal
-            (load-minimal (- rows 1) columns userfile)
+            (load-minimal (- rows 1) (- columns 3) userfile)
             (do
               ;; Load the defaults
               (set-defaults)
 
               ;; Build editor: Initial windows and buffers
-              (init-editor (- rows 1) columns)
+              (init-editor (- rows 1) (- columns 3))
 
               ;; Load userfile if present.
               (load-user-file userfile)))
