@@ -3,6 +3,7 @@
             [clojure.string :as str]
             [dk.salza.liq.adapters.tty :as tty]
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
+            [dk.salza.liq.adapters.jframeadapter2 :as jframeadapter2]
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
             [dk.salza.liq.adapters.webadapter :as webadapter]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
@@ -241,7 +242,8 @@
           usetty (or (read-arg args "--tty")
                      (not (or (read-arg args "--server")
                               (read-arg args "--ghost")
-                              (read-arg args "--jframe"))))
+                              (read-arg args "--jframe")
+                              (read-arg args "--jf2"))))
           rows (or (read-arg-int args "--rows=")
                    (and usetty (not (is-windows)) (tty/rows))
                    40)
@@ -278,7 +280,7 @@
           ;; JFrame is used on Windows
           (when usetty
             (if (is-windows)
-              (jframeadapter/init rows columns)
+              (jframeadapter2/init rows columns)
               (do
                 (tty/view-init)
                 (tty/input-handler))))
@@ -287,6 +289,8 @@
           (when (or (read-arg args "--web") (read-arg args "--server"))
             (((webadapter/adapter rows columns autoupdate) :init) port))
           (when (read-arg args "--jframe")
+            (jframeadapter2/init rows columns))
+          (when (read-arg args "--jf2")
             (jframeadapter/init rows columns))
 
           ;; Post that the editor has updated, to make view update

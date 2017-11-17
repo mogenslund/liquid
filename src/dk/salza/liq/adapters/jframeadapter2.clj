@@ -1,4 +1,4 @@
-(ns dk.salza.liq.adapters.jframeadapter
+(ns dk.salza.liq.adapters.jframeadapter2
   (:require [dk.salza.liq.tools.util :as util]
             [dk.salza.liq.renderer :as renderer]
             [dk.salza.liq.editor :as editor]
@@ -8,6 +8,7 @@
 
 
 (def frame (atom nil))
+(def panel (atom nil))
 (def pane (atom nil))
 (def old-lines (atom {}))
 (def updater (ref (future nil)))
@@ -18,26 +19,40 @@
   []
   (re-matches #"(?i)win.*" (System/getProperty "os.name")))
 
-(def colors {:plain "e4e4ef"
-             :type1 "ffdd33"
-             :type2 "95a99f"
-             :type3 "ffdd33"
-             :green "73c936"
-             :yellow "ffdd33"
-             :red "ff0000"
-             :comment "cc8c3c"
-             :string "73c936"
-             :default "aaaaaa"})
+(def colors {:plain (java.awt.Color. 200 200 250) ; "e4e4ef"
+             :type1 (java.awt.Color. 255 200 50) ; "ffdd33"
+             :type2 (java.awt.Color. 150 200 170) ; "95a99f"
+             :type3 (java.awt.Color. 255 200 50) ; "ffdd33"
+             :green (java.awt.Color. 150 255 150) ; "73c936"
+             :yellow (java.awt.Color. 255 200 50) ; "ffdd33"
+             :red (java.awt.Color. 255 0 0) ; "ff0000"
+             :comment (java.awt.Color. 200 150 50) ; "cc8c3c"
+             :string (java.awt.Color. 150 200 50) ; "73c936"
+             :default (java.awt.Color. 200 200 200)}) ; "aaaaaa"
 
-(def bgcolors {:plain "181818"
-               :cursor0 "181818"
-               :cursor1 "00ff00"
-               :cursor2 "0000ff"
-               :hl "ffff00"
-               :selection "ff0000"
-               :statusline "000000"
-               :default "333333"})
+(def bgcolors {:plain (java.awt.Color. 30 30 30) ; "181818"
+               :cursor0 (java.awt.Color. 30 30 30) ; "181818"
+               :cursor1 (java.awt.Color. 0 255 0) ; "00ff00"
+               :cursor2 (java.awt.Color. 0 0 255) ; "0000ff"
+               :hl (java.awt.Color. 255 255 0) ; "ffff00"
+               :selection (java.awt.Color. 255 0 0) ; "ff0000"
+               :statusline (java.awt.Color. 0 0 0) ; "000000"
+               :default (java.awt.Color. 20 20 20)}) ; "333333"
 
+(def fontsize (atom 13))
+
+(def font
+  (let [allfonts (into #{} (.getAvailableFontFamilyNames (java.awt.GraphicsEnvironment/getLocalGraphicsEnvironment)))
+        myfonts (list "Inconsolata"
+                      "Consolas"
+                      "DejaVu Sans Mono"
+                      "Ubuntu Mono"
+                      "Courier"
+                      "monospaced")]
+    (java.awt.Font. (some allfonts myfonts) java.awt.Font/PLAIN @fontsize)))
+
+(def fontwidth (atom 8))
+(def fontheight (atom 18))
 
 (defn event2keyword
   [e]
@@ -139,68 +154,9 @@
           (= ch "ø") :oe
           :else (keyword ch))))
 
-(defn row
-  [window r]
-  (str "<p id=\"w" window "-r" r "\"></p>"))
-
-(defn html
-  []
-  (str "<html>" ;<head><style>" style "</style></head>"
-       "<body bgcolor=\"" (bgcolors :plain) "\">"
-       "<table bgcolor=\"" (bgcolors :plain) "\"><tr>"
-       "<td>" (str/join "" (map #(row 0 %) (range 1 (inc @rows)))) "</td>"
-       "<td>" (str/join "" (map #(row 1 %) (range 1 (inc @rows)))) "</td>"
-       "<td>" (str/join "" (map #(row 2 %) (range 1 (inc @rows)))) "</td>"
-       "</tr></table>"
-       "<div id=\"tmp\"></div>"
-       "</body></html>"))
-
-
-(defn escape
-  [c]
-  (cond (= c " ") "&nbsp;"
-        :else c))
-
-;textArea.setFont(new Font("monospaced", Font.PLAIN, 12));
-(defn convert-line
-  [line]
-  (let [font (if (is-windows) "Consolas" "monospaced")]
-    (str "<font face=\"" font "\" color=\"000000\" bgcolor=\"000000\">-</font><font face=\"" font "\" color=\"" (colors :plain) "\" bgcolor=\"" (bgcolors :plain) "\">"
-      (str/join (for [c (line :line)] (if (string? c) (escape c) (str "</span><font face=\"" font "\" color=\"" (colors (c :face)) "\" bgcolor=\""   (bgcolors (c :bgface)) "\">"))))
-    "</font>"
-  )))
-
-(defn set-content
-  [id content]
-  (let [doc (.getDocument @pane)
-        element (.getElement doc id)
-        newcontent (convert-line content)]
-    (javax.swing.SwingUtilities/invokeLater
-      (proxy [Runnable] []
-        (run []
-          (.setInnerHTML doc element newcontent)
-          (.pack @frame)
-          )))))
-
-;; http://docs.oracle.com/javase/8/docs/api/javax/swing/text/html/HTMLDocument.html
-(defn jframeprint-lines
-  [lineslist]
-  ;(println (pr-str (first (second lineslist))))
-  ;(println (convert-line (first (second lineslist))))
-  (doseq [line (apply concat lineslist)]
-    (let [col (cond (= (line :column) 1) "0"
-                    (< (line :column) 80) "1"
-                    :else "2")
-          key (str "w" col "-r" (line :row))]
-      (when (not= (@old-lines key) line)
-        (swap! old-lines assoc key line)
-        (set-content key line)))))
-
 (defn view-draw
   []
-  (jframeprint-lines (renderer/render-screen))
-  ;(.setSize @frame (.getSize @pane))
-  )
+  (.repaint @panel))
 
 (defn view-handler
   [key reference old new]
@@ -220,33 +176,92 @@
   (future
     (editor/handle-input input)))
 
+(defn draw-char
+  [g char row col color bgcolor]
+  (let [w @fontwidth
+        h @fontheight]
+    (.setColor g (bgcolors bgcolor))
+    (.fillRect g (* col w) (* (- row 1) h) w h)
+    (.setColor g (colors color))
+    (.drawString g char (* col w) (- (* row h) 4))))
+
+(defn draw
+  [g]
+  (let [lineslist (renderer/render-screen)]
+    ;(println lineslist)
+    (.setFont g font)
+    (when (editor/fullupdate?)
+      (reset! old-lines {})
+      (.setRenderingHints g (java.awt.RenderingHints.
+                              java.awt.RenderingHints/KEY_TEXT_ANTIALIASING
+                              java.awt.RenderingHints/VALUE_TEXT_ANTIALIAS_ON))
+
+      (.setColor g (bgcolors :plain))
+      (.fillRect g 0 0 1600 900))
+    (doseq [line (apply concat lineslist)]
+      (let [row (line :row)
+            column (line :column)
+            content (line :line)
+            key (str "k" row "-" column)
+            oldcontent (@old-lines key)] 
+          (when (not= oldcontent content)
+            (let [oldcount (count (filter #(and (string? %) (not= % "")) oldcontent))]
+              (loop [c oldcontent offset 0]
+                (when (not-empty c)
+                  (let [ch (first c)]
+                    (if (string? ch)
+                      (draw-char g " " row (+ column offset) :plain :plain)
+                      nil)
+                    (recur (rest c) (+ offset (if (string? ch) 1 0))))))
+              (draw-char g " " row (- column 1) :plain :statusline)
+              (loop [c content offset 0 color :plain bgcolor :plain]
+                (when (not-empty c)
+                  (let [ch (first c)]
+                    (if (string? ch)
+                      (do
+                        (draw-char g ch row (+ column offset) color bgcolor)
+                        (recur (rest c) (+ offset 1) color bgcolor))
+                     (recur (rest c) offset (ch :face) (ch :bgface)))
+                    )))))
+        (swap! old-lines assoc key content)))))
+
 (defn init
   [rowcount columncount]
-  (let [icon (clojure.java.io/resource "liquid.png")]
+  (let [icon (clojure.java.io/resource "liquid.png")
+        tmpg (.getGraphics (java.awt.image.BufferedImage. 40 40 java.awt.image.BufferedImage/TYPE_INT_RGB))]
+    (.setFont tmpg font)
+    (reset! fontwidth (.stringWidth (.getFontMetrics tmpg) "M"))
+    (reset! fontheight (.getHeight (.getFontMetrics tmpg)))
     (reset! rows rowcount)
     (reset! columns columncount)
-    (reset! pane (doto (javax.swing.JEditorPane.)
-                       (.setContentType "text/html")
-                       (.setEditable false)
-                       (.setFocusTraversalKeysEnabled false)
-                       (.setDoubleBuffered true)
-                       (.setText (html))
-                       (.setMargin (java.awt.Insets. 0 0 0 0))
-                       (.addKeyListener (proxy [java.awt.event.KeyListener] []
-                         (keyPressed [e] (model-update (event2keyword e)))
-                         (keyReleased [e] (do))
-                         (keyTyped [e] (do))))))
+    (reset! panel (doto
+                    (proxy [javax.swing.JPanel] []
+                      (paintComponent [g]
+                        (draw g)))
+                    (.setFocusTraversalKeysEnabled false)
+                    (.setPreferredSize (java.awt.Dimension. (* columncount @fontwidth) (* rowcount @fontheight)))
+                    (.setDoubleBuffered true)))
     (reset! frame 
       (doto (javax.swing.JFrame. "λiquid")
         (.setDefaultCloseOperation (javax.swing.JFrame/EXIT_ON_CLOSE))
-        (.setLayout (java.awt.FlowLayout. java.awt.FlowLayout/CENTER 0 0))
-        (.add @pane)
-        ;(.setSize 1200 800)
-        ;(.pack)
+        (.setContentPane @panel)
+        (.setBackground (bgcolors :plain))
+        (.setFocusTraversalKeysEnabled false)
+        (.addKeyListener (proxy [java.awt.event.KeyListener] []
+                          (keyPressed [e] (model-update (event2keyword e)))
+                          (keyReleased [e] (do))
+                          (keyTyped [e] (do))))
         (.setIconImage (when icon (.getImage (javax.swing.ImageIcon. icon))))
+        (.pack)
         (.show)))
     (add-watch editor/updates "jframe" view-handler)
-    (editor/updated)))
+    (editor/request-fullupdate)
+    (editor/updated)
+    (view-draw)
+    (Thread/sleep 400)
+    (editor/request-fullupdate)
+    (editor/updated)
+    (view-draw)))
 
 (defn jframequit
   []

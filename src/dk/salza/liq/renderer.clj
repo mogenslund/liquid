@@ -143,8 +143,8 @@
         statuslinecontent (str "L" (format "%-6s" (buffer/get-linenumber buffer))
                                timestamp
                                (if (and filename dirty) "  *  " "     ") filename)
-        statusline (conj (map str (seq (subs (format (str "%-" (+ columns 1) "s") statuslinecontent)
-                                             0 columns))) {:face :plain :bgface :statusline})
+        statusline (conj (map str (seq (subs (format (str "%-" (+ columns 3) "s") statuslinecontent)
+                                             0 (+ columns 2)))) {:face :plain :bgface :statusline})
         lines (concat (split-to-lines (sl1 ::slider/after) rows) [statusline])]
       (map #(hash-map :row (+ %1 (window ::window/top))
                        :column (window ::window/left)
