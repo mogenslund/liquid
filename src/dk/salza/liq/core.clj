@@ -91,7 +91,8 @@
   (editor/set-global-key :C-f #(findfileapp/run textapp/run))
   (editor/set-global-key :C-o editor/other-window)
   (editor/set-global-key :C-r #(editor/prompt-append "test"))
-  (editor/set-global-key :C-h {:h #(helpapp/help-browse "index.md")
+  (editor/set-global-key :C-h {:info "h: Browse\na: Apropos\nf: Function\nk: Key"
+                               :h #(helpapp/help-browse "index.md")
                                :a helpapp/help-apropos
                                :f helpapp/help-function
                                :k helpapp/help-key})

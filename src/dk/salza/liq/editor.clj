@@ -965,7 +965,10 @@
   (when (and @macro-record (not= keyw :H))
     (swap! macro-seq conj keyw))
   (let [action (if @submap (@submap keyw) (get-action keyw))]
-    (cond (map? action) (reset! submap action)
+    (cond (map? action) (do
+                          (when (action :info)
+                                (prompt-set (action :info)))
+                          (reset! submap action))
           action (do (reset! submap nil)
                      (action))
           :else (reset! submap nil))

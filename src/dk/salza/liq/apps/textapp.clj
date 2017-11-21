@@ -8,6 +8,7 @@
             [dk.salza.liq.syntaxhl.javascripthl :as javascripthl]
             [dk.salza.liq.syntaxhl.pythonhl :as pythonhl]
             [dk.salza.liq.syntaxhl.xmlhl :as xmlhl]
+            [dk.salza.liq.syntaxhl.webassemblyhl :as webassemblyhl]
             [dk.salza.liq.syntaxhl.latexhl :as latexhl]
             [dk.salza.liq.coreutil :refer :all]))
 
@@ -34,7 +35,9 @@
    :C-s #(promptapp/run editor/find-next '("SEARCH"))
    :M-s #(promptapp/run editor/search-files '("SEARCH"))
    :v editor/selection-toggle
-   :g {:g editor/beginning-of-buffer
+   :g {:info (str "g: Beginning of buffer\nt: Top align\nn: Top next headline\n"
+                  "c: Show context\ni: Navigate headlines\nl: Navigate lines")
+       :g editor/beginning-of-buffer
        :t editor/top-align-page
        :n editor/top-next-headline
        :c #(editor/prompt-append (str "--" (editor/get-context) "--"))
@@ -68,12 +71,15 @@
              (keys/symbols-mapping editor/replace-char))
    :1 editor/highlight-sexp-at-point
    :2 editor/select-sexp-at-point
-   :y {:y #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))
+   :y {:info "y: Line or selection\nc: Context\nf: Current filepath"
+       :y #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))
        :c editor/copy-context
        :f editor/copy-file}
-   :p {:p #(do (editor/insert-line) (editor/paste) (editor/beginning-of-line))
+   :p {:info "p: Paste new line\nh: Paste here"
+       :p #(do (editor/insert-line) (editor/paste) (editor/beginning-of-line))
        :h editor/paste}
-   :d {:d #(do (or (editor/delete-selection) (editor/delete-line)) (editor/selection-cancel))}
+   :d {:info "d: Line or selection"
+       :d #(do (or (editor/delete-selection) (editor/delete-line)) (editor/selection-cancel))}
    :s editor/save-file
    :u editor/undo
    :C-w editor/kill-buffer
@@ -94,8 +100,8 @@
      :space #(editor/insert " ")
      :enter #(editor/insert "\n")
      :C-t #(editor/insert "\t")
-     :C-k #(editor/insert "(")
-     :C-l #(editor/insert ")")
+     :C-k #(do (editor/insert "()") (editor/backward-char)) 
+     :C-l #(do (editor/insert "[]") (editor/backward-char)) 
      :C-h #(editor/insert "/")
      :backspace editor/delete
      :C-g editor/escape
@@ -115,6 +121,7 @@
                          (re-matches #"^.*\.c$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.py$" filepath) pythonhl/next-face
                          (re-matches #"^.*\.xml$" filepath) xmlhl/next-face
+                         (re-matches #"^.*\.wat$" filepath) webassemblyhl/next-face
                          (re-matches #"^.*\.tex$" filepath) latexhl/next-face
                           :else (editor/get-default-highlighter)) ;; In other cases use clojure/markdown
           ]

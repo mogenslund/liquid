@@ -42,6 +42,12 @@ On Linux and Mac execute the following in a terminal:
 
     java -jar liq.jar
 
+If the terminal causes problems, like hard to see colors or artifacts when navigating, try the JFrame implementation:
+
+    java -jar liq.jar --jframe
+
+My experience is that the terminal "Terminology", with dark background works very well.
+
 *Vim and Emacs user might want to read this:* [Vim and Emacs](https://github.com/mogenslund/liquid/wiki/Vim-And-Emacs)
 
 Experience the extensibility of Liquid by completing this tutorial: [Using External Libraries with Liquid](https://github.com/mogenslund/liquid/wiki/Tutorial-External-Libraries)
