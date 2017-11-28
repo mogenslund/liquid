@@ -41,15 +41,20 @@
 
 (def fontsize (atom 13))
 
-(def font
-  (let [allfonts (into #{} (.getAvailableFontFamilyNames (java.awt.GraphicsEnvironment/getLocalGraphicsEnvironment)))
-        myfonts (list "Inconsolata"
-                      "Consolas"
-                      "DejaVu Sans Mono"
-                      "Ubuntu Mono"
-                      "Courier"
-                      "monospaced")]
-    (java.awt.Font. (some allfonts myfonts) java.awt.Font/PLAIN @fontsize)))
+(def font (atom nil))
+
+(defn update-font
+  []
+  (reset! font
+    (let [allfonts (into #{} (.getAvailableFontFamilyNames (java.awt.GraphicsEnvironment/getLocalGraphicsEnvironment)))
+          myfonts (list "Inconsolata"
+                        "Consolas"
+                        "DejaVu Sans Mono"
+                        "Ubuntu Mono"
+                        "Courier"
+                        "monospaced")]
+      (java.awt.Font. (some allfonts myfonts) java.awt.Font/PLAIN @fontsize))))
+
 
 (def fontwidth (atom 8))
 (def fontheight (atom 18))
@@ -183,18 +188,18 @@
     (.setColor g (bgcolors bgcolor))
     (.fillRect g (* col w) (* (- row 1) h) w h)
     (.setColor g (colors color))
-    (.drawString g char (* col w) (- (* row h) 4))))
+    (.drawString g char (* col w) (- (* row h) (quot @fontsize 4) 1))))
 
 (defn draw
   [g]
   (let [lineslist (renderer/render-screen)]
     ;(println lineslist)
-    (.setFont g font)
+    (.setFont g @font)
     (when (editor/fullupdate?)
       (reset! old-lines {})
-      (.setRenderingHints g (java.awt.RenderingHints.
-                              java.awt.RenderingHints/KEY_TEXT_ANTIALIASING
-                              java.awt.RenderingHints/VALUE_TEXT_ANTIALIAS_ON))
+     ; (.setRenderingHints g (java.awt.RenderingHints.
+     ;                         java.awt.RenderingHints/KEY_TEXT_ANTIALIASING
+     ;                         java.awt.RenderingHints/VALUE_TEXT_ANTIALIAS_ON))
 
       (.setColor g (bgcolors :plain))
       (.fillRect g 0 0 1600 900))
@@ -226,12 +231,14 @@
         (swap! old-lines assoc key content)))))
 
 (defn init
-  [rowcount columncount]
+  [rowcount columncount & {:keys [font-size]}]
+  (when font-size (reset! fontsize font-size))
+  (update-font)
   (let [icon (clojure.java.io/resource "liquid.png")
         tmpg (.getGraphics (java.awt.image.BufferedImage. 40 40 java.awt.image.BufferedImage/TYPE_INT_RGB))]
-    (.setFont tmpg font)
+    (.setFont tmpg @font)
     (reset! fontwidth (.stringWidth (.getFontMetrics tmpg) "M"))
-    (reset! fontheight (.getHeight (.getFontMetrics tmpg)))
+    (reset! fontheight (+ (.getHeight (.getFontMetrics tmpg)) 1))
     (reset! rows rowcount)
     (reset! columns columncount)
     (reset! panel (doto

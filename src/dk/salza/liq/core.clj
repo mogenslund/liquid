@@ -88,7 +88,7 @@
   (editor/set-global-key :C-space #(do (editor/request-fullupdate) (commandapp/run)))
   (editor/set-global-key :C-q editor/quit)
   (editor/set-global-key :C-M-q editor/force-quit)
-  (editor/set-global-key :C-f #(findfileapp/run textapp/run))
+  (editor/set-global-key :C-f #(findfileapp/run editor/find-file))
   (editor/set-global-key :C-o editor/other-window)
   (editor/set-global-key :C-r #(editor/prompt-append "test"))
   (editor/set-global-key :C-h {:info "h: Browse\na: Apropos\nf: Function\nk: Key"
@@ -258,6 +258,7 @@
                      (or (read-arg args "--load=")
                          (and (not minimal)
                               (fileutil/file (System/getProperty "user.home") ".liq"))))
+          fontsize (read-arg-int args "--fontsize=")
           logfile (read-arg args "--log=")
           singlethreaded (read-arg args "--no-threads")]
 
@@ -290,7 +291,7 @@
           (when (or (read-arg args "--web") (read-arg args "--server"))
             (((webadapter/adapter rows columns autoupdate) :init) port))
           (when (read-arg args "--jframe")
-            (jframeadapter2/init rows columns))
+            (jframeadapter2/init rows columns :font-size fontsize))
           (when (read-arg args "--jf2")
             (jframeadapter/init rows columns))
 

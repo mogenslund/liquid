@@ -50,6 +50,7 @@
    ::global-keymap {}
    ::file-eval {}
    ::settings {::default-keymap nil
+               ::key-info false
                ::default-highlighter nil
                ::default-app nil
                ::searchstring ""
@@ -146,6 +147,10 @@
   buffer is created."
   [app]
   (set-setting ::default-app app))
+
+(defn get-default-app
+  []
+  (setting ::default-app))
 
 (defn- doto-buffer
   "Apply the given function to the top-most buffer."
@@ -409,8 +414,8 @@
   (update-mem-col))
 
 (defn beginning-of-buffer
-  []
   "Moves the cursor to the beginning of the buffer."
+  []
   (doto-buffer buffer/beginning-of-buffer)
   (update-mem-col))
 
@@ -966,7 +971,7 @@
     (swap! macro-seq conj keyw))
   (let [action (if @submap (@submap keyw) (get-action keyw))]
     (cond (map? action) (do
-                          (when (action :info)
+                          (when (and (action :info) (setting ::key-info))
                                 (prompt-set (action :info)))
                           (reset! submap action))
           action (do (reset! submap nil)
