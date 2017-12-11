@@ -4,8 +4,8 @@
 (defn next-face
   [sl face]
   (let [ch (look-ahead sl 0)
-        pch (look-behind sl 1)
-        ppch (look-behind sl 2)]
+        pch (or (look-behind sl 1) " ")
+        ppch (or (look-behind sl 2) " ")]
     (cond (= face :string)  (cond (and (= pch "\"") (= ppch "\\")) face
                                   (and (= pch "\"") (string? (-> sl (left 2) (get-char)))) :plain
                                   (and (= pch "\"") (re-matches #"[^#\( \[{\n]" ppch)) :plain
