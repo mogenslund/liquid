@@ -49,6 +49,7 @@
    ::windows '()
    ::global-keymap {}
    ::file-eval {}
+   ::frame-dimensions {::rows 40 ::columns 140}
    ::settings {::default-keymap nil
                ::key-info false
                ::default-highlighter nil
@@ -678,6 +679,16 @@
   (switch-to-buffer name)
   (set-highlighter (setting ::default-highlighter))
   (set-keymap (setting ::default-keymap)))
+
+(defn set-frame-dimensions
+  "Setting rows and columns of the window frame."
+  [rows columns]
+  (dosync
+    (alter editor assoc ::frame-dimensions {::rows rows ::columns columns}
+                        ::windows '()))
+  (add-window "scratch" 1 1 (- rows 1) (- columns 3) "scratch")
+  (new-buffer "-prompt-")
+  (new-buffer "scratch"))
 
 (defn find-file
   "Opens the file with the given name

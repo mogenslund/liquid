@@ -11,7 +11,7 @@
   (testing "That calling (eval-last-sexp) on
            an interactive function like
            (editor/end-of-buffer) will not freeze
-          the program"
+           the program"
     (editor/set-default-keymap @textapp/keymap-navigation)
     (editor/add-window (window/create "prompt" 1 1 30 40 "-prompt-"))
     (editor/new-buffer "-prompt-")

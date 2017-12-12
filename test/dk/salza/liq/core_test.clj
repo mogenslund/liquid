@@ -61,7 +61,7 @@
   (screen-check [:enter \"abc\" :tab] \"¤BRabc¤PB \")
   will be a success."
   [input expected]
-  (let [program (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=90"))]
+  (let [program (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=190"))]
     (send-input "ggvGdd" :tab) ; Clearing screen. Ready to type
     (apply send-input input)
     (Thread/sleep 100)
@@ -74,7 +74,7 @@
 (deftest defn-highlight
   (testing "Checking highlight of defn"
     (screen-check ["(defn myfun" :enter " []" :enter " (do))"]
-                  "¤22(¤1Pdefn¤2P myfun¤BR¤22¤PP []¤BR¤22 (do))¤PG ¤PP¤BR¤"))) 
+                  "¤44(¤1Pdefn¤2P myfun¤BR¤44¤PP []¤BR¤44 (do))¤PG ¤PP¤BR¤"))) 
 
 (deftest reproduce-findfile-slash
   (testing "Reproduce error when typing /a in findfile mode"

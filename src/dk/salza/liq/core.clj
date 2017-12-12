@@ -131,11 +131,13 @@
   (editor/set-eval-function :default #(str (load-file %))))
 
 (defn init-editor
-  [rows columns]
-  ;; Setup start windows and scratch buffer
-  (editor/add-window "scratch" 1 1 rows columns "scratch")
+  []
+  ;; Setup windows
   (editor/split-window-right 0.22)
-  (editor/new-buffer "scratch")
+  (editor/switch-to-buffer "-prompt-")
+  (editor/insert logo)
+  (editor/other-window)
+  (editor/switch-to-buffer "scratch")
   (editor/insert (str "# Welcome to λiquid\n"
                       "To quit press C-q. To escape situation press C-g."
                       "To undo press u in navigation mode (blue cursor)\n"
@@ -152,9 +154,6 @@
                       "(range 10 30)\n"
                       "(editor/end-of-buffer)\n"
                      ))
-  (editor/new-buffer "-prompt-")
-  (editor/insert logo)
-  (editor/other-window)
   (editor/end-of-buffer))
 
 
@@ -210,37 +209,14 @@
       (println "Version can only be extracted from jar.")))
   (System/exit 0))
   
-(defn load-minimal
-  [rows columns userfile]
-  ;; Set defaults
-  (editor/set-default-keymap @textapp/keymap-navigation)
-  (editor/set-default-app textapp/run)
-
-  ;; Set global keymappings
-  (editor/set-global-key :C-space commandapp/run)
-  (editor/set-global-key :C-q editor/quit)
-  (editor/set-global-key :C-M-q editor/force-quit)
-  (editor/set-global-key :C-f #(findfileapp/run textapp/run))
-  (editor/set-global-key :C-o editor/other-window)
-  (editor/set-global-key :C-r #(editor/prompt-append "test"))
-  
-  ;; Create window
-  (editor/add-window "liquid" 1 1 rows columns "-Liquid-")
-  (editor/new-buffer "-prompt-")
-  (editor/new-buffer "scratch")
-
-  ;; Load userfile, if specified
-  (when userfile (load-user-file userfile)))
-
-(defn -main
+(defn startup
   [& args]
   ;; If arguments are --help or --version, just show information
   ;; and quit.
   (cond (read-arg args "--help") (print-help-and-exit)
         (read-arg args "--version") (print-version-and-exit)
     :else
-    (let [minimal (read-arg args "--minimal")
-          usetty (or (read-arg args "--tty")
+    (let [usetty (or (read-arg args "--tty")
                      (not (or (read-arg args "--server")
                               (read-arg args "--ghost")
                               (read-arg args "--jframe")
@@ -254,10 +230,6 @@
                       140)
           port (or (read-arg-int args "--port=") 8520)
           autoupdate (if (read-arg args "--autoupdate") true false)
-          userfile (when-not (read-arg args "--no-init-file") 
-                     (or (read-arg args "--load=")
-                         (and (not minimal)
-                              (fileutil/file (System/getProperty "user.home") ".liq"))))
           fontsize (read-arg-int args "--fontsize=")
           logfile (read-arg args "--log=")
           singlethreaded (read-arg args "--no-threads")]
@@ -266,17 +238,8 @@
           (when logfile
             (logging/enable logfile))
 
-          (if minimal
-            (load-minimal (- rows 1) (- columns 3) userfile)
-            (do
-              ;; Load the defaults
-              (set-defaults)
-
-              ;; Build editor: Initial windows and buffers
-              (init-editor (- rows 1) (- columns 3))
-
-              ;; Load userfile if present.
-              (load-user-file userfile)))
+          (set-defaults)
+          (editor/set-frame-dimensions rows columns)
 
           ;; TTY is used as default view on Linux and Mac
           ;; JFrame is used on Windows
@@ -296,6 +259,15 @@
             (jframeadapter/init rows columns))
 
           ;; Post that the editor has updated, to make view update
-          (editor/updated)
-       )))
+          (editor/updated))))
     
+(defn -main
+  [& args]
+  (apply startup args)
+  (let [minimal (read-arg args "--minimal")
+        userfile (when-not (read-arg args "--no-init-file") 
+                   (or (read-arg args "--load=")
+                     (and (not minimal)
+                          (fileutil/file (System/getProperty "user.home") ".liq"))))]
+    (when (not minimal) (init-editor))
+    (load-user-file userfile)))
