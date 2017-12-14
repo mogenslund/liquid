@@ -48,9 +48,10 @@ If the terminal causes problems, like hard to see colors or artifacts when navig
 
 My experience is that the terminal "Terminology", with dark background works very well.
 
-*Vim and Emacs user might want to read this:* [Vim and Emacs](https://github.com/mogenslund/liquid/wiki/Vim-And-Emacs)
+#### Local setup and extensions
+For a recommended approach to local setup and managing extensions, please read
 
-Experience the extensibility of Liquid by completing this tutorial: [Using External Libraries with Liquid](https://github.com/mogenslund/liquid/wiki/Tutorial-External-Libraries)
+[Basic Setup](http://salza.dk/setupbasic.html)
 
 #### Salza &lambda;iquid text editor is designed with clojure developers in mind
 
