@@ -174,13 +174,13 @@
   "Returns a new buffer with the cursor moved past
   next whitespace."
   [buffer]
-  (doto-slider buffer #(-> % (slider/right-until #"\s") (slider/right-until #"\S"))))
+  (doto-slider buffer #(-> % (slider/right-until (partial re-find #"\s")) (slider/right-until (partial re-find #"\S")))))
 
 (defn end-of-word
   "Returns a new buffer with the cursor moved
   to the end of the current word."
   [buffer]
-  (doto-slider buffer #(-> % (slider/right 1) (slider/right-until #"\S") (slider/right-until #"\s") (slider/left 1))))
+  (doto-slider buffer #(-> % (slider/right 1) (slider/right-until (partial re-find #"\S")) (slider/right-until (partial re-find #"\s")) (slider/left 1))))
 
 (defn beginning-of-buffer
   "Returns a new buffer where the cursor is

@@ -316,34 +316,36 @@
   )
 
 (defn right-until
-  "Moves the cursor forward, until the current char matches the
-  regular expression. The cursor will be placed just before the
+  "Moves the cursor forward, until for the current char:
+  (pred char) is true.
+  The cursor will be placed just before the
   character. The function only matches single characters, not
   character sequences!
   If there is no match, the cursor will move all the way to the
   end of the slider.
   Example (cursor = ^):
     aaacde^aacf   -- right-until c -->   aacdeaa^cf."
-  [sl regex] ; (re-matches #"(a|b)" "a")
+  [sl pred] ; (re-matches #"(a|b)" "a")
   (loop [s sl]
     (let [c (get-char s)]
-      (if (or (end? s) (re-matches regex c))
+      (if (or (end? s) (pred c))
         s
         (recur (right s 1))))))
 
 (defn left-until
-  "Moves the cursor backward, until the current char matches the
-  regular expression. The cursor will be places just before the
+  "Moves the cursor backward, until for the current char:
+  (pred char) is true.
+  The cursor will be places just before the
   character. The function only mathces single characters, not
   character sequences!
   If there is no match, the cursor will move all the way to the
   beginning of the slider.
   Example (cursor = ^):
     aaacde^aacf   -- left-until c -->   aa^cdeaacf."
-  [sl regex] ; (re-matches #"(a|b)" "a")
+  [sl pred] ; (re-matches #"(a|b)" "a")
   (loop [s (if (end? sl) (left sl 1) sl)]
     (let [c (get-char s)]
-      (if (or (beginning? s) (re-matches regex c))
+      (if (or (beginning? s) (pred c))
         s
         (recur (left s 1))))))
 
@@ -409,13 +411,13 @@
 (defn forward-word
   "Moves the point to beginning of next word or end-of-buffer"
   [sl]
-  (-> sl (right-until #"\s") (right 1) (right-until #"\S"))) ; (not (not (re-matches #"\S" "\n")))
+  (-> sl (right-until (partial re-find #"\s")) (right 1) (right-until (partial re-find #"\S")))) ; (not (not (re-matches #"\S" "\n")))
 
 (defn end-of-line
   "Moves the point to the end of the line. Right before the
   next line break."
   [sl]
-  (right-until sl #"\n"))
+  (right-until sl (partial re-find #"\n")))
 
 (defn beginning-of-line
   "Moves the point to the beginning
@@ -565,11 +567,11 @@
   the matched string.
   Output like {:type :file :value /tmp/tmp.txt}"
   [sl]
-  (let [sl0 (-> sl (left-until #"[^ \n\"]")
-                   (left-until #"[ \n\"]")
-                   (right-until #"[\w\.~(\[/$]")
+  (let [sl0 (-> sl (left-until (partial re-find #"[^ \n\"]"))
+                   (left-until (partial re-find #"[ \n\"]"))
+                   (right-until (partial re-find #"[\w\.~(\[/$]"))
                    (set-mark "contextstart")) ;(right 1) (set-mark "contextstart")) (re-find #"\w" "  x")
-        sl1 (-> sl0 (right-until #"[ |\n|\"]"))
+        sl1 (-> sl0 (right-until (partial re-find #"[ |\n|\"]")))
         word (str/replace (get-region sl1 "contextstart") #"(\$HOME|~)" (System/getProperty "user.home"))]
     (cond (re-matches #"https?://.*" word) {:type :url :value word}
           (re-matches #";?#" word) {:type :fold :value "fold"}

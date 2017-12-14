@@ -14,7 +14,7 @@
   back until the nth linebreak.
   So the cursor will be placed right after a linebreak."
   [sl n]
-  (nth (iterate #(-> % (left 1) (left-until #"\n")) sl) n))
+  (nth (iterate #(-> % (left 1) (left-until #{"\n"})) sl) n))
 
 (defn- add-br
   "Goes a visual line forward if the break is soft and insert a hard."
