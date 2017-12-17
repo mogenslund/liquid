@@ -28,6 +28,11 @@ Extensions are not addons or plugins, but real code on top of &lambda;iquid. So 
 
 Include [Additives](https://github.com/mogenslund/additives) for even more functionality.
 
+## Some extensions
+
+ * [Additives](https://github.com/mogenslund/additives)
+ * [Liquid-vim](https://github.com/mogenslund/liquid-vim)
+
 ## Installation
 
 ### Download and execution
