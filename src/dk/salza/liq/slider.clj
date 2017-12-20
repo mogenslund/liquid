@@ -349,6 +349,18 @@
                          0
                          (* -1 (sl ::point)))))
 
+(defn insert-slider
+  "Insert second slider into first.
+  Point is moved to match second slider.
+  Marks are lost"
+  [sl1 sl2]
+  {::before (concat (sl2 ::before) (sl1 ::before))
+   ::after (concat (sl2 ::after) (sl1 ::after))
+   ::point (+ (sl1 ::point) (sl2 ::point))
+   ::linenumber (+ (sl1 ::linenumber) (sl2 ::linenumber) -1)
+   ::totallines (+ (sl1 ::totallines) (sl2 ::totallines) -1)
+   ::marks {}})
+
 (defn hide
   "Not used yet."
   [sl amount]

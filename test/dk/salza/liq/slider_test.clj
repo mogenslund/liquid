@@ -293,6 +293,12 @@
       (is (= (after sl2) (after (after sl2))))
       (is (= (beginning sl1) (after (beginning sl1)))))))
 
+(deftest insert-slider-test
+  (let [sl1 (-> "a\nbcde\nfg" (create) (right 3))
+        sl2 (-> "aaaabbb\ncccc\ndddd" (create) (right 9))
+        expected (-> "a\nbaaaabbb\ncccc\nddddcde\nfg" (create) (right 12))]
+    (testing "Inserting slider into another"
+      (is (= (insert-slider sl1 sl2) expected)))))
 
 ;(deftest frame-test
 ;  (let [sl (create "aaa\n1\n22\n333\n4444\n55555\nbb bb bbb\ncccc cccc ccccc")]
