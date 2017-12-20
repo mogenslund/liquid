@@ -95,6 +95,18 @@
   [sl]
   (first (sl ::after)))
 
+(defn beginning?
+  "True if and only if the point is at the
+  beginning of the slider."
+  [sl]
+  (empty? (sl ::before)))
+
+(defn end?
+  "True if and only if the point is at the
+  end of the slider."
+  [sl]
+  (empty? (sl ::after)))
+
 (defn look-behind
   "Returns char behind the cursor given amount back.
   If amount = 1 the char right behind the cursor will be
@@ -179,18 +191,6 @@
         ::point (- (sl ::point) n)
         ::linenumber (- (sl ::linenumber) linecount)))))
 
-(defn- right-old
-  "Moves the point to the right the given amount of times."
-  [sl amount]
-  (let [tmp (take amount (sl ::after))
-        n (count tmp)
-        linecount (count (filter #(= % "\n") tmp))]
-   (assoc sl
-    ::before (concat (reverse tmp) (sl ::before))
-    ::after (drop n (sl ::after))
-    ::point (+ (sl ::point) n)
-    ::linenumber (+ (sl ::linenumber) linecount))))
-
 (defn right
   "Moves the point to the right (forward) the given amount of times."
   [sl amount]
@@ -224,17 +224,6 @@
     (right sl (- newpoint (sl ::point)))
     (left sl (- (sl ::point) newpoint))))
 
-(defn beginning?
-  "True if and only if the point is at the
-  beginning of the slider."
-  [sl]
-  (empty? (sl ::before)))
-
-(defn end?
-  "True if and only if the point is at the
-  end of the slider."
-  [sl]
-  (empty? (sl ::after)))
 
 (defn insert
   "Insert text at the point. The point will be
@@ -248,6 +237,27 @@
         ::linenumber (+ (sl ::linenumber) linecount)
         ::totallines (+ (sl ::totallines) linecount)
         ::marks (slide-marks (sl ::marks) (+ (sl ::point) n -1) n))))
+
+(defn insert-newline
+  "Special function to insert newline without too
+  much overhead."
+  [sl]
+  (assoc sl
+    ::before (conj (sl ::before) "\n")
+    ::point (inc (sl ::point))
+    ::linenumber (inc (sl ::linenumber))
+    ::totallines (inc (sl ::totallines))
+    ::marks (slide-marks (sl ::marks) (sl ::point) 1)))
+
+(defn insert-space
+  "Special funcon to insert a space without too
+  much overhead."
+  [sl]
+  (assoc sl
+    ::before (conj (sl ::before) " ")
+    ::point (inc (sl ::point))
+    ::marks (slide-marks (sl ::marks) (sl ::point) 1)))
+
 
 (defn delete
   "Deletes amount of characters to the left of
@@ -265,6 +275,25 @@
         ::linenumber (- (sl ::linenumber) linecount)
         ::totallines (- (sl ::totallines) linecount)
         ::marks (slide-marks (sl ::marks) (- (sl ::point) n) n)))))
+
+(defn wrap
+  "Wrap all lines. Cursor will be at end."
+  [sl columns]
+  (loop [sl1 (beginning sl) slsp nil col 0]
+    (cond (end? sl1) sl1
+          (= (get-char sl1) "\n") (recur (right sl1 1) nil 0)
+          (= col columns) (recur (insert-newline (or slsp sl1)) nil 0)
+          (= (get-char sl1) " ") (let [sl2 (right sl1 1)] (recur sl2 sl2 (inc col)))
+          :else (recur (right sl1 1) slsp (inc col)))))
+
+(defn pad-right
+  "Pad to the right with spaces"
+  [sl columns]
+  (loop [sl1 (beginning sl) col 0]
+    (cond (and (end? sl1) (>= col columns)) sl1
+          (and (= (get-char sl1) "\n") (>= col columns)) (recur (right sl1 1) 0)
+          (= (get-char sl1) "\n") (recur (insert-space sl1) (inc col))
+          :else (recur (right sl1 1) (inc col)))))
 
 (defn set-mark
   "Sets a named mark at the point.
@@ -300,6 +329,26 @@
       (set-point sl (get-mark sl name))
       sl))
 
+(defn before
+  "Returns a slider with content before cursor."
+  [sl]
+  (assoc sl
+    ::after '()
+    ::totallines (sl ::linenumber)
+    ::marks (into {} (remove #(> (second %) (sl ::point)) (sl ::marks)))))
+
+(defn after
+  "Returns a slider with content after cursor."
+  [sl]
+  (assoc sl
+    ::before '()
+    ::linenumber 1
+    ::totallines (- (sl ::totallines) (sl ::linenumber) -1)
+    ::point 0
+    ::marks (slide-marks (into {} (remove #(< (second %) (sl ::point)) (sl ::marks)))
+                         0
+                         (* -1 (sl ::point)))))
+
 (defn hide
   "Not used yet."
   [sl amount]
@@ -309,11 +358,6 @@
    (assoc sl
     ::after (conj (drop n (sl ::after)) tmp)
     ::marks (slide-marks (sl ::marks) (- (sl ::point) n) (- n 1)))))
-
-(defn unhide
-  "Not used yet."
-  [sl]
-  )
 
 (defn right-until
   "Moves the cursor forward, until for the current char:
@@ -522,6 +566,10 @@
          (right 1)
          (delete-region "deleteline")))
 
+
+;; -----------------------------------------------------
+
+
 (defn get-content
   "The full content of the slider as text."
   [sl]
@@ -581,33 +629,3 @@
           (re-matches #".*(data:image/png;base64,.*)" word) {:type :base64image :value (re-find #"(?<=base64,)[^\)]*" word)}
           :else {:type :file :value (str/replace word #"[\[\]]" "")})))
 
-;(defn frame
-;  [sl rows columns top-of-window]
-;  (if (< (get-point sl) top-of-window)
-;    (frame sl rows columns 0)
-;    (let [point0 (get-point sl)
-;          ;; A lazy list of sliders, each with point one line ahead of the preceeding
-;          linesliders (iterate
-;                        #(-> % (set-mark "beginning") (forward-line columns))
-;                        (-> sl (set-point top-of-window) (set-mark "beginning")))
-;          ;; Number of rows to go, to get to point
-;          pointrow (+ (count (take-while
-;                             #(< (get-point %) point0)
-;                             linesliders))
-;                      (if (or (= (get-char (left sl 1)) "\n") (beginning? sl)) 1 0))
-;          pointcol (- point0 (get-mark (nth linesliders pointrow) "beginning") -1)] 
-;      (if (> pointrow rows)
-;          ;; Recenter
-;          (frame sl rows columns (get-point (nth linesliders (- pointrow (int (* 0.4 rows))))))
-;          ;; Generate lines from marked list of sliders
-;          ;; todo: Check performance by replace map with pmap
-;          (let [lines (map #(if (= (get-mark % "beginning") (get-point %))
-;                                ""
-;                                (get-region
-;                                  (if (= (get-char (left % 1)) "\n") (left % 1) %) ; The if is to avoid ending with newline
-;                                  "beginning"))
-;                           (take rows (rest linesliders)))]
-;            {:lines lines
-;             :top-of-window top-of-window
-;             :cursor {:row pointrow :column pointcol}
-;             :selection {:column nil :row nil}})))))

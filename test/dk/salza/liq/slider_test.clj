@@ -123,6 +123,19 @@
       (is (= (-> sl (delete 20) (get-content)) "de"))
     )))
 
+(deftest slider-wrap-test
+  (testing "Wrapping text"
+    (let [sl (create "a\nab\nabc\nabcd\nabcde\na a\naa a\naaa a\naaaa a\n\n\nabc\ndddddddddd")]
+      (is (= (-> sl (wrap 3) (get-content)) 
+          "a\nab\nabc\nabc\nd\nabc\nde\na a\naa \na\naaa\n a\naaa\na a\n\n\nabc\nddd\nddd\nddd\nd")))))
+
+(deftest slider-pad-right-test
+  (testing "Padding to the right"
+    (let [sl (create "a\nab\nabc\nabcd\nabcde\na a\naa a\naaa a\naaaa a\n\n\nabc\ndddddddddd")]
+      (is (= (-> sl (pad-right 4) (get-content)) 
+          "a   \nab  \nabc \nabcd\nabcde\na a \naa a\naaa a\naaaa a\n    \n    \nabc \ndddddddddd")))))
+
+
 (deftest forward-word-test
   (let [sl0 (create "abc def\nhij")
         sl1 (forward-word sl0)
@@ -265,6 +278,21 @@
       (is (= (find-next sl "m") (right sl 11)))
 
    )))
+
+(deftest before-test
+  (let [sl1 (-> (create "a\ncd") (right 4) (set-mark "a"))
+        sl2 (-> sl1 (insert "e") (set-mark "b") (left 1))]
+    (testing "Before function removes chars and marks after cursor."
+      (is (= sl1 (before sl2))))))
+
+(deftest after-test
+  (let [sl1 (-> (create "d\nf") (set-mark "a"))
+        sl2 (-> (create "a\ncd\nf") (right 2) (set-mark "b") (right 1) (set-mark "a"))]
+    (testing "After function removes chars and marks before cursor."
+      (is (= sl1 (after sl2)))
+      (is (= (after sl2) (after (after sl2))))
+      (is (= (beginning sl1) (after (beginning sl1)))))))
+
 
 ;(deftest frame-test
 ;  (let [sl (create "aaa\n1\n22\n333\n4444\n55555\nbb bb bbb\ncccc cccc ccccc")]
