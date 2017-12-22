@@ -7,62 +7,6 @@
             [clojure.string :as str])
   (:use [dk.salza.liq.slider :as slider :exclude [create]]))
 
-;(def top-of-window (atom {})) ; Keys are windowname-buffername
-
-(defn- left-linebreaks
-  "Takes a slider and a number and moves cursor
-  back until the nth linebreak.
-  So the cursor will be placed right after a linebreak."
-  [sl n]
-  (nth (iterate #(-> % (left 1) (left-until #{"\n"})) sl) n))
-
-(defn- add-br
-  "Goes a visual line forward if the break is soft and insert a hard."
-  [sl columns]
-  (let [s0 (forward-line sl columns)]
-                         (cond (= (-> s0 (left 1) get-char) "\n") s0
-                               (end? s0) s0
-                               (= (get-mark s0 "cursor") (get-point s0)) (-> s0 (insert "\n") (set-mark "cursor"))
-                               :else (insert s0 "\n"))))
-  
-(defn- update-and-restore-point!
-  "This function has sideeffects"
-  [s towid newtow]
-  (when (not= (@editor/top-of-window towid) newtow)
-    (swap! editor/top-of-window assoc towid newtow))
-  (set-point s newtow))
-  
-
-(defn- apply-br-and-update-tow!
-  "Returns a slider where cursor mark has been set,
-  linebreaks on long lines created and point moved
-  to top of window."
-  [sl rows columns towid tow]
-  (let [sl0 (-> sl (set-mark "cursor") (set-point tow))]
-    (if (< (get-mark sl0 "cursor") tow) ;; If point is before top of window
-      (let [newtow (get-point (left-linebreaks sl0 (inc rows)))]
-        (apply-br-and-update-tow! sl rows columns towid newtow))
-      (let [;; Add rows number of breaks
-            sllist (iterate #(add-br % columns) sl0)
-            slbefore (nth (iterate #(add-br % columns) sl0) (dec rows))
-            sl1 (nth (iterate #(add-br % columns) sl0) rows)]
-  
-        ;; If original point is on the first rows of lines we are done
-        ;; otherwise a recenter should be performed
-        ;(futil/log (str (get-mark sl1 "cursor") ", " (get-point sl1) ", " (pr-str sl1)))
-        (if ((if (and (end? sl1) (= (get-point slbefore) (get-point sl1))) <= <) (get-mark sl1 "cursor") (get-point sl1))
-          (update-and-restore-point! sl1 towid tow)
-          (let [sl2 (loop [s sl1]
-                      (if (<= (get-mark s "cursor") (get-point s))
-                        s
-                        (recur (add-br s columns))))
-                ;; Now sl2 ends with the cursor
-                sl3 (right (left-linebreaks sl2 (int (* rows 0.4))) 1)]
-            ;; sl3 now has point at new top of window
-            (update-and-restore-point! sl3 towid (get-point sl3))
-            (apply-br-and-update-tow! sl rows columns towid (get-point sl3))
-            ))))))
-
 (defn insert-token
   [sl token]
   (assoc sl
@@ -74,7 +18,7 @@
   [sl rows towid cursor-color syntaxhighlighter active]
   (loop [sl0 sl n 0 face :plain bgface :plain pch "" ppch ""]
      (if (> n rows)
-       (set-point sl0 (@editor/top-of-window towid))
+       (set-point sl0 (editor/get-top-of-window towid))
        (let [ch (get-char sl0)
              p (get-point sl0)
              selection (get-mark sl0 "selection")
@@ -129,15 +73,16 @@
         rows (window ::window/rows)
         columns (window ::window/columns)
         towid (str (window ::window/name) "-" (window ::window/buffername))
-        tow (or (@editor/top-of-window towid) 0)
+        tow (or (editor/get-top-of-window towid) 0)
         sl (set-mark (buffer/get-slider buffer) "cursor")
-        sl0 (apply-br-and-update-tow! sl rows columns towid tow)
-        ;tmp (futil/log (get-mark sl "cursor"))
-        ;tmp1 (futil/log (get-mark sl0 "cursor"))
+
+        sl0 (update-top-of-window sl rows columns tow)
+        tmp-tmp-tmp (editor/set-top-of-window towid (get-point sl0))
+
         filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
         syntaxhighlighter  (or (-> buffer ::buffer/highlighter) (fn [sl face] :plain))
         active (= window (editor/current-window))
-        sl1 (apply-syntax-highlight sl0 rows towid cursor-color  syntaxhighlighter active)
+        sl1 (apply-syntax-highlight sl0 rows towid cursor-color syntaxhighlighter active)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
         dirty (buffer/get-dirty buffer)
         statuslinecontent (str "L" (format "%-6s" (buffer/get-linenumber buffer))
@@ -148,8 +93,7 @@
         lines (concat (split-to-lines (sl1 ::slider/after) rows) [statusline])]
       (map #(hash-map :row (+ %1 (window ::window/top))
                        :column (window ::window/left)
-                       :line %2) (range (inc rows)) lines)
-     ))
+                       :line %2) (range (inc rows)) lines)))
 
 (defn render-screen
   []

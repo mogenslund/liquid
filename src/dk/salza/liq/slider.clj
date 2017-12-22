@@ -169,51 +169,56 @@
   "Moves the point to the left the given amount of times.
   So moving one character left is achieved with
   (left sl 1)."
-  [sl amount]
-  (if (= amount 1)
-    (let [c (first (sl ::before))]
-      (cond (nil? c) sl
-            (not= c "\n") (assoc sl
-                            ::before (rest (sl ::before))
-                            ::after (conj (sl ::after) c)
-                            ::point (dec (sl ::point)))
-            :else (assoc sl
-                    ::before (rest (sl ::before))
-                    ::after (conj (sl ::after) c)
-                    ::point (dec (sl ::point))
-                    ::linenumber (dec (sl ::linenumber)))))
-    (let [tmp (take amount (sl ::before))             ; Characters to be moved from :before to :after
-          n (count tmp)                               ; Might be less than amount, since at most (count :before)
-          linecount (count (filter #(= % "\n") tmp))] ; Checking how many lines are moved
-      (assoc sl
-        ::before (drop n (sl ::before))
-        ::after (concat (reverse tmp) (sl ::after))
-        ::point (- (sl ::point) n)
-        ::linenumber (- (sl ::linenumber) linecount)))))
+  ([sl]
+     (let [c (first (sl ::before))]
+       (cond (nil? c) sl
+             (not= c "\n") (assoc sl
+                             ::before (rest (sl ::before))
+                             ::after (conj (sl ::after) c)
+                             ::point (dec (sl ::point)))
+             :else (assoc sl
+                     ::before (rest (sl ::before))
+                     ::after (conj (sl ::after) c)
+                     ::point (dec (sl ::point))
+                     ::linenumber (dec (sl ::linenumber))))))
+
+  ([sl amount]
+   (if (= amount 1)
+     (left sl)
+     (let [tmp (take amount (sl ::before))             ; Characters to be moved from :before to :after
+           n (count tmp)                               ; Might be less than amount, since at most (count :before)
+           linecount (count (filter #(= % "\n") tmp))] ; Checking how many lines are moved
+       (assoc sl
+         ::before (drop n (sl ::before))
+         ::after (concat (reverse tmp) (sl ::after))
+         ::point (- (sl ::point) n)
+         ::linenumber (- (sl ::linenumber) linecount))))))
 
 (defn right
   "Moves the point to the right (forward) the given amount of times."
-  [sl amount]
-  (if (= amount 1)
+  ([sl] 
     (let [c (first (sl ::after))]
-      (cond (nil? c) sl
-            (not= c "\n") (assoc sl
-                            ::before (conj (sl ::before) c)
-                            ::after (rest (sl ::after))
-                            ::point (inc (sl ::point)))
-            :else (assoc sl
-                    ::before (conj (sl ::before) c)
-                    ::after (rest (sl ::after))
-                    ::point (inc (sl ::point))
-                    ::linenumber (inc (sl ::linenumber)))))
-    (let [tmp (take amount (sl ::after))
-          n (count tmp)
-          linecount (count (filter #(= % "\n") tmp))]
-      (assoc sl
-        ::before (concat (reverse tmp) (sl ::before))
-        ::after (drop n (sl ::after))
-        ::point (+ (sl ::point) n)
-        ::linenumber (+ (sl ::linenumber) linecount)))))
+       (cond (nil? c) sl
+             (not= c "\n") (assoc sl
+                             ::before (conj (sl ::before) c)
+                             ::after (rest (sl ::after))
+                             ::point (inc (sl ::point)))
+             :else (assoc sl
+                     ::before (conj (sl ::before) c)
+                     ::after (rest (sl ::after))
+                     ::point (inc (sl ::point))
+                     ::linenumber (inc (sl ::linenumber))))))
+  ([sl amount]
+   (if (= amount 1)
+     (right sl)
+     (let [tmp (take amount (sl ::after))
+           n (count tmp)
+           linecount (count (filter #(= % "\n") tmp))]
+       (assoc sl
+         ::before (concat (reverse tmp) (sl ::before))
+         ::after (drop n (sl ::after))
+         ::point (+ (sl ::point) n)
+         ::linenumber (+ (sl ::linenumber) linecount))))))
 
 (defn set-point
   "Moves point the the given location.
@@ -427,7 +432,7 @@
   The last paren will be selected."
   [sl name]
   (loop [sl0 (-> sl (remove-mark name) (set-mark "mark-paren-curser")) ch (if (= (get-char sl) "(") "" (get-char sl)) level 0]
-    (cond (and (= ch ")") (= level 0)) (-> sl0 (right 1) (set-mark name) (point-to-mark "mark-paren-curser"))
+    (cond (and (= ch ")") (= level 0)) (-> sl0 right (set-mark name) (point-to-mark "mark-paren-curser"))
           (end? sl0) sl
           :else (recur (right sl0 1)
                        (get-char (right sl0 1))
@@ -444,7 +449,7 @@
         sl0 (-> sl (mark-paren-start "paren-start") (mark-paren-end "paren-end"))]
     (if (and (get-mark sl0 "paren-start") (get-mark sl0 "paren-end"))
       (if (= sel (get-mark sl0 "paren-end"))
-        (-> sl0 (point-to-mark "paren-start") (set-mark "selection") (point-to-mark "paren-end") (left 1))
+        (-> sl0 (point-to-mark "paren-start") (set-mark "selection") (point-to-mark "paren-end") left)
         (-> sl0 (point-to-mark "paren-end") (set-mark "selection") (point-to-mark "paren-start")))
       sl)))
 
@@ -467,7 +472,7 @@
 (defn forward-word
   "Moves the point to beginning of next word or end-of-buffer"
   [sl]
-  (-> sl (right-until (partial re-find #"\s")) (right 1) (right-until (partial re-find #"\S")))) ; (not (not (re-matches #"\S" "\n")))
+  (-> sl (right-until (partial re-find #"\s")) right (right-until (partial re-find #"\S")))) ; (not (not (re-matches #"\S" "\n")))
 
 (defn end-of-line
   "Moves the point to the end of the line. Right before the
@@ -497,7 +502,7 @@
                           (inc c))))))
   ([sl]
     ;; In this case just to end of buffer or efter next \n
-    (-> sl (end-of-line) (right 1))))
+    (-> sl (end-of-line) right)))
 
 (defn get-visual-column
   [sl columns]
@@ -575,12 +580,57 @@
   (-> sl beginning-of-line
          (set-mark "deleteline")
          end-of-line
-         (right 1)
+         right
          (delete-region "deleteline")))
 
 
-;; -----------------------------------------------------
+;; --------------------------
+;; Top of window calculations
+;; --------------------------
 
+(defn- left-linebreaks
+  "Takes a slider and a number and moves cursor
+  back until the nth linebreak.
+  So the cursor will be placed right after a linebreak."
+  [sl n]
+  (nth (iterate #(-> % left (left-until #{"\n"})) sl) n))
+
+(defn- wrap-and-forward-line
+  "Goes a visual line forward if the break is soft and insert a hard."
+  [sl columns]
+  (let [s0 (forward-line sl columns)]
+    (cond (= (-> s0 left get-char) "\n") s0
+          (end? s0) s0
+          (= (get-mark s0 "cursor") (get-point s0)) (-> s0 insert-newline (set-mark "cursor"))
+          :else (insert-newline s0))))
+
+(defn update-top-of-window
+  "Returns slider where cursor marks has been set
+  and point moved to top of window."
+  [sl rows columns tow]
+  (let [sl0 (-> sl (set-mark "cursor") (set-point tow))]
+    (if (< (get-mark sl0 "cursor") tow) ;; If point is before top of window
+      (let [newtow (get-point (left-linebreaks sl0 (inc rows)))]
+        (update-top-of-window sl rows columns newtow))
+      (let [;; Add rows number of breaks
+            sllist (iterate #(wrap-and-forward-line % columns) sl0)
+            slbefore (nth (iterate #(wrap-and-forward-line % columns) sl0) (dec rows))
+            sl1 (nth (iterate #(wrap-and-forward-line % columns) sl0) rows)]
+  
+        ;; If original point is on the first rows of lines we are done
+        ;; otherwise a recenter should be performed
+        ;(futil/log (str (get-mark sl1 "cursor") ", " (get-point sl1) ", " (pr-str sl1)))
+        (if ((if (and (end? sl1) (= (get-point slbefore) (get-point sl1))) <= <) (get-mark sl1 "cursor") (get-point sl1))
+          (set-point sl1 tow)
+          (let [sl2 (loop [s sl1]
+                      (if (<= (get-mark s "cursor") (get-point s))
+                        s
+                        (recur (wrap-and-forward-line s columns))))
+                ;; Now sl2 ends with the cursor
+                sl3 (right (left-linebreaks sl2 (int (* rows 0.4))) 1)]
+            ;; sl3 now has point at new top of window
+            sl3
+            (update-top-of-window sl rows columns (get-point sl3))))))))
 
 (defn get-content
   "The full content of the slider as text."
@@ -630,7 +680,7 @@
   (let [sl0 (-> sl (left-until (partial re-find #"[^ \n\"]"))
                    (left-until (partial re-find #"[ \n\"]"))
                    (right-until (partial re-find #"[\w\.~(\[/$]"))
-                   (set-mark "contextstart")) ;(right 1) (set-mark "contextstart")) (re-find #"\w" "  x")
+                   (set-mark "contextstart")) ;right (set-mark "contextstart")) (re-find #"\w" "  x")
         sl1 (-> sl0 (right-until (partial re-find #"[ |\n|\"]")))
         word (str/replace (get-region sl1 "contextstart") #"(\$HOME|~)" (System/getProperty "user.home"))]
     (cond (re-matches #"https?://.*" word) {:type :url :value word}

@@ -30,6 +30,15 @@
   names."
   (atom {}))
 
+(defn get-top-of-window
+  [keyw]
+  (@top-of-window keyw))
+
+(defn set-top-of-window
+  [keyw val]
+  (when (not= (get-top-of-window keyw) val)
+    (swap! top-of-window assoc keyw val)))
+
 (def ^:private macro-seq (atom '())) ; Macrofunctionality might belong to input handler.
 (def ^:private macro-record (atom false))
 (def ^:private submap (atom nil))
@@ -565,10 +574,10 @@
   A page is what is visible in the current window."
   []
   (let [towid (window/get-towid (current-window) (current-buffer))]
-    (doto-buffer buffer/set-point (or (@top-of-window towid)  0))
+    (doto-buffer buffer/set-point (or (get-top-of-window towid)  0))
     (dotimes [n ((current-window) ::window/rows)] (forward-line))
     (beginning-of-line)
-    (swap! top-of-window assoc towid (get-point))))
+    (set-top-of-window towid (get-point))))
 
 (defn top-align-page
   "Scrolls so the current line is at the top
@@ -576,7 +585,7 @@
   []
   (let [towid (window/get-towid (current-window) (current-buffer))]
     (beginning-of-line)
-    (swap! top-of-window assoc towid (get-point))))
+    (set-top-of-window towid (get-point))))
 
 
 (defn other-window
