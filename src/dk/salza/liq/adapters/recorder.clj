@@ -17,11 +17,13 @@
 (defn html
   [changes]
   (str
-  "<html><head><style>body {
+  "<html><head>\n
+     <meta charset=\"utf-8\"/>
+     <style>body {
         //background-color: #181818;
-        background-color: #080808;
+        //background-color: #080808;
         margin: 0;
-        margin-top: 50;
+        //margin-top: 50;
         color: #e4e4ef
       }
 
@@ -92,7 +94,7 @@
         border: solid;
         padding: 0;
         border-spacing: 0;
-        margin: 0px auto;
+        //margin: 0px auto;
         border-color: #000000;
         background-color: #181818;
       }
@@ -114,7 +116,7 @@
        if (content.length > 0) {
          var group = content.shift();
          group.forEach(updateLine);
-         setTimeout(handleNext, 300);
+         setTimeout(handleNext, 100);
        }
      }
    handleNext();
@@ -164,20 +166,27 @@
   [key reference old new]
   (remove-watch editor/editor key)
   (future
-    (Thread/sleep 100)
+    (Thread/sleep 200)
     (when (editor/fullupdate?) (reset))
     (save-file)
-    (Thread/sleep 100)
+    (Thread/sleep 200)
     (add-watch editor/updates key view-handler)))
+
+(defn start
+  []
+  (reset)
+  (add-watch editor/updates "recorder" view-handler))
+
+(defn stop
+  []
+  (remove-watch editor/updates "recorder"))
 
 (defn init
   [rows columns recordfile]
   (reset! filename recordfile)
   (reset! dimensions {:rows rows :columns columns})
-  (future
-    (Thread/sleep 3000)
-    (add-watch editor/updates "recorder" view-handler)
-    (reset)))
+  (editor/set-global-key :C-x :1 start)
+  (editor/set-global-key :C-x :2 stop))
 
 
 
