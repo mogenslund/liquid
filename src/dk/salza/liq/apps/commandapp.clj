@@ -4,6 +4,7 @@
             [dk.salza.liq.tools.cshell :as cs]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.textapp :as textapp]
+            [dk.salza.liq.apps.typeaheadapp :as typeaheadapp]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
 
@@ -73,6 +74,21 @@
           ;(= (first hit) :folder) (ed/find-file (second hit)))
     (editor/previous-buffer)))
 
+(defn simplify
+  [fullfun]
+  (let [content (editor/get-content)
+        [tmp namesp fun] (re-find #"(.*)/(.*)" fullfun)
+        [fullmatch aliasmatch] (re-find (re-pattern (str "\\[" namesp " :as ([^]]*)\\]")) content)]
+    (cond (= namesp "clojure.core") fun
+          aliasmatch (str aliasmatch "/" fun)
+          :else fullfun)))
+
+(defn function-typeahead
+  []
+  (editor/previous-buffer)
+  (let [funcs (apply concat (for [n (all-ns)] (for [f (keys (ns-publics n))] (str n "/" f))))]
+    (typeaheadapp/run funcs str #(editor/insert (simplify %)))))
+
 (defn update-search
   [ch]
   (swap! state update ::search #(str % ch))
@@ -103,6 +119,7 @@
   (merge
     {:cursor-color :green
      :C-g editor/previous-buffer
+     :C-space function-typeahead
      :esc editor/previous-buffer
      :backspace delete-char
      :C-k next-res
