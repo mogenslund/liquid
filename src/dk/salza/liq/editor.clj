@@ -42,6 +42,7 @@
 (def ^:private macro-seq (atom '())) ; Macrofunctionality might belong to input handler.
 (def ^:private macro-record (atom false))
 (def ^:private submap (atom nil))
+(def ^:private keylist (atom '()))
 
 
 (def updates
@@ -97,6 +98,11 @@
   []
   (swap! updates inc)
   nil)
+
+(defn get-key-list
+  "List of all typed keys"
+  []
+  @keylist)
 
 (defn fullupdate?
   []
@@ -989,6 +995,7 @@
 
 (defn handle-input
   [keyw]
+  (swap! keylist conj keyw)
   (when (and @macro-record (not= keyw :H))
     (swap! macro-seq conj keyw))
   (let [action (if @submap (@submap keyw) (get-action keyw))]

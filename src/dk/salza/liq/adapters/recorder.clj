@@ -152,8 +152,8 @@
 (defn get-output
   []
   (let [lineslist (renderer/render-screen)]
-        (str/join "\n" 
-          (filter #(not= "" %) (pmap convert-line (apply concat lineslist))))))
+    (str/join "\n" 
+      (filter #(not= "" %) (pmap convert-line (apply concat lineslist))))))
 
 
 (defn save-file
