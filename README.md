@@ -40,7 +40,7 @@ Include [Additives](https://github.com/mogenslund/additives) for even more funct
 #### Quick start
 Download the single jar (Uberjar containing both Clojure and Liquid) [liq.jar](http://salza.dk/liq.jar)  
 
-**IMPORTANT** Please have the [Cheatsheet](https://github.com/mogenslund/liquid/wiki/Cheat-Sheet) nearby when using Liquid for the first time. The keybindings are powerful, but needs to be learned.
+**IMPORTANT** Please have the [Cheatsheet](http://salza.dk/cheatsheet.html) nearby when using Liquid for the first time. The keybindings are powerful, but needs to be learned.
 
 On Windows double click the liq.jar.  
 On Linux and Mac execute the following in a terminal:
@@ -59,7 +59,6 @@ For a recommended approach to local setup and managing extensions, please read
 [Basic Setup](http://salza.dk/setupbasic.html)
 
 #### Salza &lambda;iquid text editor is designed with clojure developers in mind
-
 The editor is written in pure Clojure. That is, there are no other dependencies, not even curses or lanterna!
 
 I have been using Emacs for many years. I have tweaked it a lot and implemented modes, to simulate the Vim way of switching between insert mode and normal mode for navigation. I like being able to use the whole keyboard for navigation. As you will see in the video below, I am very inspired by Emacs and Vim, but I have choosen not to try to copy or reimplement Emacs or Vim. I have only stolen the features that I need or like. I hope others will just create plugins or extensions to make the editor support other features that they like.
@@ -68,31 +67,6 @@ I have been using Emacs for many years. I have tweaked it a lot and implemented 
 
 I could tell a lot about the editor, but I think you should see the video below for a demonstration.
 
-
-
-#### Other run configurations
-Download [liquid-0.8.6.jar](https://github.com/mogenslund/liquid/releases/download/v0.8.6/liquid-0.8.6.jar)
-Also download clojure-1.8.0.jar from [clojure.org](http://clojure.org/community/downloads)
-
-Execute the program with:
-
-    java -cp clojure-1.8.0.jar:liquid-0.8.6.jar clojure.main -m dk.salza.liq.core
-
-To run as webserver use:
-
-    java -cp clojure-1.8.0.jar:liquid-0.8.6.jar clojure.main -m dk.salza.liq.core --server --port=8520
-
-and access using:
-
-    http://localhost:8520
-
-(This approach will also work in Windows. Remember to replace ":" with ";" in the "-cp" on Windows. The best performance seems to be in Chrome browser.)
-
-For running in terminal and as serve at the same time use:
-
-    java -cp clojure-1.8.0.jar:liquid-0.8.6.jar clojure.main -m dk.salza.liq.core --web --port=8520
-
-Use --autoupdate for making multiple browser automatically sync content. (For collaborative editing.)
 
 ## Demo video
 Watch this video to get a sense of how the editor works: [liquid01](https://drive.google.com/file/d/0B5Au3PxHCmgBM2MySHl4aUVWTEE/view?usp=sharing)
@@ -108,23 +82,6 @@ All other tools that I create in Clojure, which are useful as is, are easy to ma
  * <b>Embedding</b> the editor into your your application. Include the &lambda;iquid to your project and use it as part of your program or for debugging and patching, just like you already do with the REPL, but with some advantages: It is easier to open a file with code and execute parts of it, or jump between snippets, do modifications, and execute again.  
 Example: I have a file with snippets like: `(patch "myserver")`, `(status "myserver")` and `(run-test "name-of-test")`. I just modify "myserver", if needed, and press "e" to execute the command.
 
-## Status of the application
-Most of the basic features I want are in place, but needs to be described further and polished.
-
-The extension system also needs to mature, with best practices and well-defined integration points. I may still have to do changes to some basic structures to accommodate this.
-
-#### Known bugs
-No known bugs at the moment.
-
-### Leiningen
-Clone the github project and execute the command below to generate a jar file
-
-    lein uberjar
-
-or just to run
-
-    lein run
-
 ## Dependencies
 Right now the only dependency is Clojure itself. I would like to keep it that way, as for core functionality. When starting Liquid, any resources can just be added to the classpath, and the code will be available from inside Liquid. So it is not a limitation to Liquid, it just means that anything requiring other dependencies should be implemented as plugins and be loaded together with Liquid. Extensions can be loaded through a .liq file in the home folder.
 
@@ -135,25 +92,6 @@ From Vi I have stolen the concept of normal/insert mode. I really like the abili
 
 S-expressions in clojure can be evaluated with "e", while the whole file is evaluated with shift+e.
 
-Extending the functionality is done by including the classpath to the wanted code, when starting &lambda;iquid and using the .liq file to require the code or remap keys to use the new code or whatever code that needs to run to integrate the code into the editor..
-
-## Sample .liq file
-Modify the content below and save it to .liq in your home directory:
-
-```clojure
-(ns user
-  (:require [clojure.string :as str]
-            [dk.salza.liq.editor :as editor])
-  (:use [dk.salza.liq.tools.cshell]))
-
-(editor/add-searchpath "/tmp")              ; Files below /tmp will now be chooseable from the Ctrl+Space chooser
-(editor/add-snippet "Something to insert.") ; This snippet will be available from the Ctrl+Space chooser
-(editor/add-file "/tmp/tmp.clj")            ; Open /tmp/tmp.clj for editing
-(editor/add-file (str (System/getProperty "user.home") ".liq")) ; Open .liq file for editing
-```
-
-## Options
-It is not working yet, but at some time the argument "--jframe" should start a JFrame implementation of the view.
 
 ## License
 Copyright &copy; 2016 Mogens Br&oslash;dsgaard Lund
