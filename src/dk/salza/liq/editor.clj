@@ -324,6 +324,14 @@
   (doto-buffer buffer/update-mem-col
                ((current-window) ::window/columns)))
 
+(defn apply-to-slider
+  "Apply function to the slider in the current buffer.
+  It should take a slider as input and produce a slider
+  as output."
+  [fun]
+  (doto-buffer buffer/apply-to-slider fun)
+  (update-mem-col))
+
 (defn get-filename
   "The filename if one is associated with the current
   buffer, otherwise nil."

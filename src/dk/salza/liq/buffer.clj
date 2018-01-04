@@ -68,6 +68,13 @@
   [buffer fun & args]
   (update-in buffer [::slider] #(apply fun (list* % args))))
 
+(defn apply-to-slider
+  "Apply function to the slider in the buffer.
+  It should take a slider as input and produce a slider
+  as output."
+  [buffer fun]
+  (update-in buffer [::slider] fun))
+
 (defn update-mem-col
   "The mem-col is the column position of the cursor,
   from the last time the cursor was moved not up and
