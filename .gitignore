@@ -1,5 +1,6 @@
 pom.xml
 pom.xml.asc
 target
+.cpcache
 *~
 .lein-failures
