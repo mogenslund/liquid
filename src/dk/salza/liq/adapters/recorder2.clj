@@ -1,4 +1,4 @@
-(ns dk.salza.liq.adapters.recorder
+(ns dk.salza.liq.adapters.recorder2
   (:require [dk.salza.liq.tools.util :as util]
             [dk.salza.liq.renderer :as renderer]
             [dk.salza.liq.editor :as editor]
@@ -101,8 +101,7 @@
 </style>
 <script type=\"text/javascript\">
 
-   let originalcontent = [" changes "];
-   let content = originalcontent.slice();
+   let content = [" changes "];
 
 
    function init() {
@@ -113,44 +112,14 @@
        }
      }
 
-     function next() {
+     function handleNext() {
        if (content.length > 0) {
          var group = content.shift();
          group.forEach(updateLine);
+         setTimeout(handleNext, 100);
        }
      }
-
-     function reset() {
-       content = originalcontent.slice();
-       next();
-     }
-
-     function prev() {
-       let c = content.length;
-       reset();
-       while (content.length > c + 1) {
-         next();
-       }
-
-     }
-
-     function handleKey(evt) {
-       if (evt) {
-         if (evt.keyCode == 39) {
-           next();
-         }
-         if (evt.keyCode == 40) {
-           reset();
-         }
-         if (evt.keyCode == 37) {
-           prev();
-         }
-       }
-       
-     }
-
-     document.onkeydown = handleKey;
-     next();
+   handleNext();
    }
 
 </script></head>
@@ -206,8 +175,7 @@
 (defn start
   []
   (reset)
-  ;(add-watch editor/updates "recorder" view-handler)
-  )
+  (add-watch editor/updates "recorder" view-handler))
 
 (defn stop
   []
@@ -218,8 +186,7 @@
   (reset! filename recordfile)
   (reset! dimensions {:rows rows :columns columns})
   (editor/set-global-key :C-x :1 start)
-  (editor/set-global-key :C-x :2 stop)
-  (editor/set-global-key :f5 save-file))
+  (editor/set-global-key :C-x :2 stop))
 
 
 
