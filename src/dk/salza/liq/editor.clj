@@ -168,6 +168,14 @@
   []
   (setting ::default-app))
 
+(defn get-frame-rows
+  []
+  (-> @editor ::frame-dimensions ::rows))
+
+(defn get-frame-columns
+  []
+  (-> @editor ::frame-dimensions ::columns))
+
 (defn- doto-buffer
   "Apply the given function to the top-most buffer."
   [fun & args]

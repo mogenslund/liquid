@@ -6,7 +6,6 @@
             [dk.salza.liq.adapters.jframeadapter2 :as jframeadapter2]
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
             [dk.salza.liq.adapters.webadapter :as webadapter]
-            [dk.salza.liq.adapters.recorder :as recorder]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.tools.cshell :as cshell]
@@ -233,7 +232,6 @@
           autoupdate (if (read-arg args "--autoupdate") true false)
           fontsize (read-arg-int args "--fontsize=")
           logfile (read-arg args "--log=")
-          recordfile (read-arg args "--record=")
           singlethreaded (read-arg args "--no-threads")]
 
           ;; Enable logging if --log specified
@@ -259,8 +257,6 @@
             (jframeadapter2/init rows columns :font-size fontsize))
           (when (read-arg args "--jf2")
             (jframeadapter/init rows columns))
-          (when recordfile
-            (recorder/init rows columns recordfile))
 
           ;; Post that the editor has updated, to make view update
           (editor/updated))))
