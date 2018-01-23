@@ -19,7 +19,9 @@
 (defn update-display
   []
   (editor/clear)
-  (editor/insert "\n\n")
+  (editor/insert (str ">> " "" (@state ::search)))
+  (editor/set-mark "hl0")
+  (editor/insert " \n\n")
   (let [to-string (@state ::tostringfun)
         pat (re-pattern (str "(?i)" (str/replace (@state ::search) #" " ".*")))
         update (> (count (@state ::oldsearch)) (count (@state ::search)))
@@ -29,10 +31,11 @@
         hit (when (< index (count filtered)) (nth filtered (@state ::selected)))]
     (swap! state assoc ::hit hit ::filtered filtered ::oldsearch (@state ::search))
     (doseq [e (take 100 filtered)]
-      (editor/insert (str (if (= e hit) "#>" "  ") "  " (to-string e) "\n")))
-    (editor/beginning-of-buffer)
-    (editor/insert (str ">> " "" (@state ::search)))
-    (editor/end-of-line)))
+      (when (= e hit) (editor/set-mark "typeaheadcursor"))
+      (editor/insert (to-string e))
+      (when (= e hit) (editor/selection-set))
+      (editor/insert "\n"))
+    (editor/point-to-mark "typeaheadcursor")))
 
 (defn delete-char
   []
@@ -65,7 +68,7 @@
 
 (def keymap
   (merge
-    {:cursor-color :green
+    {:cursor-color :blue
      :C-g editor/previous-buffer
      :esc editor/previous-buffer
      :backspace delete-char

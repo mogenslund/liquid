@@ -22,26 +22,31 @@
         filterfun (filter #(re-find pat (str %))) ; transducer
         folders (sort-by count (filter #(re-find pat %) (conj (sort-by str/upper-case (fileutil/get-folders (@state ::path))) "..")))
         files (sort-by count (filter #(re-find pat %) (sort-by str/upper-case (fileutil/get-files (@state ::path)))))
-        res (concat (map #(str "    [" (fileutil/filename %) "]") folders) (map #(str "    " (fileutil/filename %) "") files))]
+        res (concat (map #(str "[" (fileutil/filename %) "]") folders) (map #(str "" (fileutil/filename %) "") files))]
     (if (and (@state ::selected) (> (count res) 0))
       (swap! state assoc ::hit (nth (concat folders files) (min (@state ::selected) (dec (count res)))))
       (swap! state assoc ::hit (fileutil/file (@state ::path) (@state ::search))))
     (editor/clear)
     (editor/insert (str (fileutil/absolute (@state ::path)) "\n"))
     (editor/insert (@state ::search))
-    (editor/insert "\n-----------\n")
+    (editor/set-mark "hl0")
+    (editor/insert " \n-----------\n")
     (doseq [r res]
       (editor/insert (str r "\n")))
     (editor/beginning-of-buffer)
     (when (@state ::selected)
       (dotimes [n (+ (@state ::selected) 3)]
         (editor/forward-line))
-      (editor/forward-char 2)
-      (editor/delete 2)
-      (editor/insert "#>"))
-    (editor/beginning-of-buffer)
-    (editor/forward-line)
-    (editor/end-of-line)
+;      (editor/forward-char 2)
+;      (editor/delete 2)
+      (editor/set-mark "typeaheadcursor")
+;      (editor/insert "#>")
+      (editor/end-of-line)
+      (editor/selection-set))
+    ;(editor/beginning-of-buffer)
+    ;(editor/forward-line)
+    ;(editor/end-of-line)
+    (editor/point-to-mark "typeaheadcursor")
   ))
 
 (defn insert
@@ -52,11 +57,17 @@
     ;(swap! state update ::selected #(inc (or % -1)))
     (update-display)))
 
+(defn next-res
+  []
+  (swap! state update ::selected #(inc (or % -1)))
+  (update-display))
+
 (defn delete
   []
   (when (> (count (@state ::search)) 0)
     (swap! state update ::search #(subs % 0 (dec (count (@state ::search)))))
     (swap! state assoc ::selected nil)
+    (next-res)
     (update-display)))
 
 (defn up
@@ -64,12 +75,9 @@
   (swap! state update ::path #(or (.getParent (io/file %)) %))
   (swap! state assoc ::search "")
   (swap! state assoc ::selected nil)
+  (next-res)
   (update-display))
 
-(defn next-res
-  []
-  (swap! state update ::selected #(inc (or % -1)))
-  (update-display))
 
 (defn prev-res
   []
@@ -88,6 +96,7 @@
                              ::search ""
                              ::selected nil
                              ::hit nil)
+          (next-res)
           (update-display)))
       (fun hit))))
 
@@ -100,7 +109,7 @@
 (defn keymap
   [fun]
   (merge
-    {:cursor-color :green
+    {:cursor-color :blue
      :space #(insert " ")
      :backspace delete
      :C-g editor/previous-buffer
@@ -126,4 +135,5 @@
     (editor/new-buffer "-findfile-")
     (editor/set-keymap (keymap fun))
     (reset-state path))
+    (next-res)
   (update-display))

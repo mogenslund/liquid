@@ -19,9 +19,11 @@
 (defn update-display
   []
   (editor/clear)
-  (editor/insert "\n\n")
+  (editor/insert (str ">> " "" (@state ::search)))
+  (editor/set-mark "hl0")
+  (editor/insert " \n\n")
   (let [escaped (-> (@state ::search)
-                    (str/replace  #"\(" "\\\\(")
+                    (str/replace  #"\(" "\\\\(") ;))
                     (str/replace  #"\n" "\\\\n"))
         pat (re-pattern (str "(?i)" (str/replace escaped #" " ".*")))
         update (> (count (@state ::oldsearch)) (count (@state ::search)))
@@ -31,14 +33,13 @@
         hit (when (< index (count filtered)) (nth filtered (@state ::selected)))]
     (swap! state assoc ::hit hit ::filtered filtered ::oldsearch (@state ::search))
     (doseq [e (take 100 filtered)]
-      (let [pre (if (= (str e) (str hit)) "#>  " "    ")
-            label (cond (string? (second e)) (second e)
+      (let [label (cond (string? (second e)) (second e)
                         (vector? (second e)) (-> e second first)
                         :else (str (second e)))]
-        (editor/insert (str pre (first e) " " (str/replace label #"\n" "\\\\n") "\n"))))
-    (editor/beginning-of-buffer)
-    (editor/insert (str ">> " "" (@state ::search))))
-    (editor/end-of-line))
+        (when (= (str e) (str hit)) (editor/set-mark "typeaheadcursor"))
+        (editor/insert (str (first e) " " (str/replace label #"\n" "\\\\n") "\n"))
+        (when (= (str e) (str hit)) (editor/selection-set))))
+    (editor/point-to-mark "typeaheadcursor")))
 
 (defn delete-char
   []
@@ -117,7 +118,7 @@
 
 (def keymap
   (merge
-    {:cursor-color :green
+    {:cursor-color :blue
      :C-g editor/previous-buffer
      :C-space function-typeahead
      :esc editor/previous-buffer
