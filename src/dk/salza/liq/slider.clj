@@ -102,7 +102,7 @@
   "Set a meta value on the current char.
   If char is a string it will be converted to a map."
   [sl key val]
-  (let [c (get-char sl)
+  (let [c (first (sl ::after))
         c1 (cond (string? c) {:char c key val}
                  (map? c) (assoc c key val)
                  :else c)]

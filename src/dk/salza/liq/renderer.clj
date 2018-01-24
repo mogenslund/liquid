@@ -42,7 +42,8 @@
                       sl0
                       (if (and (or (= nextbgface :cursor0) (= nextbgface :cursor1) (= nextbgface :cursor2)) (or (= ch "\n") (end? sl0)))
                           (insert (insert-token sl0 {:face nextface :bgface nextbgface}) " ")
-                          (insert-token sl0 {:face nextface :bgface nextbgface})))
+                          (insert-token sl0 {:face nextface :bgface nextbgface})
+                        ))
                       ]
          (recur (right next 1)
                 (if (or (= ch "\n") (= ch nil)) (inc n) n)
@@ -67,9 +68,7 @@
 
 (defn render-window
   [window buffer]
-  (let [;bmode (buffer/get-mode buffer)
-        ;cursor-color (-> bmode ::mode/actionmapping first :cursor-color)
-        cursor-color (buffer/get-action buffer :cursor-color)
+  (let [cursor-color (buffer/get-action buffer :cursor-color)
         rows (window ::window/rows)
         columns (window ::window/columns)
         towid (str (window ::window/name) "-" (window ::window/buffername))

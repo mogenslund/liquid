@@ -92,6 +92,7 @@
                     (= (ch :bgface) :selection) (print-color 8)
                     (= (ch :bgface) :statusline) (print-color 9)
                     :else (print-color 10))
+              ;(if (= (ch :char) "\t") (tty-print (char 172)) (tty-print (ch :char)))
             )))
         (if (= row (count (first lineslist)))
           (do
