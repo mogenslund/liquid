@@ -93,7 +93,48 @@
   If point is at the end of the slider, nil will
   be returned."
   [sl]
-  (first (sl ::after)))
+  (let [c (first (sl ::after))]
+    (cond (string? c) c
+          c (c :char)
+          :else nil)))
+
+(defn set-meta
+  "Set a meta value on the current char.
+  If char is a string it will be converted to a map."
+  [sl key val]
+  (let [c (get-char sl)
+        c1 (cond (string? c) {:char c key val}
+                 (map? c) (assoc c key val)
+                 :else c)]
+    (if c1
+      (assoc sl
+        ::after (conj (rest (sl ::after)) c1))
+      sl)))
+
+(defn get-meta
+  "Get a meta value from a char.
+  If the value does not exist, nil will be
+  returned."
+  [sl key]
+  (let [c (first (sl ::after))]
+    (when (map? c) (c key))))
+
+(defn is-newline?
+  "Check if \\n or {:char \\n}"
+  [c]
+  (not (or (and (string? c) (not= c "\n"))
+       (and (map? c) (not= (c :char) "\n")))))
+
+(defn- tmp-is-valid-entry!!!
+  "This is a temporary function. Should be removed
+  as soon as nothing depends on it.
+  At the moment the renderer insert tokens
+  into the slider. It should not. To avoid
+  problems while refactoring, this function is used
+  to filter out invalid tokens."
+  [entry]
+  (or (not (map? entry)) (contains? entry :char)))
+
 
 (defn beginning?
   "True if and only if the point is at the
@@ -114,7 +155,7 @@
   Non strings will be filtered away.
   If there is no result, nil is returned."
   [sl amount]
-  (first (drop (- amount 1) (filter string? (sl ::before)))))
+  (first (drop (- amount 1) (filter tmp-is-valid-entry!!! (sl ::before)))))
 
 (defn look-ahead
   "Returns char after the cursor given amount forward.
@@ -123,13 +164,13 @@
   Non strings will be filtered away.
   If there is no result, nil is returned."
   [sl amount]
-  (first (drop amount (filter string? (sl ::after)))))
+  (first (drop amount (filter tmp-is-valid-entry!!! (sl ::after)))))
 
 (defn string-ahead
   "Returns next amount of chars as string.
   Non string will be filtered away."
   [sl amount]
-  (str/join "" (take amount (filter string? (sl ::after)))))
+  (str/join "" (take amount (filter tmp-is-valid-entry!!! (sl ::after)))))
   
 
 (defn get-point
@@ -170,55 +211,37 @@
   So moving one character left is achieved with
   (left sl 1)."
   ([sl]
-     (let [c (first (sl ::before))]
-       (cond (nil? c) sl
-             (not= c "\n") (assoc sl
-                             ::before (rest (sl ::before))
-                             ::after (conj (sl ::after) c)
-                             ::point (dec (sl ::point)))
-             :else (assoc sl
-                     ::before (rest (sl ::before))
-                     ::after (conj (sl ::after) c)
-                     ::point (dec (sl ::point))
-                     ::linenumber (dec (sl ::linenumber))))))
-
+   (let [c (first (sl ::before))]
+     (if (beginning? sl)
+         sl
+         (assoc sl
+           ::before (rest (sl ::before))
+           ::after (conj (sl ::after) c)
+           ::point (dec (sl ::point))
+           ::linenumber (- (sl ::linenumber) (if (is-newline? c) 1 0))))))
   ([sl amount]
-   (if (= amount 1)
-     (left sl)
-     (let [tmp (take amount (sl ::before))             ; Characters to be moved from :before to :after
-           n (count tmp)                               ; Might be less than amount, since at most (count :before)
-           linecount (count (filter #(= % "\n") tmp))] ; Checking how many lines are moved
-       (assoc sl
-         ::before (drop n (sl ::before))
-         ::after (concat (reverse tmp) (sl ::after))
-         ::point (- (sl ::point) n)
-         ::linenumber (- (sl ::linenumber) linecount))))))
+   (loop [s sl n amount]
+     (if (<= n 0)
+       s
+       (recur (left s) (dec n))))))
+         
 
 (defn right
   "Moves the point to the right (forward) the given amount of times."
-  ([sl] 
-    (let [c (first (sl ::after))]
-       (cond (nil? c) sl
-             (not= c "\n") (assoc sl
-                             ::before (conj (sl ::before) c)
-                             ::after (rest (sl ::after))
-                             ::point (inc (sl ::point)))
-             :else (assoc sl
-                     ::before (conj (sl ::before) c)
-                     ::after (rest (sl ::after))
-                     ::point (inc (sl ::point))
-                     ::linenumber (inc (sl ::linenumber))))))
+  ([sl]
+   (let [c (first (sl ::after))]
+     (if (end? sl)
+         sl
+         (assoc sl
+           ::before (conj (sl ::before) c)
+           ::after (rest (sl ::after))
+           ::point (inc (sl ::point))
+           ::linenumber (+ (sl ::linenumber) (if (is-newline? c) 1 0))))))
   ([sl amount]
-   (if (= amount 1)
-     (right sl)
-     (let [tmp (take amount (sl ::after))
-           n (count tmp)
-           linecount (count (filter #(= % "\n") tmp))]
-       (assoc sl
-         ::before (concat (reverse tmp) (sl ::before))
-         ::after (drop n (sl ::after))
-         ::point (+ (sl ::point) n)
-         ::linenumber (+ (sl ::linenumber) linecount))))))
+   (loop [s sl n amount]
+     (if (<= n 0)
+       s
+       (recur (right s) (dec n))))))
 
 (defn set-point
   "Moves point the the given location.
@@ -271,7 +294,7 @@
   aaa|ccc."
   [sl amount]
   (let [tmp (take amount (sl ::before))
-        linecount (count (filter #(= % "\n") tmp))
+        linecount (count (filter is-newline? tmp))
         n (count tmp)]
     (when (= (count (filter list? tmp)) 0) ; Only delete if not hidden
       (assoc sl
@@ -416,7 +439,9 @@
   aaa (aaa (aa)  a|aa
   The first paren start is selected."
   [sl name]
-  (loop [sl0 (-> sl (remove-mark name) (set-mark "mark-paren-curser")) ch (if (= (get-char sl) ")") "" (get-char sl)) level 0]
+  (loop [sl0 (-> sl (remove-mark name) (set-mark "mark-paren-curser"))
+         ch (if (= (get-char sl) ")") "" (get-char sl))
+         level 0]
     (cond (and (= ch "(") (= level 0)) (-> sl0 (set-mark name) (point-to-mark "mark-paren-curser"))
           (beginning? sl0) sl
           :else (recur (left sl0 1)
@@ -431,7 +456,9 @@
   aa (aa (aa|aa(aa))
   The last paren will be selected."
   [sl name]
-  (loop [sl0 (-> sl (remove-mark name) (set-mark "mark-paren-curser")) ch (if (= (get-char sl) "(") "" (get-char sl)) level 0]
+  (loop [sl0 (-> sl (remove-mark name) (set-mark "mark-paren-curser"))
+         ch (if (= (get-char sl) "(") "" (get-char sl))
+         level 0]
     (cond (and (= ch ")") (= level 0)) (-> sl0 right (set-mark name) (point-to-mark "mark-paren-curser"))
           (end? sl0) sl
           :else (recur (right sl0 1)
@@ -635,7 +662,7 @@
 (defn get-content
   "The full content of the slider as text."
   [sl]
-  (apply str (-> sl beginning ::after)))
+  (apply str (map #(if (string? %) % (% :char)) (-> sl beginning ::after))))
 
 (defn take-lines
   "Generate list of lines with

@@ -27,7 +27,7 @@
 
 (defn random-textoperation
   [sl]
-  (let [r (rand-int 10)]
+  (let [r (rand-int 11)]
     (cond (= r 0) (right sl 1)
           (= r 1) (right sl (rand-int 20))
           (= r 2) (left sl 1)
@@ -36,11 +36,24 @@
           (= r 5) (delete sl (rand-int 3))
           (= r 6) (end-of-line sl)
           (= r 7) (beginning sl)
+          (= r 8) (set-meta sl :something "abc")
           :else (insert sl (random-string (rand-int 100))))))
 
 (defn generate
   [n]
   (nth (iterate random-textoperation (create "")) n))
+
+(deftest meta-test
+  (testing "Setting and getting meta data"
+    (let [sl (-> (create "abc\n123") right (set-meta :a "aa") (right 2) (set-meta :b "bb") (left 2))]
+      (is (= (get-char sl) "b"))
+      (is (= (get-meta sl :a) "aa"))
+      (is (= (get-meta sl :non) nil))
+      (is (= (-> sl right get-char) "c"))
+      (is (= (-> sl right (get-meta :a)) nil))
+      (is (= (-> sl (right 2) get-char) "\n"))
+      (is (= (-> sl (right 2) (get-meta :b)) "bb"))
+    )))
 
 (deftest beginning-test
   (testing "Beginning of buffer"
@@ -325,18 +338,17 @@
       (is (= (-> sl (point-to-mark "nonexist") (get-point)) 2)))))
 
   
-   
 (deftest properties-test
   (doseq [n (range 20)]
     (let [sl (generate (rand-int 500))]
       (testing "Point = count before"
         (is (= (get-point sl) (count (sl :dk.salza.liq.slider/before)))))
       (testing "Linenumber = count linebreaks in before + 1"
-        (is (= (get-linenumber sl) (+ (count (filter #(= (str %) "\n") (sl :dk.salza.liq.slider/before))) 1))))
+        (is (= (get-linenumber sl) (+ (count (filter is-newline? (sl :dk.salza.liq.slider/before))) 1))))
       (testing "Totallines = count linebreaks in before and linebreakes after + 1"
         (is (= (sl :dk.salza.liq.slider/totallines)
-               (+ (count (filter #(= (str %) "\n") (sl :dk.salza.liq.slider/before)))
-                  (count (filter #(= (str %) "\n") (sl :dk.salza.liq.slider/after)))
+               (+ (count (filter is-newline? (sl :dk.salza.liq.slider/before)))
+                  (count (filter is-newline? (sl :dk.salza.liq.slider/after)))
                   1))))
       (testing "Insert string -> delete (count string) is invariant"
         (let [len (rand-int 100)
