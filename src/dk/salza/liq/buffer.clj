@@ -97,6 +97,10 @@
   [buffer]
   (buffer ::slider))
 
+(defn set-slider
+  [buffer sl]
+  (assoc buffer ::slider sl))
+
 (defn get-visible-content
   "Not in use yet, since there is no functionality
   for hiding lines, yet."

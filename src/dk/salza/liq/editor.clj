@@ -14,6 +14,7 @@
     ahead.
   "
   (:require [dk.salza.liq.buffer :as buffer]
+            [dk.salza.liq.slider :as slider]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.tools.util :as util]
             [dk.salza.liq.clojureutil :as clojureutil]
@@ -338,6 +339,15 @@
   as output."
   [fun]
   (doto-buffer buffer/apply-to-slider fun)
+  (update-mem-col))
+
+(defn get-slider
+  []
+  (-> (current-buffer) buffer/get-slider))
+
+(defn set-slider
+  [sl]
+  (doto-buffer buffer/set-slider sl)
   (update-mem-col))
 
 (defn get-filename
