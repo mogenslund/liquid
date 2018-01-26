@@ -302,7 +302,7 @@
         ::point (- (sl ::point) n)
         ::linenumber (- (sl ::linenumber) linecount)
         ::totallines (- (sl ::totallines) linecount)
-        ::marks (slide-marks (sl ::marks) (- (sl ::point) n) n)))))
+        ::marks (slide-marks (sl ::marks) (- (sl ::point) n) (* -1 n))))))
 
 (defn wrap
   "Wrap all lines. Cursor will be at end."
