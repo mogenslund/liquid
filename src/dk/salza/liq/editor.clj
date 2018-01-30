@@ -43,6 +43,7 @@
 (def ^:private macro-seq (atom '())) ; Macrofunctionality might belong to input handler.
 (def ^:private macro-record (atom false))
 (def ^:private submap (atom nil))
+(def ^:private tmpmap (atom {})) ; Keymap for shortterm keybindings
 (def ^:private keylist (atom '()))
 
 
@@ -145,6 +146,14 @@
   new buffer is created."
   [keymap]
   (set-setting ::default-keymap keymap))
+
+(defn set-tmp-keymap
+  [keymap]
+  (reset! tmpmap keymap))
+
+(defn drop-tmp-keymap
+  []
+  (set-tmp-keymap {}))
 
 (defn set-default-highlighter
   "Set the highlighter function to be used as
@@ -704,7 +713,8 @@
   if there is a global action for the given keyword
   that will be returned."
   [keyw]
-  (or (buffer/get-action (current-buffer) keyw)
+  (or (@tmpmap keyw)
+      (buffer/get-action (current-buffer) keyw)
       (-> @editor ::global-keymap keyw)))
 
 (defn new-buffer
