@@ -69,9 +69,9 @@
 (defn render-window
   [window buffer]
   (let [cursor-color (buffer/get-action buffer :cursor-color)
-        rows (window ::window/rows)
-        columns (window ::window/columns)
-        towid (str (window ::window/name) "-" (window ::window/buffername))
+        rows (window/get-rows window)
+        columns (window/get-columns window)
+        towid (window/get-towid window buffer)
         tow (or (editor/get-top-of-window towid) 0)
         sl (set-mark (buffer/get-slider buffer) "cursor")
 
@@ -79,7 +79,7 @@
         tmp-tmp-tmp (editor/set-top-of-window towid (get-point sl0))
 
         filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
-        syntaxhighlighter  (or (-> buffer ::buffer/highlighter) (fn [sl face] :plain))
+        syntaxhighlighter  (or (buffer/get-highlighter buffer) (fn [sl face] :plain))
         active (= window (editor/current-window))
         sl1 (apply-syntax-highlight sl0 rows towid cursor-color syntaxhighlighter active)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
@@ -90,8 +90,8 @@
         statusline (conj (map str (seq (subs (format (str "%-" (+ columns 3) "s") statuslinecontent)
                                              0 (+ columns 2)))) {:face :plain :bgface :statusline})
         lines (concat (split-to-lines (sl1 ::slider/after) rows) [statusline])]
-      (map #(hash-map :row (+ %1 (window ::window/top))
-                       :column (window ::window/left)
+      (map #(hash-map :row (+ %1 (window/get-top window))
+                       :column (window/get-left window)
                        :line %2) (range (inc rows)) lines)))
 
 (defn render-screen

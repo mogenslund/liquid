@@ -30,6 +30,22 @@
   [window]
   (window ::name))
 
+(defn get-left
+  [window]
+  (window ::left))
+
+(defn get-top
+  [window]
+  (window ::top))
+
+(defn get-rows
+  [window]
+  (window ::rows))
+
+(defn get-columns
+  [window]
+  (window ::columns))
+
 (defn get-towid
   "Top-of-window id"
   [window buffer]
