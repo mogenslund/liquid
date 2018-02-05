@@ -5,12 +5,18 @@
             [dk.salza.liq.window :as window]
             [dk.salza.liq.editor :as editor]))
 
+(defn- charval
+  [c]
+  (if (string? c)
+    c
+    (or (c :char) "")))
+
 (defn get-first-line
   "Helper returns first rendered line"
   []
   ;(doseq [l (first (render-screen))]
   ;  (println l))
-  (clojure.string/join (filter #(not (map? %)) ((first (first (render-screen))) :line))))
+  (clojure.string/join (map charval ((first (first (render-screen))) :line))))
 
 ;; To simulate editor size: lein run --jframe --no-init-file --rows=7
 (defn reset-editor

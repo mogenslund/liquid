@@ -34,24 +34,8 @@
                            (not (and (= pch "\n") (or (= nextface :string) (= nextbgface :selection)))))
                       (right sl0)
                       (if (and (or (= nextbgface :cursor0) (= nextbgface :cursor1) (= nextbgface :cursor2)) (or (= ch "\n") (end? sl0)))
-                      ;(if (= ch "\n")
-                          (-> sl0
-                            (insert " ")
-                            left
-                            (set-meta :face nextface)
-                            (set-meta :bgface nextbgface)
-                            right
-                            right
-                            ;(insert " ")
-                            )
-                          (-> sl0
-                            (set-meta :face nextface)
-                            (set-meta :bgface nextbgface)
-                            right
-                            )
-                          )
-                        )
-                      ]
+                          (-> sl0 (insert " ") left (set-meta :face nextface) (set-meta :bgface nextbgface) right right)
+                          (-> sl0 (set-meta :face nextface) (set-meta :bgface nextbgface) right)))]
          (recur next
                 (if (or (= ch "\n") (= ch nil)) (inc n) n)
                 nextface
@@ -104,7 +88,7 @@
                                (if (and filename dirty) "  *  " "     ") filename)
         statusline (conj (map str (seq (subs (format (str "%-" (+ columns 3) "s") statuslinecontent)
                                              0 (+ columns 2)))) {:char "L" :face :plain :bgface :statusline})
-        lines (concat (split-to-lines (sl1 ::slider/after) rows) [statusline])]
+        lines (concat (split-to-lines (get-after-list sl1) rows) [statusline])]
       (map #(hash-map :row (+ %1 (window/get-top window))
                       :column (window/get-left window)
                       :line %2) (range (inc rows)) lines)))

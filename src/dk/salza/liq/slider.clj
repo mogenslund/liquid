@@ -125,17 +125,6 @@
   (not (or (and (string? c) (not= c "\n"))
        (and (map? c) (not= (c :char) "\n")))))
 
-(defn- tmp-is-valid-entry!!!
-  "This is a temporary function. Should be removed
-  as soon as nothing depends on it.
-  At the moment the renderer insert tokens
-  into the slider. It should not. To avoid
-  problems while refactoring, this function is used
-  to filter out invalid tokens."
-  [entry]
-  (or (not (map? entry)) (contains? entry :char)))
-
-
 (defn beginning?
   "True if and only if the point is at the
   beginning of the slider."
@@ -155,7 +144,7 @@
   Non strings will be filtered away.
   If there is no result, nil is returned."
   [sl amount]
-  (first (drop (- amount 1) (filter tmp-is-valid-entry!!! (sl ::before)))))
+  (first (drop (- amount 1) (sl ::before))))
 
 (defn look-ahead
   "Returns char after the cursor given amount forward.
@@ -164,13 +153,13 @@
   Non strings will be filtered away.
   If there is no result, nil is returned."
   [sl amount]
-  (first (drop amount (filter tmp-is-valid-entry!!! (sl ::after)))))
+  (first (drop amount (sl ::after))))
 
 (defn string-ahead
   "Returns next amount of chars as string.
   Non string will be filtered away."
   [sl amount]
-  (str/join "" (take amount (filter tmp-is-valid-entry!!! (sl ::after)))))
+  (str/join "" (take amount (sl ::after))))
   
 
 (defn get-point
@@ -610,6 +599,9 @@
          right
          (delete-region "deleteline")))
 
+(defn get-after-list
+  [sl]
+  (sl ::after))
 
 ;; --------------------------
 ;; Top of window calculations
