@@ -7,13 +7,6 @@
             [clojure.string :as str])
   (:use [dk.salza.liq.slider :as slider :exclude [create]]))
 
-(defn insert-token
-  [sl token]
-  (assoc sl
-    ::slider/before (conj (sl ::slider/before) token)
-    ::slider/point (+ (sl ::slider/point) 1)
-    ::slider/marks (slide-marks (sl ::slider/marks) (+ (sl ::slider/point) 0) 1)))
-
 (defn apply-syntax-highlight
   [sl rows towid cursor-color syntaxhighlighter active]
   (loop [sl0 sl n 0 face :plain bgface :plain pch "" ppch ""]
@@ -39,15 +32,27 @@
              next (if (and (= nextface face)
                            (= nextbgface bgface)
                            (not (and (= pch "\n") (or (= nextface :string) (= nextbgface :selection)))))
-                      sl0
+                      (right sl0)
                       (if (and (or (= nextbgface :cursor0) (= nextbgface :cursor1) (= nextbgface :cursor2)) (or (= ch "\n") (end? sl0)))
-                          ;(-> sl0 (insert '(0)) left (set-meta :face nextface) (set-meta :bgface nextbgface) right (insert " "))
-                          ;(-> sl0 (insert '(0)) left (set-meta :face nextface) (set-meta :bgface nextbgface) right)
-                          (insert (insert-token sl0 {:face nextface :bgface nextbgface}) " ")
-                          (insert-token sl0 {:face nextface :bgface nextbgface})
-                        ))
+                      ;(if (= ch "\n")
+                          (-> sl0
+                            (insert " ")
+                            left
+                            (set-meta :face nextface)
+                            (set-meta :bgface nextbgface)
+                            right
+                            right
+                            ;(insert " ")
+                            )
+                          (-> sl0
+                            (set-meta :face nextface)
+                            (set-meta :bgface nextbgface)
+                            right
+                            )
+                          )
+                        )
                       ]
-         (recur (right next 1)
+         (recur next
                 (if (or (= ch "\n") (= ch nil)) (inc n) n)
                 nextface
                 nextbgface
@@ -55,16 +60,24 @@
                 pch
                 )))))
 
+(defn- newline?
+  [c]
+  (if (string? c)
+    (= c "\n")
+    (= (c :char) "\n")))
+  
 (defn split-to-lines
   "Takes a list of chars and splits into
   a list of lists. Splitting where the char
   is a newline character."
   [charlist n]
   (map #(if (empty? (first %)) '("") (first %))
-       (take n (iterate
+       (take n 
+               (iterate
                  (fn [x]
-                   (split-with #(not= % "\n") (rest (second x))))
-                 (split-with #(not= % "\n") charlist)))))
+                   (split-with #(not (newline? %)) (rest (second x))))
+                 (split-with #(not (newline? %)) charlist))
+         )))
 
 ;;; ("a" "\n" "\n" "\n" "b" "c" "\n" "d") ---> (("a") ("") ("") ("b" "c") ("d"))
 
@@ -86,11 +99,11 @@
         sl1 (apply-syntax-highlight sl0 rows towid cursor-color syntaxhighlighter active)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
         dirty (buffer/get-dirty buffer)
-        statuslinecontent (str "L" (format "%-6s" (buffer/get-linenumber buffer))
+        statuslinecontent (str (format "%-6s" (buffer/get-linenumber buffer))
                                timestamp
                                (if (and filename dirty) "  *  " "     ") filename)
         statusline (conj (map str (seq (subs (format (str "%-" (+ columns 3) "s") statuslinecontent)
-                                             0 (+ columns 2)))) {:face :plain :bgface :statusline})
+                                             0 (+ columns 2)))) {:char "L" :face :plain :bgface :statusline})
         lines (concat (split-to-lines (sl1 ::slider/after) rows) [statusline])]
       (map #(hash-map :row (+ %1 (window/get-top window))
                       :column (window/get-left window)

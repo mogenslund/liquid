@@ -65,35 +65,35 @@
           key (str "k" row "-" column)
           oldcontent (@old-lines key)] 
     (when (not= oldcontent content)
-      (let [diff (max 1 (- (count (filter #(and (string? %) (not= % "")) oldcontent))
-                           (count (filter #(and (string? %) (not= % "")) content))))
+      (let [diff (max 1 (- (count oldcontent)
+                           (count content) -1))
             padding (format (str "%" diff "s") " ")]
         (tty-print (str "\033[" row ";" column "H\033[s"))
         (print-color  9 " ")
         (print-color 0)
         (print-color 10)
         (doseq [ch (line :line)]
-          (if (string? ch)
-            (if (= ch "\t") (tty-print (char 172)) (tty-print ch)) 
-            (do
-              (cond (= (ch :face) :string) (print-color 1)
-                    (= (ch :face) :comment) (print-color 2)
-                    (= (ch :face) :green) (print-color 12)  
-                    (= (ch :face) :yellow) (print-color 13)  
-                    (= (ch :face) :red) (print-color 14)  
-                    (= (ch :face) :type1) (print-color 3) ; defn
-                    (= (ch :face) :type2) (print-color 4) ; function
-                    (= (ch :face) :type3) (print-color 5) ; keyword
+          (let [c (if (map? ch) (ch :char) ch)
+                face (when (map? ch) (ch :face))
+                bgface (when (map? ch) (ch :bgface))]
+            (when face
+              (cond (= face :string) (print-color 1)
+                    (= face :comment) (print-color 2)
+                    (= face :green) (print-color 12)  
+                    (= face :yellow) (print-color 13)  
+                    (= face :red) (print-color 14)  
+                    (= face :type1) (print-color 3) ; defn
+                    (= face :type2) (print-color 4) ; function
+                    (= face :type3) (print-color 5) ; keyword
                     :else (print-color 0))
-              (cond (= (ch :bgface) :cursor0) (print-color 10)
-                    (= (ch :bgface) :cursor1) (print-color 6)
-                    (= (ch :bgface) :cursor2) (print-color 7)
-                    (= (ch :bgface) :hl) (print-color 11)
-                    (= (ch :bgface) :selection) (print-color 8)
-                    (= (ch :bgface) :statusline) (print-color 9)
-                    :else (print-color 10))
-              ;(if (= (ch :char) "\t") (tty-print (char 172)) (tty-print (ch :char)))
-            )))
+              (cond (= bgface :cursor0) (print-color 10)
+                    (= bgface :cursor1) (print-color 6)
+                    (= bgface :cursor2) (print-color 7)
+                    (= bgface :hl) (print-color 11)
+                    (= bgface :selection) (print-color 8)
+                    (= bgface :statusline) (print-color 9)
+                    :else (print-color 10)))
+            (if (= c "\t") (tty-print (char 172)) (tty-print c))))
         (if (= row (count (first lineslist)))
           (do
             (tty-print (str "  " padding))

@@ -257,7 +257,10 @@ Brainstorm - editor approach (Maybe not)
   [line]
   (let [key (str "w" (if (= (line :column) 1) "0" "1") "-r" (line :row))
         content (str "<span class=\"bgstatusline\"> </span><span class=\"plain bgplain\">"
-                  (str/join (for [c (line :line)] (if (string? c) c (str "</span><span class=\"" (name (c :face)) " bg" (name (c :bgface)) "\">"))))
+                  (str/join (for [c (line :line)]
+                    (if (string? c)
+                      c
+                      (str "</span><span class=\"" (name (c :face)) " bg" (name (c :bgface)) "\">" (or (c :char) "?")))))
                   "</span>")]
     (str key ":" content)))
     ;(if (= (@old-lines key) content)

@@ -214,19 +214,22 @@
               (loop [c oldcontent offset 0]
                 (when (not-empty c)
                   (let [ch (first c)]
-                    (if (string? ch)
-                      (draw-char g " " row (+ column offset) :plain :plain)
-                      nil)
-                    (recur (rest c) (+ offset (if (string? ch) 1 0))))))
+                    (draw-char g " " row (+ column offset) :plain :plain)
+                    (recur (rest c) (+ offset 1)))))
               (draw-char g " " row (- column 1) :plain :statusline)
               (loop [c content offset 0 color :plain bgcolor :plain]
                 (when (not-empty c)
                   (let [ch (first c)]
+
                     (if (string? ch)
                       (do
                         (draw-char g ch row (+ column offset) color bgcolor)
                         (recur (rest c) (+ offset 1) color bgcolor))
-                     (recur (rest c) offset (ch :face) (ch :bgface)))
+                      (let [nextcolor (or (ch :face) color)
+                            nextbgcolor (or (ch :bgface) bgcolor)]
+                        (draw-char g (or (ch :char) "?") row (+ column offset) nextcolor nextbgcolor)
+                        (recur (rest c) (+ offset 1) nextcolor nextbgcolor)))
+
                     )))))
         (swap! old-lines assoc key content)))))
 
