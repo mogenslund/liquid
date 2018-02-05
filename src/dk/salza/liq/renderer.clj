@@ -41,6 +41,8 @@
                            (not (and (= pch "\n") (or (= nextface :string) (= nextbgface :selection)))))
                       sl0
                       (if (and (or (= nextbgface :cursor0) (= nextbgface :cursor1) (= nextbgface :cursor2)) (or (= ch "\n") (end? sl0)))
+                          ;(-> sl0 (insert '(0)) left (set-meta :face nextface) (set-meta :bgface nextbgface) right (insert " "))
+                          ;(-> sl0 (insert '(0)) left (set-meta :face nextface) (set-meta :bgface nextbgface) right)
                           (insert (insert-token sl0 {:face nextface :bgface nextbgface}) " ")
                           (insert-token sl0 {:face nextface :bgface nextbgface})
                         ))
@@ -91,8 +93,8 @@
                                              0 (+ columns 2)))) {:face :plain :bgface :statusline})
         lines (concat (split-to-lines (sl1 ::slider/after) rows) [statusline])]
       (map #(hash-map :row (+ %1 (window/get-top window))
-                       :column (window/get-left window)
-                       :line %2) (range (inc rows)) lines)))
+                      :column (window/get-left window)
+                      :line %2) (range (inc rows)) lines)))
 
 (defn render-screen
   []
