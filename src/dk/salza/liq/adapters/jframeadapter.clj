@@ -166,7 +166,7 @@
   [line]
   (let [font (if (is-windows) "Consolas" "monospaced")]
     (str "<font face=\"" font "\" color=\"000000\" bgcolor=\"000000\">-</font><font face=\"" font "\" color=\"" (colors :plain) "\" bgcolor=\"" (bgcolors :plain) "\">"
-      (str/join (for [c (line :line)] (if (string? c) (escape c) (str "</span><font face=\"" font "\" color=\"" (colors (c :face)) "\" bgcolor=\""   (bgcolors (c :bgface)) "\">"))))
+      (str/join (for [c (line :line)] (if (string? c) (escape c) (str "</span><font face=\"" font "\" color=\"" (colors (c :face)) "\" bgcolor=\""   (bgcolors (c :bgface)) "\">" (escape (c :char))))))
     "</font>"
   )))
 

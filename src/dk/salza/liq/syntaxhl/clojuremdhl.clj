@@ -8,7 +8,6 @@
         ppch (-> sl (left 2) get-char)] 
     (cond (= face :string)  (cond (and (= pch "\"") (= ppch "\\")) face
                                   (and (= pch "\"") (= ppch "\"")) :plain
-                                  ;(and (= pch "\"") (get-meta (-> sl (left 2)) :face)) :plain
                                   (and (= pch "\"") (re-matches #"[^#\( \[{\n]" ppch)) :plain
                                   (and (= pch "\"") (re-matches #"[\)\]}]" (or ch " "))) :plain
                                   :else face)

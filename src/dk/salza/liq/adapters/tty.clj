@@ -85,7 +85,8 @@
                     (= face :type1) (print-color 3) ; defn
                     (= face :type2) (print-color 4) ; function
                     (= face :type3) (print-color 5) ; keyword
-                    :else (print-color 0))
+                    :else (print-color 0)))
+            (when bgface
               (cond (= bgface :cursor0) (print-color 10)
                     (= bgface :cursor1) (print-color 6)
                     (= bgface :cursor2) (print-color 7)
