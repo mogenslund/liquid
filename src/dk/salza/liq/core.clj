@@ -14,6 +14,7 @@
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.apps.helpapp :as helpapp]
+            [dk.salza.liq.apps.typeaheadapp :as typeaheadapp]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.logging :as logging])
   (:gen-class))
@@ -77,6 +78,9 @@
 
   ;; Default highlighter
   (editor/set-default-highlighter clojuremdhl/next-face)
+
+  ;; Default typeahead function
+  (editor/set-default-typeahead-function typeaheadapp/run)
 
   ;; Default keymap
   (editor/set-default-keymap @textapp/keymap-navigation)

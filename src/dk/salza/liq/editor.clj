@@ -11,8 +11,7 @@
 
     When (forward-char 1) is called, the current buffer will be
     replaced with a new buffer, where the cursor is moved one char
-    ahead.
-  "
+    ahead."
   (:require [dk.salza.liq.buffer :as buffer]
             [dk.salza.liq.slider :as slider]
             [dk.salza.liq.window :as window]
@@ -167,6 +166,14 @@
   until some is set by user or app."
   []
   (setting ::default-highlighter))
+
+(defn set-default-typeahead-function
+  [typeaheadfn]
+  (set-setting ::default-typeahead typeaheadfn))
+
+(defn get-default-typeahead-function
+  []
+  (setting ::default-typeahead))
 
 (defn set-default-app
   "Set the default app to be used when a new
@@ -1096,3 +1103,8 @@
       (insert result)
   ;(->> (get-folder) lsr (flrex (re-pattern search)) (map #(str/join " : " %)) p)
   )))
+
+(defn typeahead
+  [items tostringfun callback]
+  (when-let [typeaheadfn (get-default-typeahead-function)]
+    (typeaheadfn items tostringfun callback)))
