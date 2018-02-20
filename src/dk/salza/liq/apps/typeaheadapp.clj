@@ -69,8 +69,8 @@
 (def keymap
   (merge
     {:cursor-color :blue
-     :C-g editor/previous-buffer
-     :esc editor/previous-buffer
+     :C-g editor/previous-real-buffer
+     :esc editor/previous-real-buffer
      :backspace delete-char
      :C-k next-res
      :down next-res
