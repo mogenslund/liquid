@@ -112,8 +112,8 @@
     {:cursor-color :blue
      :space #(insert " ")
      :backspace delete
-     :C-g editor/previous-buffer
-     :esc editor/previous-buffer
+     :C-g editor/previous-real-buffer
+     :esc editor/previous-real-buffer
      :C-j up
      :left up
      :C-k next-res
@@ -122,6 +122,7 @@
      :up prev-res
      :enter #(execute fun)
      :M-enter #(execute-search fun)
+     :C-space #(execute-search fun)
     }
     (keys/alphanum-mapping insert)
     (keys/symbols-mapping insert)))
