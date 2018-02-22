@@ -67,6 +67,7 @@
                ::default-app nil
                ::searchstring ""
                ::searchpaths '()
+               ::rootfolders '()
                ::files '()
                ::snippets '()
                ::commands '()
@@ -259,13 +260,29 @@
   (add-to-setting ::commands fun) nil)
 
 (defn add-searchpath
-  "Add a folder to searchpath.
+  "Add a folder to searchpaths.
   When using the commandapp files below
   folders in the searchpath will be available
   through typeahead.
   EXAMPLE: (editor/add-searchpath \"/tmp\")"
   [s]
   (add-to-setting ::searchpaths s) nil)
+
+(defn get-searchpaths
+  []
+  (setting ::searchpaths))
+
+(defn add-rootfolder
+  "Add a folder to rootfolders.
+  When using find file app, the rootfolders
+  can be directly accessed through typeahead.
+  EXAMPLE: (editor/add-rootfolder \"/tmp\")"
+  [s]
+  (add-to-setting ::rootfolders s) nil)
+
+(defn get-rootfolders
+  []
+  (setting ::rootfolders))
 
 (defn add-snippet
   "Add a snippet to list of snippets.

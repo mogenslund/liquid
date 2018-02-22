@@ -8,6 +8,12 @@
 
 (def state (atom {}))
 
+(defn expand-home
+  [s]
+  (if (str/starts-with? s "~")
+    (str/replace-first s "~" (System/getProperty "user.home"))
+    s))
+
 (defn reset-state
   [path]
   (swap! state assoc
@@ -19,12 +25,14 @@
 (defn update-display
   []
   (let [pat (re-pattern (str "(?i)" (str/replace (@state ::search) #" " ".*") "[^/]*$"))
+        fullpat (re-pattern (str "(?i)" (str/replace (@state ::search) #" " ".*") ".*$"))
         filterfun (filter #(re-find pat (str %))) ; transducer
         folders (sort-by count (filter #(re-find pat %) (conj (sort-by str/upper-case (fileutil/get-folders (@state ::path))) "..")))
+        rootfolders (sort-by count (filter #(re-find fullpat %) (map expand-home (editor/get-rootfolders))))
         files (sort-by count (filter #(re-find pat %) (sort-by str/upper-case (fileutil/get-files (@state ::path)))))
-        res (concat (map #(str "[" (fileutil/filename %) "]") folders) (map #(str "" (fileutil/filename %) "") files))]
+        res (concat (map #(str "[" (fileutil/filename %) "]") folders) (map #(str "" (fileutil/filename %) "") files) (map #(str "[" % "]") rootfolders))]
     (if (and (@state ::selected) (> (count res) 0))
-      (swap! state assoc ::hit (nth (concat folders files) (min (@state ::selected) (dec (count res)))))
+      (swap! state assoc ::hit (nth (concat folders files rootfolders) (min (@state ::selected) (dec (count res)))))
       (swap! state assoc ::hit (fileutil/file (@state ::path) (@state ::search))))
     (editor/clear)
     (editor/insert (str (fileutil/absolute (@state ::path)) "\n"))
