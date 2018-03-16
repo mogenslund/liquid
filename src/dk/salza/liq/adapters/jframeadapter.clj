@@ -27,6 +27,7 @@
              :red "ff0000"
              :comment "cc8c3c"
              :string "73c936"
+             :stringst "73c936"
              :default "aaaaaa"})
 
 (def bgcolors {:plain "181818"

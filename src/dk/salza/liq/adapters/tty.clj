@@ -78,6 +78,7 @@
                 bgface (when (map? ch) (ch :bgface))]
             (when face
               (cond (= face :string) (print-color 1)
+                    (= face :stringst) (print-color 1)
                     (= face :comment) (print-color 2)
                     (= face :green) (print-color 12)  
                     (= face :yellow) (print-color 13)  

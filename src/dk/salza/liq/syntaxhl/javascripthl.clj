@@ -6,14 +6,11 @@
   (let [ch (get-char sl)
         pch (-> sl left get-char)
         ppch (-> sl (left 2) get-char)] 
-    (cond (= face :string)  (cond (and (= pch "'") (= ppch "\\")) face
-                                  (and (= pch "'") (= ppch "'")) :plain
-                                  ;(and (= pch "'") (not= (-> sl left (get-meta :face)) :string)) :plain
-                                  (and (= pch "'") (re-matches #"[^#\( \[{\n]" ppch)) :plain
-                                  (and (= pch "'") (re-matches #"[\)\]}]" (or ch " "))) :plain
-                                  (and (= pch "'") (or (= ch "+") (= (-> sl right get-char) "+"))) :plain
+    (cond (= face :stringst) :string
+          (= face :string)  (cond (and (= pch "'") (= ppch "\\")) face
+                                  (= pch "'") :plain
                                   :else face)
-          (= face :plain)   (cond (and (= ch "'") (re-matches #"[#\( \[{\n]" pch)) :string
+          (= face :plain)   (cond (and (= ch "'") (not= (get-char (right sl)) "\n")) :stringst
                                   (and (= ch "/") (= (-> sl (right 1) (get-char)) "/")) :comment
                                   (and (= pch "\n") (= ch " ") (= (-> sl (right 1) (get-char)) "*")) :comment
                                   (and (= pch "\n") (= ch "/") (= (-> sl (right 1) (get-char)) "*")) :comment

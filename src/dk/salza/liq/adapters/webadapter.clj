@@ -70,6 +70,10 @@ Brainstorm - editor approach (Maybe not)
         color: #73c936;
       }
 
+      span.stringst {
+        color: #73c936;
+      }
+
       span.bgplain {
         background-color: #181818;
       }

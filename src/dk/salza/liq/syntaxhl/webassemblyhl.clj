@@ -6,12 +6,11 @@
   (let [ch (get-char sl)
         pch (-> sl left get-char)
         ppch (-> sl (left 2) get-char)] 
-    (cond (= face :string)  (cond (and (= pch "\"") (= ppch "\\")) face
-                                  (and (= pch "\"") (= ppch "\"")) :plain
-                                  (and (= pch "\"") (re-matches #"[^#\( \[{\n]" ppch)) :plain
-                                  (and (= pch "\"") (re-matches #"[\)\]}]" (or ch " "))) :plain
+    (cond (= face :stringst) :string
+          (= face :string)  (cond (and (= pch "\"") (= ppch "\\")) face
+                                  (= pch "\"") :plain
                                   :else face)
-          (= face :plain)   (cond (and (= ch "\"") (re-matches #"[#\( \[{\n]" pch)) :string
+          (= face :plain)   (cond (and (= ch "\"") (not= (get-char (right sl)) "\n")) :stringst
                                   (= ch ";") :comment
                                   (and (= ch "#") (or (= pch "\n") (= pch "") (= (get-point sl) 0))) :comment 
                                   (and (= pch "(") (re-find #"func|export" (string-ahead sl 13))) :type1

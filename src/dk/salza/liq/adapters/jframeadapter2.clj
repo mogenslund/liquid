@@ -28,6 +28,7 @@
              :red (java.awt.Color. 255 0 0) ; "ff0000"
              :comment (java.awt.Color. 200 150 50) ; "cc8c3c"
              :string (java.awt.Color. 150 200 50) ; "73c936"
+             :stringst (java.awt.Color. 150 200 50) ; "73c936"
              :default (java.awt.Color. 200 200 200)}) ; "aaaaaa"
 
 (def bgcolors {:plain (java.awt.Color. 30 30 30) ; "181818"
