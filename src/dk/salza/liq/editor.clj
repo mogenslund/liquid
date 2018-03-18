@@ -956,18 +956,18 @@
   (find-next "\n# ")
   (forward-char 1)
   (top-align-page))
-  
+
 (defn goto-definition
   [funname]
-  (if (re-find #"/" funname)
-    (let [[alias funstr] (str/split funname #"/")
-          filepath (clojureutil/get-file-path (clojureutil/get-class-path (current-buffer) alias))]
-      (find-file filepath)
-      (goto-definition funstr))
-  (do
+  (let [[alias funstr] (str/split (if (re-find #"/" funname) funname (str "/" funname)) #"/")
+        cp (if (> (count alias) 0)
+             (clojureutil/get-class-path (current-buffer) alias)
+             (re-find #"[^/\n ]*(?=/)" (with-out-str (clojure.repl/find-doc funstr))))
+        filepath (clojureutil/get-file-path cp)]
+    (find-file filepath)
     (beginning-of-buffer)
-    (find-next (str "(defn " "" funname)))))
-
+    (find-next (str "(defn " "" funstr)))) ;)
+  
 (defn get-available-functions
   []
   (let [content (get-content)]
