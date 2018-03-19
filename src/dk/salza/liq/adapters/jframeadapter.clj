@@ -10,7 +10,7 @@
 (def frame (atom nil))
 (def pane (atom nil))
 (def old-lines (atom {}))
-(def updater (ref (future nil)))
+(def updater (atom (future nil)))
 (def rows (atom 46))
 (def columns (atom 160))
 
@@ -207,12 +207,12 @@
   [key reference old new]
   (remove-watch editor/editor key)
   (when (future-done? @updater)
-    (dosync (ref-set updater
-            (future
-              (loop [u @editor/updates]
-                (view-draw)
-                (when (not= u @editor/updates)
-                  (recur @editor/updates)))))))
+    (reset! updater
+      (future
+        (loop [u @editor/updates]
+          (view-draw)
+          (when (not= u @editor/updates)
+            (recur @editor/updates))))))
   (add-watch editor/updates key view-handler))
 
 (defn model-update

@@ -85,13 +85,12 @@
 
   Most functions in the editor namespace manipulates
   this ref."
-  (ref empty-editor))
+  (atom empty-editor))
 
 (defn reset
   "Resets the editor. Mostly for testing purposes."
   []
-  (dosync
-    (ref-set editor empty-editor)))
+  (reset! editor empty-editor))
 
 (defn updated
   "Call this function to proclaim that an
@@ -133,13 +132,13 @@
   function."
   [keyw entry]
   (when (not (some #{entry} (setting keyw)))
-    (dosync (alter editor update-in [::settings keyw] conj entry))))
+    (swap! editor update-in [::settings keyw] conj entry)))
 
 (defn set-setting
   "Set keyw to value in the
   settings part of the editor." 
   [keyw value]
-  (dosync (alter editor assoc-in [::settings keyw] value)))
+  (swap! editor assoc-in [::settings keyw] value))
 
 (defn set-default-keymap
   "Set the keymap to be used as default when a
@@ -197,15 +196,13 @@
 (defn- doto-buffer
   "Apply the given function to the top-most buffer."
   [fun & args]
-  (dosync
-    (alter editor update ::buffers #(apply doto-first (list* % fun args))))
+  (swap! editor update ::buffers #(apply doto-first (list* % fun args)))
   nil)
 
 (defn- doto-windows
   "Apply the given function to the windowlist."
   [fun & args]
-  (dosync
-    (alter editor update ::windows #(apply fun (list* % args))))
+  (swap! editor update ::windows #(apply fun (list* % args)))
   (request-fullupdate)
   (updated)
   nil)
@@ -213,8 +210,7 @@
 (defn- doto-window
   "Apply the given function to the current."
   [fun & args]
-  (dosync
-    (alter editor update ::windows #(apply doto-first (list* % fun args))))
+  (swap! editor update ::windows #(apply doto-first (list* % fun args)))
   (updated)
   nil)
 
@@ -237,12 +233,11 @@
   It takes a keyword like :f5 and a function
   to call when that key is pressed."
   ([keyw fun]
-   (dosync (alter editor assoc-in [::global-keymap keyw] fun)) nil)
+   (swap! editor assoc-in [::global-keymap keyw] fun) nil)
   ([keyw1 keyw2 fun]
-   (dosync
-     (when (not (editor ::global-keymap keyw1))
-       (alter editor assoc-in [::global-keymap keyw1] {}))
-     (alter editor assoc-in [::global-keymap keyw1 keyw2] fun)) nil))
+     (when (not (@editor ::global-keymap keyw1))
+       (swap! editor assoc-in [::global-keymap keyw1] {}))
+     (swap! editor assoc-in [::global-keymap keyw1 keyw2] fun) nil))
 
 (defn set-eval-function
   "Associate an extension with a function. The function
@@ -251,8 +246,7 @@
            python command):
     (editor/set-eval-function \"py\" #(cshell/cmd \"python\" %))"
   [extension fun]
-  (dosync (alter editor assoc-in [::file-eval extension] fun)) nil)
-
+  (swap! editor assoc-in [::file-eval extension] fun) nil)
 (defn add-command
   "Add a command to be availble for commandapp typeahead.
   add-interactive is in most cases more suitable."
@@ -317,7 +311,7 @@
   It takes as input a window created using
   dk.salza.liq.window/create function."
   ([window]
-   (dosync (alter editor update ::windows conj window)))
+   (swap! editor update ::windows conj window))
   ([name top left rows columns buffername]
    (add-window (window/create name top left rows columns buffername))))
 
@@ -348,12 +342,11 @@
 (defn switch-to-buffer
   "Switch to the buffer with the given name."
   [buffername]
-  (dosync
-    (alter editor update ::buffers bump ::buffer/name buffername)
+  (swap! editor update ::buffers bump ::buffer/name buffername)
     (let [win (get-match (get-windows) ::window/buffername buffername)]
       (if win
-        (alter editor update ::windows bump ::window/buffername buffername)
-        (alter editor update ::windows doto-first assoc ::window/buffername buffername)))))
+        (swap! editor update ::windows bump ::window/buffername buffername)
+        (swap! editor update ::windows doto-first assoc ::window/buffername buffername))))
 
 (defn update-mem-col
   "Stores the current cursor position on the current line.
@@ -652,14 +645,13 @@
     (beginning-of-line)
     (set-top-of-window towid (get-point))))
 
-
 (defn other-window
   "Navigates to the next window and changes
   buffer accordingly."
   []
   (let [buffername (-> @editor ::windows second (window/get-buffername))]
-    (dosync (alter editor update ::windows rotate)
-            (alter editor update ::buffers bump ::buffer/name buffername))))
+    (swap! editor update ::windows rotate)
+    (swap! editor update ::buffers bump ::buffer/name buffername)))
 
 (defn enlarge-window-right
   [amount] 
@@ -749,8 +741,7 @@
   They can be overridden afterwards."
   [name]
   (when (not (get-buffer name))
-    (dosync
-      (alter editor update ::buffers conj (buffer/create name))))
+    (swap! editor update ::buffers conj (buffer/create name)))
   (switch-to-buffer name)
   (set-highlighter (setting ::default-highlighter))
   (set-keymap (setting ::default-keymap)))
@@ -758,9 +749,8 @@
 (defn set-frame-dimensions
   "Setting rows and columns of the window frame."
   [rows columns]
-  (dosync
-    (alter editor assoc ::frame-dimensions {::rows rows ::columns columns}
-                        ::windows '()))
+  (swap! editor assoc ::frame-dimensions {::rows rows ::columns columns}
+                        ::windows '())
   (add-window "scratch" 1 1 (- rows 1) (- columns 3) "scratch")
   (new-buffer "-prompt-")
   (new-buffer "scratch"))
@@ -778,8 +768,7 @@
   [filepath]
   (if (not (get-buffer filepath))
     (do
-      (dosync
-        (alter editor update ::buffers conj (buffer/create-from-file filepath)))
+      (swap! editor update ::buffers conj (buffer/create-from-file filepath))
       (switch-to-buffer filepath)
       (set-keymap (setting ::default-keymap))
       (set-highlighter (setting ::default-highlighter)))
@@ -996,8 +985,7 @@
 
 (defn remove-buffer
   [buffername]
-  (dosync
-    (alter editor update ::buffers remove-item ::buffer/name buffername)))
+  (swap! editor update ::buffers remove-item ::buffer/name buffername))
 
 (defn kill-buffer
   []

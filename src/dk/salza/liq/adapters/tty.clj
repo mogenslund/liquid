@@ -7,7 +7,7 @@
             [clojure.string :as str]))
 
 (def old-lines (atom {}))
-(def updater (ref (future nil)))
+(def updater (atom (future nil)))
 (def sysout (System/out))
 
 (defn tty-print
@@ -116,12 +116,12 @@
   (remove-watch editor/editor key)
   (when (editor/fullupdate?) (reset))
   (when (future-done? @updater)
-    (dosync (ref-set updater
-            (future
-              (loop [u @editor/updates]
-                (view-draw)
-                (when (not= u @editor/updates)
-                  (recur @editor/updates)))))))
+    (reset! updater
+      (future
+        (loop [u @editor/updates]
+          (view-draw)
+          (when (not= u @editor/updates)
+          (recur @editor/updates))))))
   (add-watch editor/updates key view-handler))
 
 (defn model-update
