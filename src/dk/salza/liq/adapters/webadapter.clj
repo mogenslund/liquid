@@ -1,6 +1,5 @@
 (ns dk.salza.liq.adapters.webadapter
   (:require [dk.salza.liq.tools.util :as util]
-            [dk.salza.liq.keys :as keys]
             [dk.salza.liq.renderer :as renderer]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.window :as window]
@@ -140,7 +139,11 @@ Brainstorm - editor approach (Maybe not)
      }
 
      function mapk(letter, ctrl, meta) {
-      if (letter.length >= 2) {letter = letter.toLowerCase();} 
+       if (letter.length >= 2) {letter = letter.toLowerCase();} 
+       if (letter == 'tab') {letter = '\\t';}
+       if (letter == 'enter') {letter = '\\n';}
+       if (letter == 'pagedown') {letter = 'pgdn';}
+       if (letter == 'pageup') {letter = 'pgup';}
        var ctrlstr = '';
        if (ctrl) {
          ctrlstr = 'C-';
@@ -149,49 +152,8 @@ Brainstorm - editor approach (Maybe not)
        if (meta) {
          metastr = 'M-';
        }
-
-       var keymap = new Object();
-       keymap[' '] = 'space';
-       keymap['!'] = 'exclamation';
-       keymap['\"'] = 'quote';
-       keymap['#'] = 'hash';
-       keymap['$'] = 'dollar';
-       keymap['%'] = 'percent';
-       keymap['&'] = 'ampersand';
-       keymap[\"'\"] = 'singlequote';
-       keymap['('] = 'parenstart';
-       keymap[')'] = 'parenend';
-       keymap['*'] = 'asterisk';
-       keymap['+'] = 'plus';
-       keymap[','] = 'comma';
-       keymap['-'] = 'dash';
-       keymap['.'] = 'dot';
-       keymap['/'] = 'slash';
-       keymap[':'] = 'colon';
-       keymap[';'] = 'semicolon';
-       keymap['<'] = 'lt';
-       keymap['='] = 'equal';
-       keymap['>'] = 'gt';
-       keymap['?'] = 'question';
-       keymap['@'] = 'at';
-       keymap['['] = 'bracketstart';
-       keymap[']'] = 'bracketend';
-       keymap['^'] = 'hat';
-       keymap['{'] = 'bracesstart';
-       keymap['_'] = 'underscore';
-       keymap['\\\\'] = 'backslash';
-       keymap['|'] = 'pipe';
-       keymap['}'] = 'bracesend';
-       keymap['~'] = 'tilde';
-       keymap['¤'] = 'curren';
-       keymap['´'] = 'backtick';
-       keymap['Å'] = 'caa';
-       keymap['Æ'] = 'cae';
-       keymap['Ø'] = 'coe';
-       keymap['å'] = 'aa';
-       keymap['æ'] = 'ae';
-       keymap['ø'] = 'oe';
-       return ctrlstr + metastr + (keymap[letter] || letter);
+       if (letter.length == 1) {letter = letter.charCodeAt(0);}
+       return ctrlstr + metastr + letter;
      }
 
      function updategui(evt) {
@@ -208,6 +170,9 @@ Brainstorm - editor approach (Maybe not)
          }
        };
        if (evt) {
+         console.log(JSON.stringify(evt.key));
+         console.log(JSON.stringify(evt.key.charCodeAt(0)));
+         console.log(JSON.stringify(evt.key.charCodeAt(1)));
          xhttp.open(\"GET\", \"key/\" + mapk(evt.key, evt.ctrlKey, evt.altKey), true);
        } else {
          xhttp.open(\"GET\", \"output\", true);
@@ -283,6 +248,12 @@ Brainstorm - editor approach (Maybe not)
 ; (nth "abc" 1)
 ; (int \Z)
 
+(defn str2char
+  [s]
+  (if-let [m (re-matches #"((?:C-)?(?:M-)?)?(\d+)" s)]
+    (str (nth m 1) (char (Integer/parseInt (nth m 2))))
+    s))
+
 (def handler
   (proxy [HttpHandler] []
     (handle
@@ -291,7 +262,7 @@ Brainstorm - editor approach (Maybe not)
             response (cond (= path "/output") (get-output1)
                            ;(= path "/key/tab") (do (deliver @input :tab) (get-output))
                            (re-find #"^/key/" path) (let [num (re-find #"(?<=/key/).*" path)
-                                                          c (keyword num)] 
+                                                          c (str2char num)] 
                                                       (editor/handle-input c)
                                                       (get-output1))
                            :else (html))]

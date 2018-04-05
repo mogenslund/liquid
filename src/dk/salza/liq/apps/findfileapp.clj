@@ -2,7 +2,6 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.keys :as keys]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]))
 
@@ -116,24 +115,22 @@
   
 (defn keymap
   [fun]
-  (merge
-    {:cursor-color :blue
-     :space #(insert " ")
-     :backspace delete
-     :C-g editor/previous-real-buffer
-     :esc editor/previous-real-buffer
-     :C-j up
-     :left up
-     :C-k next-res
-     :down next-res
-     :tab prev-res ; tab and C-i are the same in terminal
-     :up prev-res
-     :enter #(execute fun)
-     :M-enter #(execute-search fun)
-     :C-space #(execute-search fun)
-    }
-    (keys/alphanum-mapping insert)
-    (keys/symbols-mapping insert)))
+  {:cursor-color :blue
+   " " #(insert " ")
+   "backspace" delete
+   "C-g" editor/previous-real-buffer
+   "esc" editor/previous-real-buffer
+   "C-j" up
+   "left" up
+   "C-k" next-res
+   "down" next-res
+   "\t" prev-res ; tab and C-i are the same in terminal
+   "up" prev-res
+   "\n" #(execute fun)
+   "M-\n" #(execute-search fun)
+   "C- " #(execute-search fun)
+   :selfinsert insert
+  })
 
 (defn run
   [fun]

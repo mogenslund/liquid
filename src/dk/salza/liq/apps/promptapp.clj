@@ -1,7 +1,6 @@
 (ns dk.salza.liq.apps.promptapp
   (:require [dk.salza.liq.editor :as editor]
-            [clojure.string :as str]
-            [dk.salza.liq.keys :as keys]))
+            [clojure.string :as str]))
 
 (def state (atom {}))
 
@@ -25,16 +24,14 @@
           (editor/end-of-line)))))
 
 (def keymap
-  (merge
-    {:cursor-color :green
-     :right editor/forward-char
-     :left editor/backward-char
-     :space #(editor/insert " ")
-     :enter process-line
-     :backspace editor/delete
-     :C-g escape}
-    (keys/alphanum-mapping editor/insert)
-    (keys/symbols-mapping editor/insert)))
+  {:cursor-color :green
+   "right" editor/forward-char
+   "left" editor/backward-char
+   " " #(editor/insert " ")
+   "\n" process-line
+   "backspace" editor/delete
+   "C-g" escape
+   :selfinsert editor/insert})
 
 
 (defn run

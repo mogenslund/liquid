@@ -3,7 +3,6 @@
   It needs a list to choose from and a to-string
   function to display and filter the list."
   (:require [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.keys :as keys]
             [dk.salza.liq.coreutil :refer :all]
             [clojure.string :as str]))
 
@@ -67,20 +66,18 @@
   (update-display))
 
 (def keymap
-  (merge
-    {:cursor-color :blue
-     :C-g editor/previous-real-buffer
-     :esc editor/previous-real-buffer
-     :backspace delete-char
-     :C-k next-res
-     :down next-res
-     :tab prev-res ; tab = C-i in termainal!
-     :up prev-res
-     :enter execute
-     :space #(update-search " ")
-     }
-    (keys/alphanum-mapping update-search)
-    (keys/symbols-mapping update-search)))
+  {:cursor-color :blue
+   "C-g" editor/previous-real-buffer
+   "esc" editor/previous-real-buffer
+   "backspace" delete-char
+   "C-k" next-res
+   "down" next-res
+   "\t" prev-res ; tab = C-i in termainal!
+   "up" prev-res
+   "\n" execute
+   " " #(update-search " ")
+   :selfinsert update-search
+   })
   
 
 (defn run

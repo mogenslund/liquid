@@ -3,7 +3,6 @@
             [clojure.string :as str]
             [dk.salza.liq.adapters.tty :as tty]
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
-            [dk.salza.liq.adapters.jframeadapter2 :as jframeadapter2]
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
             [dk.salza.liq.adapters.webadapter :as webadapter]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
@@ -89,27 +88,27 @@
   (editor/set-default-app textapp/run)
 
   ;; Default global keybindings
-  (editor/set-global-key :C-space #(do (editor/request-fullupdate) (commandapp/run)))
-  (editor/set-global-key :C-q editor/quit)
-  (editor/set-global-key :C-M-q editor/force-quit)
-  (editor/set-global-key :C-f #(findfileapp/run editor/find-file))
-  (editor/set-global-key :C-o editor/other-window)
-  (editor/set-global-key :C-r #(editor/prompt-append "test"))
-  (editor/set-global-key :C-h {:info "h: Browse\na: Apropos\nf: Function\nk: Key"
-                               :h #(helpapp/help-browse "index.md")
-                               :a helpapp/help-apropos
-                               :f helpapp/help-function
-                               :k helpapp/help-key})
-  (editor/set-global-key :C-x :C-c editor/quit)
-  (editor/set-global-key :C-x :2 editor/split-window-below)
-  (editor/set-global-key :C-x :3 editor/split-window-right)
-  (editor/set-global-key :C-x :C-f #(findfileapp/run textapp/run))
-  (editor/set-global-key :C-x :o editor/other-window)
-  (editor/set-global-key :C-x :0 editor/delete-window)
-  (editor/set-global-key :C-x :plus (partial editor/enlarge-window-right 5))
-  (editor/set-global-key :C-x :dash (partial editor/shrink-window-right 5))
-  (editor/set-global-key :C-x :down (partial editor/enlarge-window-below 1))
-  (editor/set-global-key :C-x :up (partial editor/shrink-window-below 1))
+  (editor/set-global-key "C- " #(do (editor/request-fullupdate) (commandapp/run)))
+  (editor/set-global-key "C-q" editor/quit)
+  (editor/set-global-key "C-M-q" editor/force-quit)
+  (editor/set-global-key "C-f" #(findfileapp/run editor/find-file))
+  (editor/set-global-key "C-o" editor/other-window)
+  (editor/set-global-key "C-r" #(editor/prompt-append "test"))
+  (editor/set-global-key "C-h" {:info "h: Browse\na: Apropos\nf: Function\nk: Key"
+                               "h" #(helpapp/help-browse "index.md")
+                               "a" helpapp/help-apropos
+                               "f" helpapp/help-function
+                               "k" helpapp/help-key})
+  (editor/set-global-key "C-x" "C-c" editor/quit)
+  (editor/set-global-key "C-x" "2" editor/split-window-below)
+  (editor/set-global-key "C-x" "3" editor/split-window-right)
+  (editor/set-global-key "C-x" "C-f" #(findfileapp/run textapp/run))
+  (editor/set-global-key "C-x" "o" editor/other-window)
+  (editor/set-global-key "C-x" "0" editor/delete-window)
+  (editor/set-global-key "C-x" "+" (partial editor/enlarge-window-right 5))
+  (editor/set-global-key "C-x" "/" (partial editor/shrink-window-right 5))
+  (editor/set-global-key "C-x" "down" (partial editor/enlarge-window-below 1))
+  (editor/set-global-key "C-x" "up" (partial editor/shrink-window-below 1))
 
 
   ;; Default interactive functions
@@ -224,8 +223,7 @@
     (let [usetty (or (read-arg args "--tty")
                      (not (or (read-arg args "--server")
                               (read-arg args "--ghost")
-                              (read-arg args "--jframe")
-                              (read-arg args "--jf2"))))
+                              (read-arg args "--jframe"))))
           rows (or (read-arg-int args "--rows=")
                    (and usetty (not (is-windows)) (tty/rows))
                    40)
@@ -250,7 +248,7 @@
           ;; JFrame is used on Windows
           (when usetty
             (if (is-windows)
-              (jframeadapter2/init rows columns)
+              (jframeadapter/init rows columns)
               (do
                 (tty/view-init)
                 (tty/input-handler))))
@@ -259,9 +257,7 @@
           (when (or (read-arg args "--web") (read-arg args "--server"))
             (((webadapter/adapter rows columns autoupdate) :init) port))
           (when (read-arg args "--jframe")
-            (jframeadapter2/init rows columns :font-size fontsize))
-          (when (read-arg args "--jf2")
-            (jframeadapter/init rows columns))
+            (jframeadapter/init rows columns :font-size fontsize))
 
           ;; Post that the editor has updated, to make view update
           (editor/updated))))

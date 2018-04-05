@@ -8,16 +8,9 @@
   [& syms]
   (doseq [s syms]
     (Thread/sleep 20)
-    (if (string? s)
-      (doseq [c s] (ghostadapter/send-input
-                     (cond (= (str c) " ") :space
-                           (= (str c) "(") :parenstart
-                           (= (str c) ")") :parenend
-                           (= (str c) "[") :bracketstart
-                           (= (str c) "]") :bracketend
-                           :else (keyword (str c)))))
-      (ghostadapter/send-input s)))
-  (ghostadapter/send-input :empty))
+    (if (re-matches #"(C-)?(M-)?\w" s)
+      (ghostadapter/send-input s)
+      (doseq [c s] (ghostadapter/send-input (str c))))))
 
 (defn- short-screen-notation
   "This function takes the lines which are created
@@ -64,7 +57,7 @@
   [input expected]
   (let [program (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=190"))]
     (Thread/sleep 100)
-    (send-input "ggvGdd" :tab) ; Clearing screen. Ready to type
+    (send-input "ggvGdd" "\t") ; Clearing screen. Ready to type
     (apply send-input input)
     (Thread/sleep 100)
     ;(while (not (empty? @ghostadapter/input)) (Thread/sleep 10))
@@ -75,12 +68,12 @@
 
 (deftest defn-highlight
   (testing "Checking highlight of defn"
-    (screen-check [" (defn myfun" :enter " []" :enter " (do))"]
+    (screen-check [" (defn myfun" "\n" " []" "\n" " (do))"]
                   "¤44 (¤1Pdefn¤2P myfun¤BR¤44¤PP []¤BR¤44 (do))"))) 
 
 (deftest reproduce-findfile-slash
   (testing "Reproduce error when typing /a in findfile mode"
-    (screen-check [:C-o :C-f :slash :a]
+    (screen-check ["C-o" "C-f" "/" "a"]
                   "findfile")))
 
 ; (deftest temporary

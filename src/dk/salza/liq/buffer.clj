@@ -380,8 +380,8 @@
   "If the keymap has an action (function)
   for the given keyword, it will be returned."
   [buffer keyw]
-  (when (-> buffer ::keymap)
-    (-> buffer ::keymap keyw)))
+  (when (buffer ::keymap)
+    ((buffer ::keymap) keyw)))
 
 (defn end-of-buffer?
   "Return true if the cursor is at the

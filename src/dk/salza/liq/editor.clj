@@ -235,7 +235,7 @@
   ([keyw fun]
    (swap! editor assoc-in [::global-keymap keyw] fun) nil)
   ([keyw1 keyw2 fun]
-     (when (not (@editor ::global-keymap keyw1))
+     (when (not ((@editor ::global-keymap) keyw1))
        (swap! editor assoc-in [::global-keymap keyw1] {}))
      (swap! editor assoc-in [::global-keymap keyw1 keyw2] fun) nil))
 
@@ -731,7 +731,7 @@
   [keyw]
   (or (@tmpmap keyw)
       (buffer/get-action (current-buffer) keyw)
-      (-> @editor ::global-keymap keyw)))
+      ((@editor ::global-keymap) keyw)))
 
 (defn new-buffer
   "Create a new buffer with the given name.
@@ -1044,15 +1044,19 @@
 (defn handle-input
   [keyw]
   (swap! keylist conj keyw)
-  (when (and @macro-record (not= keyw :H))
+  (when (and @macro-record (not= keyw "H"))
     (swap! macro-seq conj keyw))
-  (let [action (if @submap (@submap keyw) (get-action keyw))]
+  (let [action (if @submap (@submap keyw) (get-action keyw))
+        selfins (when (not action) (if @submap (@submap :selfinsert) (get-action :selfinsert)))]
     (cond (map? action) (do
                           (when (and (action :info) (setting ::key-info))
                                 (prompt-set (action :info)))
                           (reset! submap action))
           action (do (reset! submap nil)
                      (action))
+          (and selfins (= (count keyw) 1))
+                 (do (reset! submap nil)
+                    (selfins keyw))
           :else (reset! submap nil))
     (updated)))
 

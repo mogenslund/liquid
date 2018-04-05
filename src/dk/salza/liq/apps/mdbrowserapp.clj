@@ -15,44 +15,44 @@
 
 (def keymap
   {:cursor-color :blue
-   :M editor/prompt-to-tmp
-   :enter #(@navigate)
-   :tab #(editor/find-next "[")
-   :space #(editor/forward-page)
-   :right editor/forward-char
-   :left editor/backward-char
-   :up editor/backward-line
-   :down editor/forward-line
-   :C-s #(promptapp/run editor/find-next '("SEARCH"))
-   :v editor/selection-toggle
-   :g {:g editor/beginning-of-buffer
-       :t editor/top-align-page
-       :n editor/top-next-headline
-       :c #(editor/prompt-append (str "--" (editor/get-context) "--"))
-       :i dk.salza.liq.extensions.headlinenavigator/run
-       :l dk.salza.liq.extensions.linenavigator/run}
-   :dash editor/top-next-headline
-   :C-g editor/escape
-   :esc editor/escape
-   :e editor/eval-last-sexp
-   :E editor/evaluate-file
-   :C-e editor/evaluate-file-raw
-   :l editor/forward-char
-   :j editor/backward-char
-   :i editor/backward-line
-   :k editor/forward-line
-   :J editor/beginning-of-line
-   :G editor/end-of-buffer
-   :L editor/end-of-line
-   :m editor/previous-real-buffer 
-   :n editor/find-next
-   :O editor/context-action
-   :w editor/forward-word
-   :1 editor/highlight-sexp-at-point
-   :2 editor/select-sexp-at-point
-   :y {:y #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))}
-   :C-w editor/kill-buffer
-   :C-t (fn [] (editor/tmp-test))
+   "M" editor/prompt-to-tmp
+   "\n" #(@navigate)
+   "\t" #(editor/find-next "[")
+   " " #(editor/forward-page)
+   "right" editor/forward-char
+   "left" editor/backward-char
+   "up" editor/backward-line
+   "down" editor/forward-line
+   "C-s" #(promptapp/run editor/find-next '("SEARCH"))
+   "v" editor/selection-toggle
+   "g" {"g" editor/beginning-of-buffer
+       "t" editor/top-align-page
+       "n" editor/top-next-headline
+       "c" #(editor/prompt-append (str "--" (editor/get-context) "--"))
+       "i" dk.salza.liq.extensions.headlinenavigator/run
+       "l" dk.salza.liq.extensions.linenavigator/run}
+   "/" editor/top-next-headline
+   "C-g" editor/escape
+   "esc" editor/escape
+   "e" editor/eval-last-sexp
+   "E" editor/evaluate-file
+   "C-e" editor/evaluate-file-raw
+   "l" editor/forward-char
+   "j" editor/backward-char
+   "i" editor/backward-line
+   "k" editor/forward-line
+   "J" editor/beginning-of-line
+   "G" editor/end-of-buffer
+   "L" editor/end-of-line
+   "m" editor/previous-real-buffer 
+   "n" editor/find-next
+   "O" editor/context-action
+   "w" editor/forward-word
+   "1" editor/highlight-sexp-at-point
+   "2" editor/select-sexp-at-point
+   "y" {"y" #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))}
+   "C-w" editor/kill-buffer
+   "C-t" (fn [] (editor/tmp-test))
    })
 
 (defn markdown-link

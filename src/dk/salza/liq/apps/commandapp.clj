@@ -1,6 +1,5 @@
 (ns dk.salza.liq.apps.commandapp
   (:require [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.keys :as keys]
             [dk.salza.liq.tools.cshell :as cs]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.textapp :as textapp]
@@ -117,21 +116,19 @@
   (update-display))
 
 (def keymap
-  (merge
-    {:cursor-color :blue
-     :C-g editor/previous-buffer
-     :C-space function-typeahead
-     :esc editor/previous-buffer
-     :backspace delete-char
-     :C-k next-res
-     :down next-res
-     :tab prev-res ; tab = C-i in termainal!
-     :up prev-res
-     :enter execute
-     :space #(update-search " ")
-    }
-    (keys/alphanum-mapping update-search)
-    (keys/symbols-mapping update-search)))
+  {:cursor-color :blue
+   "C-g" editor/previous-buffer
+   "C- " function-typeahead
+   "esc" editor/previous-buffer
+   "backspace" delete-char
+   "C-k" next-res
+   "down" next-res
+   "\t" prev-res ; tab = C-i in termainal!
+   "up" prev-res
+   "\n" execute
+   " " #(update-search " ")
+   :selfinsert update-search
+  })
 
 (defn run
   []
