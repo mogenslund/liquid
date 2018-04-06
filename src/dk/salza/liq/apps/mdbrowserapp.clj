@@ -3,7 +3,6 @@
             [dk.salza.liq.buffer :as buffer]
             [dk.salza.liq.slider :refer :all]
             [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.keys :as keys]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
