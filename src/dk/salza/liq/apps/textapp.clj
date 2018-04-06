@@ -42,7 +42,7 @@
        "c" #(editor/prompt-append (str "--" (editor/get-context) "--"))
        "i" dk.salza.liq.extensions.headlinenavigator/run
        "l" dk.salza.liq.extensions.linenavigator/run}
-   "/" editor/top-next-headline
+   "-" editor/top-next-headline
    "C-g" editor/escape
    "esc" editor/escape
    "e" editor/eval-last-sexp

@@ -69,63 +69,6 @@
 (def fontwidth (atom 8))
 (def fontheight (atom 18))
 
-(defn event2keyword
-  [e]
-  (let [ch (str (.getKeyChar e))
-        code (re-find #"(?<=primaryLevelUnicode=)\d+" (.paramString e))
-        rawcode (re-find #"(?<=rawCode=)\d+" (.paramString e))]
-    (logging/log
-      "KEYCHAR:   " ch "\n"
-      "CTRL:      " (.isControlDown e) "\n"
-      "CODE:      " code "\n"
-      "RAW CODE:  " rawcode "\n"
-      "PARAM STR: " (.paramString e)) ; ,primaryLevelUnicode=108
-    (cond (= (.getModifiers e) InputEvent/CTRL_MASK)
-                             (cond (= code "102") "C-f"
-                                   (= code "103") "C-g"
-                                   (= code "106") "C-j"
-                                   (= code "107") "C-k"
-                                   (= code "108") "C-l"
-                                   (= code "111") "C-o"
-                                   (= code "113") "C-q"
-                                   (= code "115") "C-s"
-                                   (= code "116") "C-t"
-                                   (= code "117") "C-u"
-                                   (= code "118") "C-v"
-                                   (= code "119") "C-w"
-                                   (= code "120") "C-x"
-                                   (= code "32") "C- "
-                                   :else :unknown)
-          (= (.getModifiers e) InputEvent/META_MASK)
-                                   (cond (= code "10") "M-\n"
-                                   (= code "97") "M-a"
-                                   (= code "98") "M-b"
-                                   :else :unknown)
-          (re-matches #"[a-zA-Z0-9]" ch) ch
-          (= rawcode "110") "home"
-          (= rawcode "111") "up"
-          (= rawcode "115") "end"
-          (= rawcode "116") "down"
-          (= rawcode "113") "left"
-          (= rawcode "114") "right"
-          (= rawcode "117") "pgdn"
-          (= rawcode "112") "pgup"
-          (= rawcode "67") "f1"
-          (= rawcode "68") "f2"
-          (= rawcode "69") "f3"
-          (= rawcode "70") "f4"
-          (= rawcode "71") "f5"
-          (= rawcode "72") "f6"
-          (= rawcode "73") "f7"
-          (= rawcode "74") "f8"
-          (= rawcode "75") "f9"
-          (= rawcode "76") "f10"
-          (= rawcode "95") "f11"
-          (= rawcode "96") "f12"
-          (= code "27") "esc"
-          (= code "8") "backspace"
-          (not= code "0") ch)))
-
 (defn view-draw
   []
   (.repaint @panel))
@@ -160,14 +103,9 @@
 (defn draw
   [g]
   (let [lineslist (renderer/render-screen)]
-    ;(println lineslist)
     (.setFont g @font)
     (when (editor/fullupdate?)
       (reset! old-lines {})
-     ; (.setRenderingHints g (java.awt.RenderingHints.
-     ;                         java.awt.RenderingHints/KEY_TEXT_ANTIALIASING
-     ;                         java.awt.RenderingHints/VALUE_TEXT_ANTIALIAS_ON))
-
       (.setColor g (bgcolors :plain))
       (.fillRect g 0 0 1600 900))
     (doseq [line (apply concat lineslist)]
@@ -200,6 +138,32 @@
                     )))))
         (swap! old-lines assoc key content)))))
 
+(defn handle-keydown
+  [e]
+  (let [code (.getExtendedKeyCode e)
+        raw (int (.getKeyChar e))
+        ctrl (when (.isControlDown e) "C-")
+        alt (when (or (.isAltDown e) (.isMetaDown e)) "M-")
+        key (cond (<= 112 code 123) (str ctrl alt "f" (- code 111))
+                  (> raw 40000) (cond 
+                                  (= code 36) "home"
+                                  (= code 35) "end"
+                                  (= code 34) "pgdn"
+                                  (= code 33) "pgup"
+                                  (= code 37) "left"
+                                  (= code 39) "right"
+                                  (= code 38) "up"
+                                  (= code 40) "down")
+                  (and ctrl (= raw 32)) "C- "
+                  ctrl (str ctrl alt (char (+ raw 96)))
+                  alt (str ctrl alt (char raw))
+                  (= raw 127) "backspace" 
+                  (>= raw 32) (str (char raw))
+                  (= raw 9) "\t"
+                  (= raw 10) "\n"
+                  true (str (char raw)))]
+    (when key (model-update key))))
+
 (defn init
   [rowcount columncount & {:keys [font-size]}]
   (when font-size (reset! fontsize font-size))
@@ -227,7 +191,7 @@
         (.setFocusTraversalKeysEnabled false)
         (.addKeyListener
           (proxy [KeyListener] []
-            (keyPressed [e] (model-update (event2keyword e)))
+            (keyPressed [e] (handle-keydown e))
             (keyReleased [e] (do))
             (keyTyped [e] (do))))
         (.setIconImage (when icon (.getImage (ImageIcon. icon))))

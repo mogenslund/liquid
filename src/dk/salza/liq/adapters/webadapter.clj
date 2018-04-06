@@ -8,33 +8,7 @@
            [java.net InetSocketAddress]
            [com.sun.net.httpserver HttpExchange HttpHandler HttpServer]))
 
-(comment "
-
-Brainsstorm
------------
-
-1. m pressed in browser
-2. Ajax call to liquid with /key/m (or /key/77)
-3. Deliver :m to input promise  
-4. wait-for-input reads input promise
-5. (editor executes)
-6. print-lines delivers delta lines to output promise
-7. Ajax call returns output promise
-
-
-
-Brainstorm - editor approach (Maybe not)
-1. m pressed in browser
-2. Ajax call to liquid with /key/m (or /key/77)
-3. call editor/handle-input :m
-
-
-
-")
-
 (def server (atom nil))
-;(def output (atom (promise)))
-;; (def outputchanges (clojure.lang.PersistentQueue/EMPTY))
 (def input (atom (promise)))
 (def dimensions (atom {:rows 40 :columns 80}))
 (def autoupdate (atom false))
@@ -49,53 +23,18 @@ Brainstorm - editor approach (Maybe not)
         color: #e4e4ef
       }
 
-      span.type1 {
-        color: #ffdd33;
-      }
-
-      span.type2 {
-        color: #95a99f;
-      }
-
-      span.type3 {
-        color: #ffdd33;
-      }
-
-      span.comment {
-        color: #cc8c3c;
-      }
-
-      span.string {
-        color: #73c936;
-      }
-
-      span.stringst {
-        color: #73c936;
-      }
-
-      span.bgplain {
-        background-color: #181818;
-      }
-
-      span.bgcursor1 {
-        background-color: green;
-      }
-
-      span.bgcursor2 {
-        background-color: blue;
-      }
-
-      span.bghl {
-        background-color: yellow;
-      }
-
-      span.bgselection {
-        background-color: purple;
-      }
-
-      span.bgstatusline {
-        background-color: #000000;
-      }
+      span.type1 {color: #ffdd33;}
+      span.type2 {color: #95a99f;}
+      span.type3 {color: #ffdd33;}
+      span.comment {color: #cc8c3c;}
+      span.string {color: #73c936;}
+      span.stringst {color: #73c936;}
+      span.bgplain {background-color: #181818;}
+      span.bgcursor1 {background-color: green;}
+      span.bgcursor2 {background-color: blue;}
+      span.bghl {background-color: yellow;}
+      span.bgselection {background-color: purple;}
+      span.bgstatusline {background-color: #000000;}
 
       div.row {
         font-family: monospace;
@@ -129,62 +68,64 @@ Brainstorm - editor approach (Maybe not)
   []
   (str "
 
+   function updateLine(line) {
+     var parts = line.match(/(w\\d+-r\\d+):(.*)/);
+     if (document.getElementById(parts[1]).innerHTML != parts[2]) {
+       document.getElementById(parts[1]).innerHTML = parts[2];
+     }
+   }
+
+   function mapk(letter, ctrl, meta) {
+     if (letter.length >= 2) {letter = letter.toLowerCase();} 
+     if (letter == 'tab') {letter = '\\t';}
+     if (letter == 'enter') {letter = '\\n';}
+     if (letter == 'pagedown') {letter = 'pgdn';}
+     if (letter == 'pageup') {letter = 'pgup';}
+     var ctrlstr = '';
+     if (ctrl) {
+       ctrlstr = 'C-';
+     }
+     var metastr = '';
+     if (meta) {
+       metastr = 'M-';
+     }
+     if (letter.length == 1) {letter = letter.charCodeAt(0);}
+     return ctrlstr + metastr + letter;
+   }
+
    var xhttp = new XMLHttpRequest();
+
+   xhttp.onreadystatechange = function() {
+     if (this.readyState == 4 && this.status == 200) {
+       this.responseText.split('\\n').forEach(updateLine)
+     }
+   };
+
+   function updategui(evt) {
+     if (evt) {
+       evt.preventDefault();
+       evt.stopPropagation();
+     }
+     xhttp.abort();
+
+     if (evt) {
+       xhttp.open(\"GET\", \"key/\" + mapk(evt.key, evt.ctrlKey, evt.altKey), true);
+     } else {
+       xhttp.open(\"GET\", \"output\", true);
+     }
+     xhttp.send();
+   }
+
+   document.onkeydown = updategui;
+
+   " (when @autoupdate "setInterval(() => updategui(false), 20);") "
+   updategui(false);
+
    function init() {
-     function updateLine(line) {
-       var parts = line.match(/(w\\d+-r\\d+):(.*)/);
-       if (document.getElementById(parts[1]).innerHTML != parts[2]) {
-         document.getElementById(parts[1]).innerHTML = parts[2];
-       }
-     }
 
-     function mapk(letter, ctrl, meta) {
-       if (letter.length >= 2) {letter = letter.toLowerCase();} 
-       if (letter == 'tab') {letter = '\\t';}
-       if (letter == 'enter') {letter = '\\n';}
-       if (letter == 'pagedown') {letter = 'pgdn';}
-       if (letter == 'pageup') {letter = 'pgup';}
-       var ctrlstr = '';
-       if (ctrl) {
-         ctrlstr = 'C-';
-       }
-       var metastr = '';
-       if (meta) {
-         metastr = 'M-';
-       }
-       if (letter.length == 1) {letter = letter.charCodeAt(0);}
-       return ctrlstr + metastr + letter;
-     }
-
-     function updategui(evt) {
-       if (evt) {
-         evt.preventDefault();
-         evt.stopPropagation();
-         //document.getElementById(\"tmp\").innerHTML = evt.which + ' ' + evt.ctrlKey + ' ' + evt.altKey + ' ' + evt.shiftKey + ' ' + evt.key;
-       }
-       xhttp.abort();
-       xhttp.onreadystatechange = function() {
-         if (this.readyState == 4 && this.status == 200) {
-           this.responseText.split('\\n').forEach(updateLine)
-           //document.getElementById(\"w0-r4\").innerHTML = this.responseText;
-         }
-       };
-       if (evt) {
-         console.log(JSON.stringify(evt.key));
-         console.log(JSON.stringify(evt.key.charCodeAt(0)));
-         console.log(JSON.stringify(evt.key.charCodeAt(1)));
-         xhttp.open(\"GET\", \"key/\" + mapk(evt.key, evt.ctrlKey, evt.altKey), true);
-       } else {
-         xhttp.open(\"GET\", \"output\", true);
-       }
-       xhttp.send();
-     }
-
-     document.onkeydown = updategui;
-     " (when @autoupdate "setInterval(() => updategui(false), 20);") "
-     updategui(false);
+    
      
-     }"))
+   }"))
 
 
 (defn row
@@ -195,8 +136,6 @@ Brainstorm - editor approach (Maybe not)
   []
   (str "<html><head><style>" style "</style><script type=\"text/javascript\">" (javascript) "</script></head>"
        "  <body onload=\"init();\">"
-       ;"a "
-       ;(System/currentTimeMillis)
        "<table><tr>"
        "<td>" (str/join "\n" (map #(row 0 %) (range 1 (inc (@dimensions :rows))))) "</td>"
        "<td>" (str/join "\n" (map #(row 1 %) (range 1 (inc (@dimensions :rows))))) "</td>"
@@ -204,21 +143,6 @@ Brainstorm - editor approach (Maybe not)
        "<div id=\"tmp\"></div>"
        "</body></html>"))
 
-; java -cp /home/molu/resources/clojure-1.8.0.jar:/home/molu/m/lib2  clojure.main -m dk.salza.liqscratch.server
-; (slurp "http://localhost:8520")
-; http://www.rgagnon.com/javadetails/java-have-a-simple-http-server.html
-; http://unixpapa.com/js/key.html
-
-;(defn get-output
-;  []
-;  (let [out @@output]
-;    (println out)
-;    (reset! output (promise))
-;    (str/join "<br />" out)))
-
-;(let [path "/key/74"
-;      num (Integer/parseInt (re-find #"(?<=/key/)\d+" path))]
-;  (if num (keyword (str (char (+ num 32))))))
 
 (def old-lines (atom {}))
 
@@ -232,10 +156,6 @@ Brainstorm - editor approach (Maybe not)
                       (str "</span><span class=\"" (name (c :face)) " bg" (name (c :bgface)) "\">" (or (c :char) "?")))))
                   "</span>")]
     (str key ":" content)))
-    ;(if (= (@old-lines key) content)
-    ;  ""
-    ;  (do (swap! old-lines assoc key content)
-    ;      (str key ":" content)))))
 
 
 (defn get-output1
@@ -243,10 +163,6 @@ Brainstorm - editor approach (Maybe not)
   (let [lineslist (renderer/render-screen)]
         (str/join "\n" 
           (filter #(not= "" %) (pmap convert-line (apply concat lineslist))))))
-
-; (numkey2keyword "1110064") -> C-a
-; (nth "abc" 1)
-; (int \Z)
 
 (defn str2char
   [s]
@@ -260,17 +176,16 @@ Brainstorm - editor approach (Maybe not)
       [exchange]
       (let [path (.getPath (.getRequestURI exchange))
             response (cond (= path "/output") (get-output1)
-                           ;(= path "/key/tab") (do (deliver @input :tab) (get-output))
                            (re-find #"^/key/" path) (let [num (re-find #"(?<=/key/).*" path)
                                                           c (str2char num)] 
                                                       (editor/handle-input c)
-                                                      (get-output1))
+                                                      (get-output1)
+                                                      )
                            :else (html))]
         (.sendResponseHeaders exchange 200 (count (.getBytes response)))
         (let [ostream (.getResponseBody exchange)]
           (.write ostream (.getBytes response))
           (.close ostream)))
-      ;(reset! output (promise))
       )))
 
 (defn quit
@@ -292,26 +207,10 @@ Brainstorm - editor approach (Maybe not)
     (println "Input" r)
     (reset! input (promise))
     r))
-  ;(let [r (read-line)]
-  ;  :i))
-
-(comment 
-; {:column 44, :row 1, :line '( {:face :type1, :bgface :plain} "d" "e" "f" "n" {:face :type2, :bgface :plain} " " "m" "y" "f" "u" "n")}
-; -> "w1-r1:<span class=\"type1 bg-plain\">defn</span><span class=\"type2 bg-plain\">&nbsp;myfun</span>"
-)
-
-
-; (convert-line {:column 44, :row 1, :line '({:face :type1, :bgface :plain} "d" "e" "f" "n" {:face :type2, :bgface :plain} " " "m" "y" "f" "u" "n")})
 
 (defn print-lines
   [lines]
   )
-  ;(deliver @output
-  ;        (map convert-line lines)))
-
-
-;  (let [simple (clojure.string/join "\n" (map #(clojure.string/join "" (filter string? (% :line))) lines))]
-;    (reset! output (str "<pre>" simple "</pre>"))))
 
 (defn adapter
   [rows columns auto]
