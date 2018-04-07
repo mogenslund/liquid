@@ -157,8 +157,9 @@
                   (and ctrl (= raw 32)) "C- "
                   ctrl (str ctrl alt (char (+ raw 96)))
                   alt (str ctrl alt (char raw))
-                  (= raw 127) "backspace" 
+                  (= raw 127) "delete" 
                   (>= raw 32) (str (char raw))
+                  (= raw 8) "backspace"
                   (= raw 9) "\t"
                   (= raw 10) "\n"
                   true (str (char raw)))]
