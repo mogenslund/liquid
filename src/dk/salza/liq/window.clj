@@ -58,7 +58,7 @@
   [windowlist amount]
   (let [w0 (first windowlist)
         wn (rest windowlist)
-        absolute (if (int? amount)
+        absolute (if (integer? amount)
                      amount
                      (- (int (* (w0 ::columns) amount)) 1))]
     (conj wn
@@ -76,7 +76,7 @@
   [windowlist amount]
   (let [w0 (first windowlist)
         wn (rest windowlist)
-        absolute (if (int? amount)
+        absolute (if (integer? amount)
                      amount
                      (- (int (* (w0 ::rows) amount)) 1))]
     (conj wn
