@@ -123,7 +123,7 @@
 ;; http://ascii-table.com/ansi-escape-sequences.php
 (defn raw2keyword
   [raw]
-  (if (int? raw)
+  (if (integer? raw)
     (cond (= raw 127) "backspace"
           (>= raw 32) (str (char raw))
           (= raw 9) "\t"
