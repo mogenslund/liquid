@@ -4,3 +4,4 @@ target
 .cpcache
 *~
 .lein-failures
+.lein-repl-history
