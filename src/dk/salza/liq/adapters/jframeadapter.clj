@@ -7,7 +7,7 @@
             [clojure.string :as str]
             [clojure.java.io :as io])
   (:import [java.awt Font Color GraphicsEnvironment Dimension]
-           [java.awt.event InputEvent KeyListener]
+           [java.awt.event InputEvent KeyListener ComponentListener]
            [java.awt.image BufferedImage]
            [javax.swing JFrame ImageIcon JPanel]))
 
@@ -205,7 +205,18 @@
     (Thread/sleep 400)
     (editor/request-fullupdate)
     (editor/updated)
-    (view-draw)))
+    (view-draw)
+    (.addComponentListener @frame
+      (proxy [ComponentListener] []
+        (componentShown [c])
+        (componentMoved [c])
+        (componentHidden [c])
+        (componentResized [c]
+          (editor/set-frame-dimensions (quot (.getHeight @panel) @fontheight) (quot (.getWidth @panel) @fontwidth))
+          (editor/split-window-right 0.22)
+          (editor/switch-to-buffer "-prompt-")
+          (editor/other-window)
+          (editor/request-fullupdate))))))
 
 (defn jframequit
   []
