@@ -212,11 +212,15 @@
         (componentMoved [c])
         (componentHidden [c])
         (componentResized [c]
-          (editor/set-frame-dimensions (quot (.getHeight @panel) @fontheight) (quot (.getWidth @panel) @fontwidth))
-          (editor/split-window-right 0.22)
-          (editor/switch-to-buffer "-prompt-")
-          (editor/other-window)
-          (editor/request-fullupdate))))))
+          (let [wndcount (count (editor/get-windows))
+                buffername (editor/get-name)]
+            (editor/set-frame-dimensions (quot (.getHeight @panel) @fontheight) (quot (.getWidth @panel) @fontwidth))
+            (when (= wndcount 2)
+              (editor/split-window-right 0.22)
+              (editor/switch-to-buffer "-prompt-")
+              (editor/other-window))
+            (editor/switch-to-buffer buffername)
+            (editor/request-fullupdate)))))))
 
 (defn jframequit
   []
