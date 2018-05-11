@@ -6,7 +6,7 @@
             [dk.salza.liq.logging :as logging]
             [clojure.string :as str]
             [clojure.java.io :as io])
-  (:import [java.awt Font Color GraphicsEnvironment Dimension]
+  (:import [java.awt Font Color GraphicsEnvironment Dimension GraphicsDevice Window]
            [java.awt.event InputEvent KeyListener ComponentListener]
            [java.awt.image BufferedImage]
            [javax.swing JFrame ImageIcon JPanel]))
@@ -85,11 +85,22 @@
             (recur @editor/updates))))))
   (add-watch editor/updates key view-handler))
 
+(defn toggle-fullscreen
+  []
+  (let [ge (GraphicsEnvironment/getLocalGraphicsEnvironment)
+        screen (.getDefaultScreenDevice ge)]
+      (when (.isFullScreenSupported screen)
+        (if (.getFullScreenWindow screen)
+          (.setFullScreenWindow screen nil)
+          (.setFullScreenWindow screen @frame)))))
+
 (defn model-update
   [input]
   (logging/log "INPUT" input)
-  (future
-    (editor/handle-input input)))
+  (if (= input "f11")
+    (toggle-fullscreen)
+    (future
+      (editor/handle-input input))))
 
 (defn draw-char
   [g char row col color bgcolor]
@@ -133,9 +144,7 @@
                       (let [nextcolor (or (ch :face) color)
                             nextbgcolor (or (ch :bgface) bgcolor)]
                         (draw-char g (or (ch :char) "?") row (+ column offset) nextcolor nextbgcolor)
-                        (recur (rest c) (+ offset 1) nextcolor nextbgcolor)))
-
-                    )))))
+                        (recur (rest c) (+ offset 1) nextcolor nextbgcolor))))))))
         (swap! old-lines assoc key content)))))
 
 (defn handle-keydown
