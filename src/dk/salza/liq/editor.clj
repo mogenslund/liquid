@@ -498,6 +498,10 @@
   []
   (doto-buffer buffer/clear))
 
+(defn selection-active?
+  []
+  (buffer/get-mark (current-buffer) "selection"))
+
 (defn selection-set
   "Sets selection mark at the current point.
   This will be the starting point of a selection.

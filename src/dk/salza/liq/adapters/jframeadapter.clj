@@ -24,28 +24,32 @@
   []
   (re-matches #"(?i)win.*" (System/getProperty "os.name")))
 
+(defn hexcolor
+  [h]
+  (Color/decode (str "0x" h)))
+
 (def colors
-  {:plain (Color. 200 200 250) ; "e4e4ef"
-   :type1 (Color. 255 200 50) ; "ffdd33"
-   :type2 (Color. 150 200 170) ; "95a99f"
-   :type3 (Color. 255 200 50) ; "ffdd33"
-   :green (Color. 150 255 150) ; "73c936"
-   :yellow (Color. 255 200 50) ; "ffdd33"
-   :red (Color. 255 0 0) ; "ff0000"
-   :comment (Color. 200 150 50) ; "cc8c3c"
-   :string (Color. 150 200 50) ; "73c936"
-   :stringst (Color. 150 200 50) ; "73c936"
-   :default (Color. 200 200 200)}) ; "aaaaaa"
+  {:plain (hexcolor "e4e4ef")
+   :type1 (hexcolor "ffdd33")
+   :type2 (hexcolor "95a99f")
+   :type3 (hexcolor "ffdd33")
+   :green (hexcolor "73c936")
+   :yellow (hexcolor "ffdd33")
+   :red (hexcolor "ff0000")
+   :comment (hexcolor "cc8c3c")
+   :string (hexcolor "73c936")
+   :stringst (hexcolor "73c936")
+   :default (hexcolor "aaaaaa")})
 
 (def bgcolors
-  {:plain (Color. 30 30 30) ; "181818"
-   :cursor0 (Color. 30 30 30) ; "181818"
-   :cursor1 (Color. 0 255 0) ; "00ff00"
-   :cursor2 (Color. 0 0 255) ; "0000ff"
-   :hl (Color. 255 255 0) ; "ffff00"
-   :selection (Color. 255 0 0) ; "ff0000"
-   :statusline (Color. 0 0 0) ; "000000"
-   :default (Color. 20 20 20)}) ; "333333"
+  {:plain (hexcolor "181818")
+   :cursor0 (hexcolor "181818")
+   :cursor1 (hexcolor "336633")
+   :cursor2 (hexcolor "0000cc")
+   :hl (hexcolor "ffff00")
+   :selection (hexcolor "ff0000")
+   :statusline (hexcolor "000000")
+   :default (hexcolor "333333")})
 
 (def fontsize (atom 13))
 
@@ -153,8 +157,9 @@
         raw (int (.getKeyChar e))
         ctrl (when (.isControlDown e) "C-")
         alt (when (or (.isAltDown e) (.isMetaDown e)) "M-")
-        key (cond (<= 112 code 123) (str ctrl alt "f" (- code 111))
-                  (> raw 40000) (cond 
+        shift (when (.isShiftDown e) "S-")
+        key (cond (<= 112 code 123) (str shift ctrl alt "f" (- code 111))
+                  (> raw 40000) (str shift (cond 
                                   (= code 36) "home"
                                   (= code 35) "end"
                                   (= code 34) "pgdn"
@@ -162,7 +167,7 @@
                                   (= code 37) "left"
                                   (= code 39) "right"
                                   (= code 38) "up"
-                                  (= code 40) "down")
+                                  (= code 40) "down"))
                   (and ctrl (= raw 32)) "C- "
                   ctrl (str ctrl alt (char (+ raw 96)))
                   alt (str ctrl alt (char raw))
