@@ -425,6 +425,13 @@
   (doto-buffer buffer/forward-word)
   (update-mem-col))
 
+(defn backward-word
+  "Moves the cursor to the beginning
+  of the previous word."
+  []
+  (doto-buffer buffer/backward-word)
+  (update-mem-col))
+
 (defn end-of-word
   "Moves the cursor to the end of the current
   word."
