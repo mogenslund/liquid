@@ -187,6 +187,13 @@
   [buffer]
   (doto-slider buffer #(-> % (slider/right-until (partial re-find #"\s")) (slider/right-until (partial re-find #"\S")))))
 
+(defn backward-word
+  "Returns a new buffer with the cursor moved backward
+  to the beginning of the previous word."
+  [buffer]
+  (doto-slider buffer #(let [new-buffer (-> % (slider/left 1) (slider/left-until (partial re-find #"\S")) (slider/left-until (partial re-find #"\s")))] 
+                        (if (slider/beginning? new-buffer) new-buffer (slider/right new-buffer)))))
+
 (defn end-of-word
   "Returns a new buffer with the cursor moved
   to the end of the current word."
@@ -400,3 +407,4 @@
 (defn tmp-buffer
   [buffer columns]
   (doto-slider buffer slider/forward-line columns))
+
