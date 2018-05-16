@@ -63,6 +63,7 @@
    "n" editor/find-next
    "O" editor/context-action
    "w" editor/forward-word
+   "b" editor/backward-word
    "K" editor/swap-line-down
    "I" editor/swap-line-up
    "r" {" " #(editor/replace-char " ")
