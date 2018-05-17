@@ -118,7 +118,7 @@
 
 (defn model-update
   [input]
-  (future (editor/handle-input input)))
+  (editor/handle-input input))
 
 ;; http://ascii-table.com/ansi-escape-sequences.php
 (defn raw2keyword
