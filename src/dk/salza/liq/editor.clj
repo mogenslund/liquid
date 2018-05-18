@@ -339,6 +339,11 @@
   []
   (map ::buffer/name (filter ::buffer/dirty (@editor ::buffers))))
 
+(defn dirty?
+  "Returns weather current buffer is dirty."
+  []
+  (buffer/get-dirty (current-buffer)))
+
 (defn switch-to-buffer
   "Switch to the buffer with the given name."
   [buffername]
@@ -381,6 +386,11 @@
   buffer, otherwise nil."
   []
   (-> (current-buffer) buffer/get-filename))
+
+(defn changed-on-disk?
+  ""
+  []
+  (-> (current-buffer) buffer/changed-on-disk?))
 
 (defn get-folder
   "The folder part if a filename is associated with
@@ -1006,6 +1016,32 @@
       (remove-buffer buffername)
    )
   ))
+
+(defn force-reopen-file
+  "Reopening file in buffer,
+  ignore dirty flag."
+  []
+  (when (changed-on-disk?)
+    (doto-buffer buffer/force-reopen-file) (update-mem-col)))
+
+(defn reopen-file
+  "Reopen file in buffer,
+  if the file is not dirty."
+  []
+  (when (changed-on-disk?)
+    (doto-buffer buffer/reopen-file) (update-mem-col)))
+
+(defn reopen-all-files
+  "Reopen all files which are not dirty."
+  []
+  (println (str/join ""
+    (for [buffername (filter #(re-matches #"[^-*].*" %) (reverse (buffer-names)))]
+      (do
+        (switch-to-buffer buffername)
+        (when (changed-on-disk?)
+          (if (dirty?) (str buffername " is dirty\n")
+            (reopen-file))))))))
+
 
 (defn tmp-test
   []

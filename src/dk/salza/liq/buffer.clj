@@ -33,6 +33,7 @@
    ::slider-undo '()  ;; Conj slider into this when doing changes
    ::slider-stack '() ;; To use in connection with undo
    ::filename nil
+   ::modified nil
    ::dirty false
    ::mem-col 0
    ::highlighter nil
@@ -59,6 +60,7 @@
    ::slider-undo '()  ;; Conj slider into this when doing changes
    ::slider-stack '() ;; To use in connection with undo
    ::filename path
+   ::modified (.lastModified (io/file path))
    ::dirty false
    ::mem-col 0
    ::highlighter nil
@@ -89,6 +91,20 @@
   the line when passing an empty line."
   [buffer columns]
   (assoc buffer ::mem-col (slider/get-visual-column (buffer ::slider) columns)))
+
+(defn changed-on-disk?
+  ""
+  [buffer]
+  (if (buffer ::modified)
+    (not= (buffer ::modified) (.lastModified (io/file (buffer ::filename))))
+    false))
+
+(defn update-modified
+  ""
+  [buffer]
+  (if-let [filepath (buffer ::filename)]
+    (assoc buffer ::modified (.lastModified (io/file filepath)))
+    buffer))
 
 (defn get-slider
   "Returns the slider in the buffer datastructure.
@@ -401,9 +417,35 @@
   the content of the buffer will be saved to that file."
   [buffer]
   (when-let [filepath (get-filename buffer)]
-    (fileutil/write-file filepath (get-content buffer)))
-  (set-dirty buffer false))
+    (fileutil/write-file filepath (get-content buffer))
+    (assoc buffer ::modified (.lastModified (io/file filepath))))
+  (-> buffer
+    (set-dirty false)
+    update-modified))
   
+(defn force-reopen-file
+  "Reopening file in buffer,
+  ignore dirty flag."
+  [buffer]
+  (if-let [filepath (get-filename buffer)]
+    (let [sl (create-slider-from-file filepath)
+          p (get-point buffer)]
+      (-> buffer
+        (set-slider sl)      
+        (set-dirty false)
+        update-modified
+        (set-point p)))
+    buffer))
+
+(defn reopen-file
+  "Reopen file in buffer,
+  if the file is not dirty."
+  [buffer]
+  (if (get-dirty buffer)
+    buffer
+    (force-reopen-file buffer)))
+
+
 (defn tmp-buffer
   [buffer columns]
   (doto-slider buffer slider/forward-line columns))
