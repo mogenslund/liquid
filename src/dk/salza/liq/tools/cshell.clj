@@ -6,6 +6,8 @@
   (:import [java.lang ProcessBuilder]
            [java.util.concurrent TimeUnit]))
 
+(def current-dir (atom (System/getProperty "user.dir")))
+
 (defn datetimestamp
   "Todays date in yyyy-mm-dd-HH-mm-ss format"
   []
@@ -31,9 +33,18 @@
     (when (realized? coll)
       (cons (first coll) (take-realized (rest coll))))))
 
+(defn cd
+  [d]
+  (reset! current-dir d))
+
+(defn mkdir
+  [d]
+  (.mkdirs (io/file @current-dir d)))
+
 (defn cmdseq
   [& args]
-  (let [builder (ProcessBuilder. args)
+  (let [builder (doto (ProcessBuilder. args)
+                      (.directory (io/file @current-dir)))
         process (.start builder)]
     (line-seq (io/reader (.getInputStream process)))))
 
@@ -44,7 +55,8 @@
   [& args]
   (let [[parameters options] (split-arguments args)
         builder (doto (ProcessBuilder. parameters)
-                  (.redirectErrorStream true))
+                  (.redirectErrorStream true)
+                  (.directory (io/file @current-dir)))
         process (.start builder)]
     (if (if (options :timeout)
           (.waitFor process (options :timeout) TimeUnit/SECONDS)
