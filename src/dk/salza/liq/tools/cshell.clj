@@ -7,6 +7,7 @@
            [java.util.concurrent TimeUnit]))
 
 (def current-dir (atom (System/getProperty "user.dir")))
+(def current-process (atom nil))
 
 (defn datetimestamp
   "Todays date in yyyy-mm-dd-HH-mm-ss format"
@@ -44,9 +45,13 @@
 (defn cmdseq
   [& args]
   (let [builder (doto (ProcessBuilder. args)
-                      (.directory (io/file @current-dir)))
-        process (.start builder)]
-    (line-seq (io/reader (.getInputStream process)))))
+                      (.directory (io/file @current-dir)))]
+    (reset! current-process (.start builder))
+    (line-seq (io/reader (.getInputStream @current-process)))))
+
+(defn kill-process
+  []
+  (.destroy @current-process))
 
 (defn cmd
   "Execute a native command.
