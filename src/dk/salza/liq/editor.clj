@@ -1165,12 +1165,3 @@
   (when-let [typeaheadfn (get-default-typeahead-function)]
     (typeaheadfn items tostringfun callback)))
 
-(defmacro c
-  "Allows syntac like:
-  (c git status).
-  without quotes etc."
-  [& args]
-  (future
-    (doseq [l (apply cshell/cmdseq (map str args))]
-      (prompt-append l)))
-  nil)

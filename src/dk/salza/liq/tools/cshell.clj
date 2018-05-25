@@ -102,8 +102,10 @@
   "Outputs files and folders in a given
    dir into a vector."
   {:example "(ls \"/tmp\")"}
-  [dir]
-  (into [] (map #(.getAbsolutePath %1) (.listFiles (io/file (expand-home dir))))))
+  ([dir]
+   (into [] (map #(.getAbsolutePath %1) (.listFiles (io/file (expand-home dir))))))
+  ([]
+   (ls @current-dir)))
 
 (defn lsr
   [dir]
