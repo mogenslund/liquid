@@ -78,9 +78,11 @@
   [fullfun]
   (let [content (editor/get-content)
         [tmp namesp fun] (re-find #"(.*)/(.*)" fullfun)
-        [fullmatch aliasmatch] (re-find (re-pattern (str "\\[" namesp " :as ([^]]*)\\]")) content)]
+        [fullmatch aliasmatch] (re-find (re-pattern (str "\\[" namesp " :as ([^]]*)\\]")) content)
+        refermatch (re-find (re-pattern (str "\\[" namesp " :refer :all\\]")) content)]
     (cond (= namesp "clojure.core") fun
           aliasmatch (str aliasmatch "/" fun)
+          refermatch fun
           :else fullfun)))
 
 (defn function-typeahead
