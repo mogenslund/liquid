@@ -705,7 +705,7 @@
     (cond (re-matches #"https?://.*" word) {:type :url :value word}
           (re-matches #";?#" word) {:type :fold :value "fold"}
           (re-matches #"\(.*" word) {:type :function :value (str/replace word #"(\(|\))" "")}
-          (re-matches #"[-a-z0-9\.]+/[-a-z0-9]+" word) {:type :function :value (str/replace word #"(\(|\))" "")}
+          (re-matches #"[-a-z0-9\.]+/[-a-z0-9]+\)?" word) {:type :function :value (str/replace word #"(\(|\))" "")}
           (re-matches #"/.*" word) {:type :file :value word}
           (re-matches #".*(data:image/png;base64,.*)" word) {:type :base64image :value (re-find #"(?<=base64,)[^\)]*" word)}
           :else {:type :file :value (str/replace word #"[\[\]]" "")})))

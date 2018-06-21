@@ -976,7 +976,9 @@
         filepath (when (> (count cp) 0) (clojureutil/get-file-path cp))]
     (when filepath (find-file filepath))
     (beginning-of-buffer)
-    (find-next (str "(defn " "" funstr)))) ;)
+    (find-next (str "(defn " "" funstr)) ;)
+    (when (= (get-point) 0)
+      (find-next (str "(def " "" funstr))))) ;)
   
 (defn get-available-functions
   []
