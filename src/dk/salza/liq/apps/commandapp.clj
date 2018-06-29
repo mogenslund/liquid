@@ -127,6 +127,7 @@
    "down" next-res
    "\t" prev-res ; tab = C-i in termainal!
    "up" prev-res
+   "C-i" prev-res
    "\n" execute
    " " #(update-search " ")
    :selfinsert update-search
