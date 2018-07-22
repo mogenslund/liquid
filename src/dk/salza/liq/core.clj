@@ -10,6 +10,7 @@
             [dk.salza.liq.tools.cshell :as cshell]
             [dk.salza.liq.apps.findfileapp :as findfileapp]
             [dk.salza.liq.apps.textapp :as textapp]
+            [dk.salza.liq.apps.textappwin :as textappwin]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.apps.helpapp :as helpapp]
@@ -161,6 +162,23 @@
                      ))
   (editor/end-of-buffer))
 
+(defn init-editor-easy
+  []
+  (editor/set-default-keymap @textappwin/keymap)
+  (editor/set-keymap @textappwin/keymap)
+  (editor/set-default-app textappwin/run)
+
+  (editor/split-window-right 0.22)
+  (editor/switch-to-buffer "-prompt-")
+  (editor/insert logo)
+  (editor/other-window)
+  (editor/switch-to-buffer "scratch")
+  (editor/insert (str "# Welcome to λiquid\n"
+                      "(range 10 30)\n"
+                      "(editor/end-of-buffer)\n"
+                     ))
+  (editor/end-of-buffer))
+
 
 (defn read-arg
   "Reads the value of an argument.
@@ -221,16 +239,18 @@
   (cond (read-arg args "--help") (print-help-and-exit)
         (read-arg args "--version") (print-version-and-exit)
     :else
-    (let [usetty (or (read-arg args "--tty")
-                     (not (or (read-arg args "--server")
-                              (read-arg args "--ghost")
-                              (read-arg args "--jframe"))))
+    (let [easy (read-arg args "--easy")
+          useserver (or (read-arg args "--server")
+                        (read-arg args "--web"))
+          usejframe (or (read-arg args "--jframe")
+                        (read-arg args "--easy")
+                        (and (not (read-arg args "--ghost")) (is-windows)))
+          usetty (or (read-arg args "--tty") (not (or usejframe useserver (read-arg args "--ghost"))))
           rows (or (read-arg-int args "--rows=")
-                   (and usetty (not (is-windows)) (tty/rows))
+                   (and usetty (tty/rows))
                    40)
           columns (or (read-arg-int args "--columns=")
-                      (and usetty (not (is-windows))
-                      (tty/columns))
+                      (and usetty (tty/columns))
                       140)
           port (or (read-arg-int args "--port=") 8520)
           autoupdate (if (read-arg args "--autoupdate") true false)
@@ -238,40 +258,36 @@
           logfile (read-arg args "--log=")
           singlethreaded (read-arg args "--no-threads")]
 
-          ;; Enable logging if --log specified
           (when logfile
             (logging/enable logfile))
 
           (set-defaults)
           (editor/set-frame-dimensions rows columns)
 
-          ;; TTY is used as default view on Linux and Mac
-          ;; JFrame is used on Windows
           (when usetty
-            (if (is-windows)
-              (jframeadapter/init rows columns)
-              (do
-                (tty/view-init)
-                (tty/input-handler))))
+            (tty/view-init)
+            (tty/input-handler))
 
-          ;; If specified load as web, server, html or JFrame
-          (when (or (read-arg args "--web") (read-arg args "--server"))
-            (((webadapter/adapter rows columns autoupdate) :init) port))
-          (when (read-arg args "--jframe")
+          (when usejframe
             (jframeadapter/init rows columns :font-size fontsize))
 
-          ;; Post that the editor has updated, to make view update
+          (when useserver
+            (((webadapter/adapter rows columns autoupdate) :init) port))
+
           (editor/updated))))
     
 (defn -main
   [& args]
   (apply startup args)
-  (let [minimal (read-arg args "--minimal")
+  (let [easy (read-arg args "--easy")
+        minimal (read-arg args "--minimal")
         userfile (when-not (read-arg args "--no-init-file") 
                    (or (read-arg args "--load=")
                      (and (not minimal)
                           (fileutil/file (System/getProperty "user.home") ".liq"))))]
-    (when (not minimal) (init-editor))
+    (cond minimal (do)
+          easy (init-editor-easy)
+          true (init-editor))
     (load-user-file userfile)
     (when-let [filename (re-matches #"[^-].*" (or (last args) ""))]
       (editor/find-file filename))

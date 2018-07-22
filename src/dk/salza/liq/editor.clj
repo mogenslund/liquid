@@ -348,10 +348,10 @@
   "Switch to the buffer with the given name."
   [buffername]
   (swap! editor update ::buffers bump ::buffer/name buffername)
-    (let [win (get-match (get-windows) ::window/buffername buffername)]
-      (if win
-        (swap! editor update ::windows bump ::window/buffername buffername)
-        (swap! editor update ::windows doto-first assoc ::window/buffername buffername))))
+  (let [win (get-match (get-windows) ::window/buffername buffername)]
+    (if win
+      (swap! editor update ::windows bump ::window/buffername buffername)
+      (swap! editor update ::windows doto-first assoc ::window/buffername buffername))))
 
 (defn update-mem-col
   "Stores the current cursor position on the current line.
