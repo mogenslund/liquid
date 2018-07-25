@@ -41,6 +41,10 @@
    "S-down" #(with-select editor/forward-line)
    "home" editor/beginning-of-line
    "end" editor/end-of-line
+   "C-home" editor/beginning-of-buffer
+   "C-end" editor/end-of-buffer
+   "C-c" #(do (editor/copy-selection) (editor/selection-cancel))
+   "C-v" editor/paste
    " " #(editor/insert " ")
    "\n" #(editor/insert "\n")
    "C-t" #(editor/insert "\t")
