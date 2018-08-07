@@ -973,7 +973,7 @@
         cp (if (> (count alias) 0)
              (clojureutil/get-class-path (current-buffer) alias)
              (re-find #"[^/\n ]*(?=/)" (with-out-str (clojure.repl/find-doc funstr))))
-        filepath (when (> (count cp) 0) (clojureutil/get-file-path cp))]
+        filepath (when (> (count cp) 0) (clojureutil/get-file-path (current-buffer) cp))]
     (when filepath (find-file filepath))
     (beginning-of-buffer)
     (find-next (str "(defn " "" funstr)) ;)

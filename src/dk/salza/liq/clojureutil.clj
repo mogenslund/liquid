@@ -7,11 +7,6 @@
 ;(println (repl/apropos #"tmp"))
 ;(symbol "clojure.string")
 
-(defn get-file-path
-  [classpath]
-  (str/replace (str (io/resource (str (str/replace classpath #"\." "/") ".clj")))
-    #"^file:" ""))
-
 (defn get-class-path
   [buffer alias]
   (if (re-find #"\." alias)
@@ -25,3 +20,17 @@
   (let [content (buffer/get-content buffer)]
     (re-find #"(?<=\(ns )[-a-z0-9\\.]+" content)))
 ; (re-pattern "\\(") ;)
+
+(defn get-file-path
+  ([classpath]
+   (str/replace (str (io/resource (str (str/replace classpath #"\." "/") ".clj")))
+     #"^file:" ""))
+  ([buffer classpath]
+   (let [fp (get-file-path classpath)]
+     (if (not= fp "")
+       fp
+       (str/replace
+         (buffer/get-filename buffer)
+         (str/replace (or (get-namespace buffer) "") #"\." "/")
+         (str/replace classpath #"\." "/"))))))
+
