@@ -160,6 +160,7 @@
         shift (when (.isShiftDown e) "S-")
         key (cond (<= 112 code 123) (str shift ctrl alt "f" (- code 111))
                   (= code 135) "~"
+                  (= code 129) "|"
                   (> raw 40000) (str shift (cond 
                                   (= code 36) "home"
                                   (= code 35) "end"
@@ -175,7 +176,6 @@
                   (and ctrl alt (= raw 92)) "\\" ;"
                   (and ctrl alt (= raw 93)) "]"
                   (and ctrl alt (= raw 123)) "{"
-                  (and ctrl alt (= raw 129)) "|"
                   (and ctrl alt (= raw 125)) "}"
                   (and ctrl (= raw 32)) "C- "
                   ctrl (str ctrl alt (char (+ raw 96)))
