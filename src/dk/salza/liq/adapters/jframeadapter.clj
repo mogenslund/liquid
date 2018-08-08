@@ -159,6 +159,7 @@
         alt (when (or (.isAltDown e) (.isMetaDown e)) "M-")
         shift (when (.isShiftDown e) "S-")
         key (cond (<= 112 code 123) (str shift ctrl alt "f" (- code 111))
+                  (= code 135) "~"
                   (> raw 40000) (str shift (cond 
                                   (= code 36) "home"
                                   (= code 35) "end"
@@ -168,6 +169,14 @@
                                   (= code 39) "right"
                                   (= code 38) "up"
                                   (= code 40) "down"))
+                  (and ctrl alt (= raw 36)) "$"
+                  (and ctrl alt (= raw 64)) "@"
+                  (and ctrl alt (= raw 91)) "["
+                  (and ctrl alt (= raw 92)) "\\" ;"
+                  (and ctrl alt (= raw 93)) "]"
+                  (and ctrl alt (= raw 123)) "{"
+                  (and ctrl alt (= raw 124)) "|"
+                  (and ctrl alt (= raw 125)) "}"
                   (and ctrl (= raw 32)) "C- "
                   ctrl (str ctrl alt (char (+ raw 96)))
                   alt (str ctrl alt (char raw))
