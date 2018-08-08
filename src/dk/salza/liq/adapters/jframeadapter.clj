@@ -175,7 +175,7 @@
                   (and ctrl alt (= raw 92)) "\\" ;"
                   (and ctrl alt (= raw 93)) "]"
                   (and ctrl alt (= raw 123)) "{"
-                  (and ctrl alt (= raw 124)) "|"
+                  (and ctrl alt (= raw 129)) "|"
                   (and ctrl alt (= raw 125)) "}"
                   (and ctrl (= raw 32)) "C- "
                   ctrl (str ctrl alt (char (+ raw 96)))
