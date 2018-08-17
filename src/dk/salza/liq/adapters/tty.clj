@@ -65,7 +65,7 @@
         (print-color 0)
         (print-color 10)
         (doseq [ch (line :line)]
-          (let [c (if (map? ch) (ch :char) ch)
+          (let [c (if (map? ch) (or (ch :char) "⊕") ch)
                 face (when (map? ch) (ch :face))
                 bgface (when (map? ch) (ch :bgface))]
             (when face

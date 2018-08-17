@@ -315,6 +315,15 @@
   [buffer]
   (doto-slider buffer slider/delete-region "selection"))
 
+(defn hide-selection
+  [buffer]
+  (doto-slider buffer slider/hide-region "selection"))
+
+(defn unhide
+  [buffer]
+  (doto-slider buffer slider/unhide))
+
+
 (defn delete-line
   "Returns a buffer where the current lines is deleted
   and the cursor is moved to the next line."

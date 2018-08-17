@@ -95,7 +95,7 @@
   [sl]
   (let [c (first (sl ::after))]
     (cond (string? c) c
-          c (c :char)
+          c (or (c :char) c)
           :else nil)))
 
 (defn set-meta
@@ -275,6 +275,12 @@
     ::point (inc (sl ::point))
     ::marks (slide-marks (sl ::marks) (sl ::point) 1)))
 
+(defn insert-subslider
+  [sl subsl]
+  (assoc sl
+    ::before (conj (sl ::before) subsl)
+    ::point (inc (sl ::point))
+    ::marks (slide-marks (sl ::marks) (sl ::point) 1)))
 
 (defn delete
   "Deletes amount of characters to the left of
@@ -377,6 +383,7 @@
    ::linenumber (+ (sl1 ::linenumber) (sl2 ::linenumber) -1)
    ::totallines (+ (sl1 ::totallines) (sl2 ::totallines) -1)
    ::marks {}})
+
 
 (defn hide
   "Not used yet."
@@ -494,7 +501,7 @@
   "Moves the point to the end of the line. Right before the
   next line break."
   [sl]
-  (right-until sl (partial re-find #"\n")))
+  (right-until sl #(= % "\n")))
 
 (defn beginning-of-line
   "Moves the point to the beginning
@@ -564,18 +571,28 @@
        (left sl0 (- vc0 column))
        sl0)))
 
+(defn get-content
+  "The full content of the slider as text."
+  [sl]
+  (apply str (map #(if (string? %) % (or (% :char) (get-content %))) (-> sl beginning ::after))))
+
+(defn get-region-as-slider
+  [sl markname]
+  (let [mark (get-mark sl markname)]
+    (cond (nil? mark) nil
+          (< mark (get-point sl)) (create (reverse
+                                            (take (- (get-point sl) mark)
+                                              (sl ::before))))
+          :else (create (take (- mark (get-point sl)) (sl ::after))))))
+
 (defn get-region
   "Returns the content between the mark
   with the given name and the point.
   If there is no mark with the given name
   nil is returned."
   [sl markname]
-  (let [mark (get-mark sl markname)]
-    (cond (nil? mark) nil
-          (< mark (get-point sl)) (apply str (reverse
-                                             (take (- (get-point sl) mark)
-                                                  (sl ::before))))
-          :else (apply str (take (- mark (get-point sl)) (sl ::after))))))
+  (when-let [r (get-region-as-slider sl markname)]
+    (get-content r)))
 
 (defn delete-region
   "Deletes the region between the given
@@ -587,6 +604,24 @@
       (-> sl (set-point (max p0 mark))
              (delete (- (max p0 mark) (min p0 mark)))))
     sl))
+
+(defn hide-region
+  [sl markname]
+  (let [subsl (get-region-as-slider sl markname)]
+    (-> sl
+        (delete-region markname)
+        (insert-subslider subsl)
+        left)))
+
+(defn unhide
+  [sl]
+  (let [subsl (first (sl ::after))]
+    (if (and (map? subsl) (not (subsl :char)))
+      (-> sl
+          right
+          (delete 1)
+          (insert-slider subsl))
+      sl)))
 
 (defn delete-line
   "Deletes the current line.
@@ -650,11 +685,6 @@
             ;; sl3 now has point at new top of window
             sl3
             (update-top-of-window sl rows columns (get-point sl3))))))))
-
-(defn get-content
-  "The full content of the slider as text."
-  [sl]
-  (apply str (map #(if (string? %) % (% :char)) (-> sl beginning ::after))))
 
 (defn take-lines
   "Generate list of lines with

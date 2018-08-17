@@ -849,6 +849,17 @@
     (update-mem-col)
     true))
 
+(defn hide-selection
+  []
+  (doto-buffer buffer/hide-selection)
+  (update-mem-col)
+  true)
+
+(defn unhide
+  []
+  (doto-buffer buffer/unhide)
+  true)
+
 (defn paste
   "Insert the text from the clipboard
   at the current position."
