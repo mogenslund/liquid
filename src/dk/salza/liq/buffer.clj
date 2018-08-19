@@ -30,8 +30,8 @@
   [name]
   {::name name
    ::slider (slider/create)
-   ::slider-undo '()  ;; Conj slider into this when doing changes
-   ::slider-stack '() ;; To use in connection with undo
+   ::slider-undo ()  ;; Conj slider into this when doing changes
+   ::slider-stack () ;; To use in connection with undo
    ::filename nil
    ::modified nil
    ::dirty false
@@ -57,8 +57,8 @@
   [path]
   {::name path
    ::slider (create-slider-from-file path)
-   ::slider-undo '()  ;; Conj slider into this when doing changes
-   ::slider-stack '() ;; To use in connection with undo
+   ::slider-undo ()  ;; Conj slider into this when doing changes
+   ::slider-stack () ;; To use in connection with undo
    ::filename path
    ::modified (.lastModified (io/file path))
    ::dirty false

@@ -147,7 +147,7 @@
                         (recur (rest c) (+ offset 1) color bgcolor))
                       (let [nextcolor (or (ch :face) color)
                             nextbgcolor (or (ch :bgface) bgcolor)]
-                        (draw-char g (or (ch :char) "?") row (+ column offset) nextcolor nextbgcolor)
+                        (draw-char g (or (ch :char) "…") row (+ column offset) nextcolor nextbgcolor)
                         (recur (rest c) (+ offset 1) nextcolor nextbgcolor))))))))
         (swap! old-lines assoc key content)))))
 

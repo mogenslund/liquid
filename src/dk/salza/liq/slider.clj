@@ -52,7 +52,7 @@
       before = (d c b a), after = (e f)."
   ([text]
     (let [after (if (string? text) (map str text) text)] ; Creating with a list '("a" "b") should also work
-     {::before '()    ; The list of characters before the cursor in reverse order
+     {::before ()     ; The list of characters before the cursor in reverse order
       ::after after   ; The list of characters after the cursor in normal order
       ::point 0       ; The current point (cursor position). Starts at 0, the begining of the slider
       ::linenumber 1  ; Meta information for fast retrievel of the current line number
@@ -72,7 +72,7 @@
   "Moves the point (cursor) to the beginning of the slider."
   [sl]
   (assoc sl
-   ::before '()
+   ::before ()
    ::after (concat (reverse (sl ::before)) (sl ::after))
    ::point 0
    ::linenumber 1))
@@ -83,7 +83,7 @@
   (let [tmp (concat (reverse (sl ::after)) (sl ::before))]
     (assoc sl
      ::before tmp
-     ::after '()
+     ::after ()
      ::point (count tmp)
      ::linenumber (sl ::totallines))))
 
@@ -356,7 +356,7 @@
   "Returns a slider with content before cursor."
   [sl]
   (assoc sl
-    ::after '()
+    ::after ()
     ::totallines (sl ::linenumber)
     ::marks (into {} (remove #(> (second %) (sl ::point)) (sl ::marks)))))
 
@@ -364,7 +364,7 @@
   "Returns a slider with content after cursor."
   [sl]
   (assoc sl
-    ::before '()
+    ::before ()
     ::linenumber 1
     ::totallines (- (sl ::totallines) (sl ::linenumber) -1)
     ::point 0
@@ -385,15 +385,6 @@
    ::marks {}})
 
 
-(defn hide
-  "Not used yet."
-  [sl amount]
-  (let [tmp (take amount (sl ::after))
-
-        n (count tmp)]
-   (assoc sl
-    ::after (conj (drop n (sl ::after)) tmp)
-    ::marks (slide-marks (sl ::marks) (- (sl ::point) n) (- n 1)))))
 
 (defn right-until
   "Moves the cursor forward, until for the current char:

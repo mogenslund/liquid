@@ -55,7 +55,7 @@
   a list of lists. Splitting where the char
   is a newline character."
   [charlist n]
-  (map #(if (empty? (first %)) '("") (first %))
+  (map #(if (empty? (first %)) (list "") (first %))
        (take n 
                (iterate
                  (fn [x]

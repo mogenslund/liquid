@@ -19,7 +19,7 @@
             [dk.salza.liq.logging :as logging])
   (:gen-class))
 
-(def logo (str/join "\n" '(
+(def logo (str/join "\n" (list
   " "
   "       o0o"
   "     o0000"
@@ -201,7 +201,7 @@
 
 (defn print-help-and-exit
   []
-  (println (str/join "\n" '(
+  (println (str/join "\n" (list
      ""
      "Salza Liquid Help"
      "================="

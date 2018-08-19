@@ -39,11 +39,11 @@
   (when (not= (get-top-of-window keyw) val)
     (swap! top-of-window assoc keyw val)))
 
-(def ^:private macro-seq (atom '())) ; Macrofunctionality might belong to input handler.
+(def ^:private macro-seq (atom ())) ; Macrofunctionality might belong to input handler.
 (def ^:private macro-record (atom false))
 (def ^:private submap (atom nil))
 (def ^:private tmpmap (atom {})) ; Keymap for shortterm keybindings
-(def ^:private keylist (atom '()))
+(def ^:private keylist (atom ()))
 
 
 (def updates
@@ -56,8 +56,8 @@
 
 
 (def ^:private empty-editor
-  {::buffers '()
-   ::windows '()
+  {::buffers ()
+   ::windows ()
    ::global-keymap {}
    ::file-eval {}
    ::frame-dimensions {::rows 40 ::columns 140}
@@ -66,12 +66,12 @@
                ::default-highlighter nil
                ::default-app nil
                ::searchstring ""
-               ::searchpaths '()
-               ::rootfolders '()
-               ::files '()
-               ::snippets '()
-               ::commands '()
-               ::interactive '()}})
+               ::searchpaths ()
+               ::rootfolders ()
+               ::files ()
+               ::snippets ()
+               ::commands ()
+               ::interactive ()}})
 
 (def editor
   "The ref which contains the editor data, that is
@@ -771,7 +771,7 @@
   "Setting rows and columns of the window frame."
   [rows columns]
   (swap! editor assoc ::frame-dimensions {::rows rows ::columns columns}
-                        ::windows '())
+                        ::windows ())
   (add-window "scratch" 1 1 (- rows 1) (- columns 3) "scratch")
   (new-buffer "-prompt-")
   (new-buffer "scratch"))
@@ -1125,7 +1125,7 @@
   (if (not @macro-record)
     (do
       (prompt-append "Recording macro")
-      (reset! macro-seq '()))
+      (reset! macro-seq ()))
     (prompt-append "Recording finished"))
   (swap! macro-record not))
 
@@ -1136,7 +1136,7 @@
 
 (defn tmp-do-macro
   []
-  (doall (map handle-input '(:i :i :j))))
+  (doall (map handle-input (:i :i :j))))
 
 (defn swap-windows
   []
