@@ -3,6 +3,7 @@
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
+            [dk.salza.liq.extensions.folding :as folding]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.syntaxhl.javascripthl :as javascripthl]
             [dk.salza.liq.syntaxhl.pythonhl :as pythonhl]
@@ -82,6 +83,14 @@
    "s" editor/save-file
    "u" editor/undo
    "C-w" editor/kill-buffer
+   "+" {"+" #(editor/apply-to-slider folding/cycle-level-fold)
+        "0" #(editor/apply-to-slider folding/expand-all)
+        "9" #(editor/apply-to-slider folding/collapse-all)
+        "1" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 1)))
+        "2" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 2)))
+        "3" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 3)))
+        "4" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 4)))
+        "5" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 5)))}
    "C-t" (fn [] (editor/tmp-test))
    })
 

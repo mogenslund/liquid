@@ -12,8 +12,8 @@
       (set-mark "2")
       (right 1)
       (set-mark "3")
-      (right 4)
-      (hide 6)
+      (right 10)
+      (delete 6)
       (right 3)
       (set-mark "5")
       (left 7)
@@ -63,10 +63,9 @@
 (deftest get-visible-content-test
   (testing "Visible content"
     (is (= (-> (create "abc")
-               (right 1)
-               (hide 1)
+               (right 2)
                get-visible-content)
-           "a¤c"))))
+           "abc"))))
 
 (deftest create-test
   (testing "Creating slider with text or as list"
@@ -105,7 +104,7 @@
     (is (= (-> (sample)
                (insert "xyz")
                get-visible-content)
-           "abcdef hijxyz1234¤ 78")))
+           "abcdef hijxyz1234 78")))
   (testing "Multiple inserts"
     (is (= (-> (create "abc")
                (insert "xyz")

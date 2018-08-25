@@ -604,6 +604,14 @@
         (insert-subslider subsl)
         left)))
 
+(defn hidden?
+  "Checks if current position is a hidden
+  region."
+  [sl]
+  (-> sl
+      get-char
+      map?))
+
 (defn unhide
   [sl]
   (let [subsl (first (sl ::after))]
