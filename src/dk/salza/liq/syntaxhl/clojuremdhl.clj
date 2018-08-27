@@ -18,7 +18,7 @@
                                   :else face)
           (= face :type1)   (cond (= ch " ") :type2
                                   :else face)
-          (= face :type2)   (cond (= ch " ") :plain
+          (= face :type2)   (cond (or (= ch " ") (= ch ")")) :plain
                                   :else face)
           (= face :type3)   (cond (re-matches #"[\)\]}\s]" (or ch " ")) :plain
                                   :else face)

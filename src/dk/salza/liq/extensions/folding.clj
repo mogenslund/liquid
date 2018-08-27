@@ -33,12 +33,13 @@
 
 (defn unfold-line
   [sl]
-  (if (= (-> sl end-of-line get-point) (-> sl beginning-of-line get-point))
-    sl
-    (-> sl
-        end-of-line
-        left
-        unhide)))
+  (let [p (get-point sl)
+        sl1 (loop [s (beginning-of-line sl)]
+              (cond (hidden? s) (unhide s) 
+                    (is-newline? (get-char s)) s
+              (nil? (get-char s)) s
+              true (recur (right s))))]
+    (set-point sl1 p)))
 
 (defn fold-level
   [sl]
@@ -66,6 +67,29 @@
                 (recur (-> s
                            end-of-line
                            right))))))))
+
+(defn fold-def
+  [sl]
+  (let [p (get-point sl)]
+    (-> sl
+        (mark-paren-end "pend")
+        (point-to-mark "pend")
+        left
+        (set-mark "fold")
+        (set-point p)
+        end-of-line
+        (hide-region "fold")
+        (set-point p))))
+
+(defn fold-all-def
+  [sl]
+  (loop [s (beginning sl)]
+    (if (end? s)
+      (beginning s) 
+      (recur
+        (-> (if (= (get-char s) "(") (fold-def s) s) ;)
+            end-of-line
+            right)))))
 
 (defn unfold-all
   [sl]
@@ -99,6 +123,7 @@
                     fold-level
                     end-of-line
                     right))))
+          (= (-> sl beginning-of-line get-char) "(") (fold-def sl) ;)
           (sublevel-folded? sl)
           (loop [s (-> sl end-of-line right)]
             (if (or (end? s) (<= 1 (get-headline-level s) level))
