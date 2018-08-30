@@ -62,6 +62,10 @@
                       ; strictly before the mark.
   ([] (create "")))
 
+(defn slider?
+  [sl]
+  (and (map? sl) (sl ::before)))
+
 (defn clear
   "Erases everything in the slider,
   content and marks."
@@ -97,6 +101,12 @@
     (cond (string? c) c
           c (or (c :char) c)
           :else nil)))
+
+(defn hidden?
+  "Checks if current position is a hidden
+  region."
+  [sl]
+  (slider? (first (sl ::after))))
 
 (defn set-meta
   "Set a meta value on the current char.
@@ -207,7 +217,10 @@
            ::before (rest (sl ::before))
            ::after (conj (sl ::after) c)
            ::point (dec (sl ::point))
-           ::linenumber (- (sl ::linenumber) (if (is-newline? c) 1 0))))))
+           ::linenumber (- (sl ::linenumber)
+                           (cond (is-newline? c) 1
+                                 (slider? c) (- (c ::totallines) 1)
+                                 true 0))))))
   ([sl amount]
    (loop [s sl n amount]
      (if (<= n 0)
@@ -225,7 +238,10 @@
            ::before (conj (sl ::before) c)
            ::after (rest (sl ::after))
            ::point (inc (sl ::point))
-           ::linenumber (+ (sl ::linenumber) (if (is-newline? c) 1 0))))))
+           ::linenumber (+ (sl ::linenumber)
+                           (cond (is-newline? c) 1
+                                 (slider? c) (- (c ::totallines) 1)
+                                 true 0))))))
   ([sl amount]
    (loop [s sl n amount]
      (if (<= n 0)
@@ -280,7 +296,9 @@
   (assoc sl
     ::before (conj (sl ::before) subsl)
     ::point (inc (sl ::point))
-    ::marks (slide-marks (sl ::marks) (sl ::point) 1)))
+    ::marks (slide-marks (sl ::marks) (sl ::point) 1)
+    ::linenumber (+ (sl ::linenumber) (subsl ::totallines) -1)
+    ::totallines (+ (sl ::totallines) (subsl ::totallines) -1)))
 
 (defn delete
   "Deletes amount of characters to the left of
@@ -289,7 +307,7 @@
   aaa|ccc."
   [sl amount]
   (let [tmp (take amount (sl ::before))
-        linecount (count (filter is-newline? tmp))
+        linecount (+ (count (filter is-newline? tmp)) (apply + (map #(- (% ::totallines) 1) (filter slider? tmp))))
         n (count tmp)]
     (when (= (count (filter list? tmp)) 0) ; Only delete if not hidden
       (assoc sl
@@ -570,11 +588,12 @@
 (defn get-region-as-slider
   [sl markname]
   (let [mark (get-mark sl markname)]
-    (cond (nil? mark) nil
-          (< mark (get-point sl)) (create (reverse
-                                            (take (- (get-point sl) mark)
-                                              (sl ::before))))
-          :else (create (take (- mark (get-point sl)) (sl ::after))))))
+    (when mark
+      (let [l (if (< mark (get-point sl))
+                (reverse (take (- (get-point sl) mark) (sl ::before)))
+                (take (- mark (get-point sl)) (sl ::after)))
+            total (+ (count (filter is-newline? l)) (apply + (map #(- (% ::totallines) 1) (filter slider? l))) 1)]
+        (assoc (create) ::after l ::totallines total)))))
 
 (defn get-region
   "Returns the content between the mark
@@ -604,18 +623,10 @@
         (insert-subslider subsl)
         left)))
 
-(defn hidden?
-  "Checks if current position is a hidden
-  region."
-  [sl]
-  (-> sl
-      get-char
-      map?))
-
 (defn unhide
   [sl]
   (let [subsl (first (sl ::after))]
-    (if (and (map? subsl) (not (subsl :char)))
+    (if (slider? subsl)
       (-> sl
           right
           (delete 1)
