@@ -85,9 +85,7 @@
    "C-w" editor/kill-buffer
    "+" {"+" #(editor/apply-to-slider folding/cycle-level-fold)
         "0" #(editor/apply-to-slider folding/expand-all)
-        "9" #(editor/apply-to-slider (fn [sl] (folding/collapse-all sl)))
-        "8" #(editor/apply-to-slider (fn [sl] (folding/fold-all-def sl)))
-        "1" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 1)))
+        "1" #(editor/apply-to-slider (fn [sl] (folding/collapse-all (folding/fold-all-def sl))))
         "2" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 2)))
         "3" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 3)))
         "4" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 4)))

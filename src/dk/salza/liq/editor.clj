@@ -31,10 +31,14 @@
   (atom {}))
 
 (defn get-top-of-window
+  "Used by renderer to get the position
+  of the first char to be rendered."
   [keyw]
   (@top-of-window keyw))
 
 (defn set-top-of-window
+  "Used by the renderer to store the position
+  of the first char to be rendered."
   [keyw val]
   (when (not= (get-top-of-window keyw) val)
     (swap! top-of-window assoc keyw val)))
@@ -106,12 +110,15 @@
   @keylist)
 
 (defn fullupdate?
+  "If a full update of the ui has been requested.
+  Resets the value afterwards."
   []
   (when @fullupdate
     (reset! fullupdate false)
     true))
 
 (defn request-fullupdate
+  "Used notify the ui to do a full updated."
   []
   (reset! fullupdate true))
 
@@ -147,10 +154,13 @@
   (set-setting ::default-keymap keymap))
 
 (defn set-tmp-keymap
+  "Overrule the current keymap temporarily.
+  This keymap has highest priority."
   [keymap]
   (reset! tmpmap keymap))
 
 (defn drop-tmp-keymap
+  "Drop the current temporary keymap."
   []
   (set-tmp-keymap {}))
 
@@ -168,10 +178,13 @@
   (setting ::default-highlighter))
 
 (defn set-default-typeahead-function
+  "Set the typeahead function to be used of none
+  has been set."
   [typeaheadfn]
   (set-setting ::default-typeahead typeaheadfn))
 
 (defn get-default-typeahead-function
+  "Get the default function for typeahead."
   []
   (setting ::default-typeahead))
 
@@ -182,14 +195,18 @@
   (set-setting ::default-app app))
 
 (defn get-default-app
+  "Get the app to be used as default,
+  if none has been specified."
   []
   (setting ::default-app))
 
 (defn get-frame-rows
+  "Get the number of rows in the current frame."
   []
   (-> @editor ::frame-dimensions ::rows))
 
 (defn get-frame-columns
+  "Get the number of columns in the current frame."
   []
   (-> @editor ::frame-dimensions ::columns))
 
@@ -263,6 +280,7 @@
   (add-to-setting ::searchpaths s) nil)
 
 (defn get-searchpaths
+  "Returns the list of searchpaths."
   []
   (setting ::searchpaths))
 
@@ -275,6 +293,8 @@
   (add-to-setting ::rootfolders s) nil)
 
 (defn get-rootfolders
+  "Returns the list of root folders. Used by apps to
+  navigate directly to these folders."
   []
   (setting ::rootfolders))
 
@@ -373,10 +393,13 @@
   (update-mem-col))
 
 (defn get-slider
+  "Get the slider from the current buffer."
   []
   (-> (current-buffer) buffer/get-slider))
 
 (defn set-slider
+  "Replace the slider in the current buffer
+  with the given."
   [sl]
   (doto-buffer buffer/set-slider sl)
   (update-mem-col))
@@ -388,7 +411,9 @@
   (-> (current-buffer) buffer/get-filename))
 
 (defn changed-on-disk?
-  ""
+  "If the current buffer is from a file, it
+  returns if the file has changed on the disk,
+  maybe by another program."
   []
   (-> (current-buffer) buffer/changed-on-disk?))
 
@@ -516,6 +541,7 @@
   (doto-buffer buffer/clear))
 
 (defn selection-active?
+  "If something is selected."
   []
   (buffer/get-mark (current-buffer) "selection"))
 
@@ -676,11 +702,11 @@
 
 (defn enlarge-window-right
   [amount] 
-   (doto-windows window/enlarge-window-right amount))
+  (doto-windows window/enlarge-window-right amount))
 
 (defn shrink-window-right
   [amount] 
-   (doto-windows window/shrink-window-right amount))
+  (doto-windows window/shrink-window-right amount))
 
 (defn enlarge-window-below
   [amount] 
@@ -850,12 +876,17 @@
     true))
 
 (defn hide-selection
+  "Hide the current selection.
+  Will be collapsed into a symbol with
+  3 dots."
   []
   (doto-buffer buffer/hide-selection)
   (update-mem-col)
   true)
 
 (defn unhide
+  "If the current position has collapsed content
+  it will be expanded."
   []
   (doto-buffer buffer/unhide)
   true)
@@ -894,6 +925,7 @@
   (backward-char 2))
 
 (defn prompt-append
+  "Append the given strings to the prompt buffer."
   [& string]
   (when string
     (switch-to-buffer "-prompt-")
@@ -902,6 +934,7 @@
     (updated)))
 
 (defn prompt-set
+  "Set the prompt buffer to the given strings."
   [& string]
   (switch-to-buffer "-prompt-")
   (clear)
@@ -920,6 +953,8 @@
   ([] (when-let [filepath (get-filename)] (evaluate-file-raw filepath))))
 
 (defn evaluate-file
+  "Evaluate the given file. How evaluation is done
+  depends on the file type."
   ([filepath]
     (let [extension (or (re-find #"(?<=\.)\w*$" filepath) :empty)
           fun (or ((@editor ::file-eval) extension) ((@editor ::file-eval) :default))]
@@ -932,6 +967,8 @@
   ([] (when-let [filepath (get-filename)] (evaluate-file filepath))))
 
 (defn eval-sexp
+  "Evaluate the given s-expression in the current
+  namespace."
   [sexp]
   (let [isprompt (= (get-name) "-prompt-")
         namespace (or (clojureutil/get-namespace (current-buffer)) "user")]
@@ -949,6 +986,7 @@
       )))
 
 (defn eval-safe
+  "Evaluate a function, catching errors if thrown."
   [fun]
   (let [output (try
                  (with-out-str (fun))
@@ -956,6 +994,7 @@
       (when output (prompt-set output))))
 
 (defn eval-last-sexp
+  "Evaluate the current s-expression."
   []
   (eval-sexp (or (get-selection) (sexp-at-point))))
 

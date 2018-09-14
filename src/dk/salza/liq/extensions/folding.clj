@@ -165,6 +165,7 @@
   [sl]
   (-> sl
       expand-all
+      fold-all-def
       (collapse-all-level 6)
       (collapse-all-level 5)
       (collapse-all-level 4)

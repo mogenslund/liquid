@@ -63,6 +63,8 @@
   ([] (create "")))
 
 (defn slider?
+  "Returns true if the input has shape/properties
+  like a slider."
   [sl]
   (and (map? sl) (sl ::before)))
 
@@ -616,6 +618,9 @@
     sl))
 
 (defn hide-region
+  "Hides/collapses the given region:
+  The content between the cursor and the
+  given mark"
   [sl markname]
   (let [subsl (get-region-as-slider sl markname)]
     (-> sl
@@ -624,6 +629,8 @@
         left)))
 
 (defn unhide
+  "If current position contains hidden/collapsed
+  content it will be expanded."
   [sl]
   (let [subsl (first (sl ::after))]
     (if (slider? subsl)
