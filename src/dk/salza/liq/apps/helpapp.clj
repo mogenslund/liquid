@@ -7,6 +7,7 @@
             [dk.salza.liq.slider :refer :all]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
+            [dk.salza.liq.extensions.folding :as folding]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.logging :as logging]
             [dk.salza.liq.coreutil :refer :all]
@@ -53,6 +54,15 @@
    "2" editor/select-sexp-at-point
    "y" {"y" #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))}
    "C-w" editor/kill-buffer
+   "+" {"+" #(editor/apply-to-slider folding/cycle-level-fold)
+        "0" #(editor/apply-to-slider folding/expand-all)
+        "1" #(editor/apply-to-slider (fn [sl] (folding/collapse-all (folding/fold-all-def sl))))
+        "2" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 2)))
+        "3" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 3)))
+        "4" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 4)))
+        "5" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 5)))
+        "s" #(if (editor/selection-active?) (do (editor/hide-selection) (editor/selection-cancel)) (editor/unhide))
+        "f" #(editor/apply-to-slider folding/fold-def)}
    "C-t" (fn [] (editor/tmp-test))
    })
 

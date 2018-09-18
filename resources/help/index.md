@@ -28,4 +28,5 @@ brackets).
  * Tab: Move cursor to next link
 
 # Topics
+ * [keymappings.md]
  * [command-line-options.md]
