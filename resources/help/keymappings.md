@@ -1,5 +1,7 @@
 # Keymappings #
 
+[index.md]
+
 # Modes
 
   tab:        Switch between navigation mode (blue cursor) and insert mode (green cursor)
@@ -40,7 +42,8 @@
   s:          Save file
   C-f:        Open file (See Find File section)
 
-# Clojure code
+# Clojure code (blue cursor)
+[evaluation.md]
 
   C-e:        Evaluate current file without capturing output (for (re)-loading internal stuff)
   E:          Evaluate current file
@@ -49,7 +52,7 @@
   2:          Select current s-expression
               (Multiple presses will make the cursor switch between begin and end parenthesis.)
 
-# Macro recording
+# Macro recording (blue cursor)
 
   H:          Start and stop recording
   h:          Play recording
@@ -58,6 +61,18 @@
 
   C-s:        Search (Type a search string an press enter)
   n:          Next search result
+
+# Folding and collapsing (blue cursor)
+
+   ++:        Cycle collapse level
+   +0:        Expand all
+   +1:        Collapse level 1 and function definitions
+   +2:        Collapse level 2
+   +3:        Collapse level 3
+   +4:        Collapse level 4
+   +5:        Collapse level 5
+   +s:        Collapse selection or expand if collapsed already
+   +f:        Collapse function definition
 
 # Help
 

@@ -5,15 +5,16 @@ Velcome to the Liquid help system!
 The help system is a collection of files with different topics.
 
 This is the front page. You can always get back to this with the key combination
-"C-h h" (Ctrl+h and the h).
+
+    C-h C-h (Ctrl+h Ctrl+h)
 
 # Navigate the help system
 To move the cursor use
 
- * i: up
- * k: down
- * j: left
- * l: right
+  i:          Up
+  k:          Down
+  j:          Left
+  l:          Right
 
 Links in the help system are encapsulated with square brackets, like this
 one: [command-line-options.md]
@@ -24,9 +25,10 @@ will navigate to that topic.
 The tab key can be used to move the cursor to the next reference (the square
 brackets).
 
- * Enter: Navigate link
- * Tab: Move cursor to next link
+  enter:      Navigate link
+  tab:        Move cursor to next link
 
 # Topics
- * [keymappings.md]
  * [command-line-options.md]
+ * [keymappings.md]
+ * [evaluation.md]
