@@ -1,9 +1,6 @@
 (ns dk.salza.liq.apps.typeaheadapp
-  "A general app for doing typeahead
-  It needs a list to choose from and a to-string
-  function to display and filter the list."
-  (:require [dk.salza.liq.editor :as editor]
-            [dk.salza.liq.coreutil :refer :all]
+  (:require [dk.salza.liq.slider :refer :all]
+            [dk.salza.liq.editor :as editor]
             [clojure.string :as str]))
 
 (def state (atom {::tostringfun nil
@@ -13,35 +10,46 @@
                   ::oldsearch ""
                   ::search ""
                   ::hit nil
+                  ::prompt ""
                   ::selected 0}))
+
+(defn update-state
+  []
+  (let [st @state
+        pat (re-pattern (str "(?i)" (str/replace (st ::search) #" " ".*")))
+        filtered (take 150 (filter #(re-find pat ((st ::tostringfun)  %)) (st ::items)))
+        selected (max (min (st ::selected) (- (count filtered) 1)) 0)
+        hit (first (drop selected filtered))]
+    (swap! state assoc ::filtered filtered ::selected selected ::hit hit)))
+
+(defn forward-lines
+  [sl amount]
+  (loop [sl1 sl n 0]
+    (if (= n amount)
+      sl1
+      (recur (forward-line sl1) (inc n)))))
 
 (defn update-display
   []
-  (editor/clear)
-  (editor/insert (str ">> " "" (@state ::search)))
-  (editor/set-mark "hl0")
-  (editor/insert " \n\n")
-  (let [to-string (@state ::tostringfun)
-        pat (re-pattern (str "(?i)" (str/replace (@state ::search) #" " ".*")))
-        update (> (count (@state ::oldsearch)) (count (@state ::search)))
-        res (if update (@state ::items) (@state ::filtered))
-        filtered (filter #(re-find pat (to-string %)) res)
-        index (@state ::selected)
-        hit (when (< index (count filtered)) (nth filtered (@state ::selected)))]
-    (swap! state assoc ::hit hit ::filtered filtered ::oldsearch (@state ::search))
-    (doseq [e (take 100 filtered)]
-      (when (= e hit) (editor/set-mark "typeaheadcursor"))
-      (editor/insert (to-string e))
-      (when (= e hit) (editor/selection-set))
-      (editor/insert "\n"))
-    (editor/point-to-mark "typeaheadcursor")))
+  (let [st (update-state)]
+    (-> (create (str (st ::prompt) (st ::search) " "))
+        end
+        left
+        (set-mark "hl0")
+        right
+        (insert "\n\n")
+        (insert (str/join "\n" (map (st ::tostringfun) (st ::filtered))))
+        beginning
+        (forward-lines (+ (st ::selected) 2))
+        end-of-line
+        (set-mark "selection")
+        beginning-of-line
+        editor/set-slider)))
 
-(defn delete-char
-  []
-  (when (> (count (@state ::search)) 0)
-    (swap! state assoc ::search (subs (@state ::search) 0 (dec (count (@state ::search)))))
-    (swap! state assoc ::selected 0)
-    (update-display)))
+(defn update-search
+  [ch]
+  (swap! state update ::search #(str % ch))
+  (update-display))
 
 (defn next-res
   []
@@ -53,17 +61,18 @@
   (swap! state update ::selected #(max (dec %) 0))
   (update-display))
 
+(defn delete-char
+  []
+  (when (> (count (@state ::search)) 0)
+    (swap! state assoc ::search (subs (@state ::search) 0 (dec (count (@state ::search)))))
+    (swap! state assoc ::selected 0)
+    (update-display)))
+
 (defn execute
   []
   (editor/previous-real-buffer)
   (when-let [hit (@state ::hit)]
      ((@state ::callback) hit)))
-
-(defn update-search
-  [ch]
-  (swap! state update ::search #(str % ch))
-  (swap! state assoc ::selected 0)
-  (update-display))
 
 (def keymap
   {:cursor-color :blue
@@ -72,14 +81,13 @@
    "backspace" delete-char
    "C-k" next-res
    "down" next-res
-   "\t" prev-res ; tab = C-i in termainal!
+   "\t" prev-res ; tab = C-i in terminal!
    "up" prev-res
    "C-i" prev-res
    "\n" execute
    " " #(update-search " ")
    :selfinsert update-search
    })
-  
 
 (defn run
   "Items is a list of items.
@@ -89,7 +97,7 @@
   The callback takes an item as input.
   The callback will be executed with the
   result."
-  [items tostringfun callback]
+  [items tostringfun callback & {:keys [keymappings prompt]}]
   (swap! state assoc ::tostringfun tostringfun
                      ::callback callback
                      ::items items
@@ -97,7 +105,8 @@
                      ::oldsearch ""
                      ::search ""
                      ::hit nil
+                     ::prompt (or prompt ">> ")
                      ::selected 0)
   (editor/new-buffer "-typeaheadapp-")
-  (editor/set-keymap keymap)
+  (editor/set-keymap (merge keymap keymappings))
   (update-display))
