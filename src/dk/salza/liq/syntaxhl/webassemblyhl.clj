@@ -1,5 +1,5 @@
 (ns dk.salza.liq.syntaxhl.webassemblyhl
-  (:use [dk.salza.liq.slider :as slider :exclude [create]]))
+  (:require [dk.salza.liq.slider :refer :all :rename {create create-slider}]))
 
 (defn next-face
   [sl face]

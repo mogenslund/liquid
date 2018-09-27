@@ -4,8 +4,8 @@
             [dk.salza.liq.buffer :as buffer]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.editor :as editor]
-            [clojure.string :as str])
-  (:use [dk.salza.liq.slider :as slider :exclude [create]]))
+            [clojure.string :as str]
+            [dk.salza.liq.slider :refer :all]))
 
 (defn apply-syntax-highlight
   [sl rows towid cursor-color syntaxhighlighter active]
@@ -72,6 +72,7 @@
         columns (window/get-columns window)
         towid (window/get-towid window buffer)
         tow (or (editor/get-top-of-window towid) 0)
+        active (= window (editor/current-window))
         sl (set-mark (buffer/get-slider buffer) "cursor")
 
         sl0 (update-top-of-window sl rows columns tow)
@@ -79,7 +80,6 @@
 
         filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
         syntaxhighlighter  (or (buffer/get-highlighter buffer) (fn [sl face] :plain))
-        active (= window (editor/current-window))
         sl1 (apply-syntax-highlight sl0 rows towid cursor-color syntaxhighlighter active)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
         dirty (buffer/get-dirty buffer)
