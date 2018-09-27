@@ -70,14 +70,14 @@
 
 (defn execute
   []
-  (editor/previous-real-buffer)
+  (editor/previous-real-buffer-same-window)
   (when-let [hit (@state ::hit)]
      ((@state ::callback) hit)))
 
 (def keymap
   {:cursor-color :blue
-   "C-g" editor/previous-real-buffer
-   "esc" editor/previous-real-buffer
+   "C-g" editor/previous-real-buffer-same-window
+   "esc" editor/previous-real-buffer-same-window
    "backspace" delete-char
    "C-k" next-res
    "down" next-res

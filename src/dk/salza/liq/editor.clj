@@ -373,6 +373,13 @@
       (swap! editor update ::windows bump ::window/buffername buffername)
       (swap! editor update ::windows doto-first assoc ::window/buffername buffername))))
 
+(defn switch-to-buffer-same-window
+  "Switch to the buffer with the given name.
+  Use the same window."
+  [buffername]
+  (swap! editor update ::buffers bump ::buffer/name buffername)
+  (swap! editor update ::windows doto-first assoc ::window/buffername buffername))
+
 (defn update-mem-col
   "Stores the current cursor position on the current line.
   Primarily used for forward-line and backward-line to
@@ -745,6 +752,13 @@
   (when-let [previous (first (filter (fn [x] (not (re-find #"^-" x))) (rest (buffer-names))))]
     (switch-to-buffer previous)))
 
+(defn previous-real-buffer-same-window
+  "Navigates to the prevous buffer, but skip over
+  buffer with names containing dashes."
+  []
+  (when-let [previous (first (filter (fn [x] (not (re-find #"^-" x))) (rest (buffer-names))))]
+    (switch-to-buffer-same-window previous)))
+
 (defn set-keymap
   "Sets the keymap on the current buffer."
   [keymap]
@@ -816,10 +830,10 @@
   (if (not (get-buffer filepath))
     (do
       (swap! editor update ::buffers conj (buffer/create-from-file filepath))
-      (switch-to-buffer filepath)
+      (switch-to-buffer-same-window filepath)
       (set-keymap (setting ::default-keymap))
       (set-highlighter (setting ::default-highlighter)))
-    (switch-to-buffer filepath)))
+    (switch-to-buffer-same-window filepath)))
 
 (defn save-file
   "If the current buffer is connected to a file,

@@ -105,7 +105,9 @@
                              ::hit nil)
           (next-res)
           (update-display)))
-      (fun hit))))
+      (do 
+        (editor/previous-real-buffer-same-window)
+        (fun hit)))))
 
 (defn execute-search
   [fun]
@@ -118,8 +120,8 @@
   {:cursor-color :blue
    " " #(insert " ")
    "backspace" delete
-   "C-g" editor/previous-real-buffer
-   "esc" editor/previous-real-buffer
+   "C-g" editor/previous-real-buffer-same-window
+   "esc" editor/previous-real-buffer-same-window
    "C-j" up
    "left" up
    "C-k" next-res
