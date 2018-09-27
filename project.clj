@@ -13,5 +13,6 @@
   :resource-paths ["resources"]
   :target-path "target/%s"
   :clean-targets ^{:protect false} [:target-path]
+  :plugins [[lein-codox "0.10.4"]]
   :profiles {:uberjar {:aot :all}}
   :aliases {"dev" ["run" "--load=.liq"]})
