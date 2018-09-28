@@ -10,11 +10,11 @@
 
 (def server (atom nil))
 (def input (atom (promise)))
-(def dimensions (atom {:rows 40 :columns 80}))
-(def autoupdate (atom false))
+(def ^:private dimensions (atom {:rows 40 :columns 80}))
+(def ^:private autoupdate (atom false))
 
 
-(def style
+(def ^:private style
      "body {
         //background-color: #181818;
         background-color: #080808;
@@ -64,7 +64,7 @@
         background-color: #181818;
       }")
 
-(defn javascript
+(defn- javascript
   []
   (str "
 
@@ -132,7 +132,7 @@
   [window r]
   (str "<div class=\"row\" id=\"w" window "-r" r "\"></div>"))
 
-(defn html
+(defn- html
   []
   (str "<html><head><style>" style "</style><script type=\"text/javascript\">" (javascript) "</script></head>"
        "  <body onload=\"init();\">"
@@ -146,7 +146,7 @@
 
 (def old-lines (atom {}))
 
-(defn convert-line
+(defn- convert-line
   [line]
   (let [key (str "w" (if (= (line :column) 1) "0" "1") "-r" (line :row))
         content (str "<span class=\"bgstatusline\"> </span><span class=\"plain bgplain\">"
@@ -158,28 +158,28 @@
     (str key ":" content)))
 
 
-(defn get-output1
+(defn- get-output
   []
   (let [lineslist (renderer/render-screen)]
         (str/join "\n" 
           (filter #(not= "" %) (pmap convert-line (apply concat lineslist))))))
 
-(defn str2char
+(defn- str2char
   [s]
   (if-let [m (re-matches #"((?:C-)?(?:M-)?)?(\d+)" s)]
     (str (nth m 1) (char (Integer/parseInt (nth m 2))))
     s))
 
-(def handler
+(def ^:private handler
   (proxy [HttpHandler] []
     (handle
       [exchange]
       (let [path (.getPath (.getRequestURI exchange))
-            response (cond (= path "/output") (get-output1)
+            response (cond (= path "/output") (get-output)
                            (re-find #"^/key/" path) (let [num (re-find #"(?<=/key/).*" path)
                                                           c (str2char num)] 
                                                       (editor/handle-input c)
-                                                      (get-output1)
+                                                      (get-output)
                                                       )
                            :else (html))]
         (.sendResponseHeaders exchange 200 (count (.getBytes response)))
@@ -188,27 +188,27 @@
           (.close ostream)))
       )))
 
-(defn quit
+(defn- quit
   []
   (.stop @server)
   (System/exit 0))
       
 
-(defn init
+(defn- init
   [port]
   (reset! server (HttpServer/create (InetSocketAddress. port) 0))
   (.createContext @server "/" handler)
   (.setExecutor @server nil)
   (.start @server))
 
-(defn wait-for-input
+(defn- wait-for-input
   []
   (let [r @@input]
     (println "Input" r)
     (reset! input (promise))
     r))
 
-(defn print-lines
+(defn- print-lines
   [lines]
   )
 

@@ -5,19 +5,19 @@
             [dk.salza.liq.logging :as logging]
             [clojure.string :as str]))
 
-(def old-lines (atom {}))
-(def updater (atom (future nil)))
-(def sysout (System/out))
+(def ^:private old-lines (atom {}))
+(def ^:private updater (atom (future nil)))
+(def ^:private sysout (System/out))
 
-(defn tty-print
+(defn- tty-print
   [arg]
   (.print sysout arg))
 
-(defn tty-println
+(defn- tty-println
   [arg]
   (.println sysout arg))
 
-(defn reset
+(defn- reset
   []
   (reset! old-lines {}))
 
@@ -42,13 +42,13 @@
         (recur (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty")) (inc n))))))
 
 ;;                 0         1          2        3          4         5        6    7      8           9     10      11      12 green  13 yellow 14 red
-(def colorpalette ["0;40" "38;5;131" "38;5;105" "38;5;11" "38;5;40" "38;5;117" "42" "44" "48;5;17" "48;5;235" "49" "48;5;52" "38;5;40" "38;5;11" "38;5;196"])
+(def ^:private colorpalette ["0;40" "38;5;131" "38;5;105" "38;5;11" "38;5;40" "38;5;117" "42" "44" "48;5;17" "48;5;235" "49" "48;5;52" "38;5;40" "38;5;11" "38;5;196"])
 
-(defn print-color
+(defn- print-color
   [index & strings]
   (tty-print (str "\033[" (colorpalette index) "m" (str/join strings))))
 
-(defn print-lines
+(defn- print-lines
   [lineslist]
   (doseq [line (apply concat lineslist)]
     (let [row (line :row)
@@ -98,12 +98,12 @@
   (flush))
 
 
-(defn view-draw
+(defn- view-draw
   []
   (when (empty? @old-lines) (tty-print "\033[0;37m\033[2J"))
   (print-lines (renderer/render-screen)))
 
-(defn view-handler
+(defn- view-handler
   [key reference old new]
   (remove-watch editor/editor key)
   (when (editor/fullupdate?) (reset))
@@ -116,12 +116,12 @@
           (recur @editor/updates))))))
   (add-watch editor/updates key view-handler))
 
-(defn model-update
+(defn- model-update
   [input]
   (editor/handle-input input))
 
 ;; http://ascii-table.com/ansi-escape-sequences.php
-(defn raw2keyword
+(defn- raw2keyword
   [raw]
   (if (integer? raw)
     (cond (= raw 127) "backspace"

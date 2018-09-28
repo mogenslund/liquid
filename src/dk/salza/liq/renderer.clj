@@ -8,7 +8,7 @@
             [clojure.string :as str]
             [dk.salza.liq.slider :refer :all]))
 
-(defn apply-syntax-highlight
+(defn- apply-syntax-highlight
   [sl rows towid cursor-color syntaxhighlighter active]
   (loop [sl0 sl n 0 face :plain bgface :plain pch "" ppch ""]
      (if (> n rows)
