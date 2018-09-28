@@ -1,6 +1,7 @@
 (ns dk.salza.liq.renderer
   (:require [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]
+            [dk.salza.liq.slider :as slider]
             [dk.salza.liq.buffer :as buffer]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.editor :as editor]
@@ -83,7 +84,7 @@
         sl1 (apply-syntax-highlight sl0 rows towid cursor-color syntaxhighlighter active)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
         dirty (buffer/get-dirty buffer)
-        statuslinecontent (str (format "%-6s" (buffer/get-linenumber buffer))
+        statuslinecontent (str (format "%-6s" (-> (buffer/get-slider buffer) slider/get-linenumber))
                                timestamp
                                (if (and filename dirty) "  *  " "     ") filename)
         statusline (conj (map str (seq (subs (format (str "%-" (+ columns 3) "s") statuslinecontent)
