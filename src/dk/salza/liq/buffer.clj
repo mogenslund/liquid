@@ -117,12 +117,6 @@
   [buffer sl]
   (assoc buffer ::slider sl))
 
-(defn get-visible-content
-  "Not in use yet, since there is no functionality
-  for hiding lines, yet."
-  [buffer]
-  (-> buffer ::slider slider/get-visible-content)) 
-
 (defn- set-undo-point
   "Return new buffer with the current slider to the undo stack."
   [buffer]
@@ -185,49 +179,6 @@
   [buffer]
   (buffer ::name))
 
-(defn forward-char
-  "Returns a new buffer where the cursor has been
-  moved amount steps forward."
-  [buffer amount]
-  (doto-slider buffer slider/right amount))
-
-(defn backward-char
-  "Returns a new buffer where the cursor has been
-  moved amount steps backward."
-  [buffer amount]
-  (doto-slider buffer slider/left amount))
-
-(defn forward-word
-  "Returns a new buffer with the cursor moved past
-  next whitespace."
-  [buffer]
-  (doto-slider buffer #(-> % (slider/right-until (partial re-find #"\s")) (slider/right-until (partial re-find #"\S")))))
-
-(defn backward-word
-  "Returns a new buffer with the cursor moved backward
-  to the beginning of the previous word."
-  [buffer]
-  (doto-slider buffer #(let [new-buffer (-> % (slider/left 1) (slider/left-until (partial re-find #"\S")) (slider/left-until (partial re-find #"\s")))] 
-                        (if (slider/beginning? new-buffer) new-buffer (slider/right new-buffer)))))
-
-(defn end-of-word
-  "Returns a new buffer with the cursor moved
-  to the end of the current word."
-  [buffer]
-  (doto-slider buffer #(-> % (slider/right 1) (slider/right-until (partial re-find #"\S")) (slider/right-until (partial re-find #"\s")) (slider/left 1))))
-
-(defn beginning-of-buffer
-  "Returns a new buffer where the cursor is
-  moved to the beginning of the buffer."
-  [buffer]
-  (doto-slider buffer slider/beginning))
-
-(defn end-of-buffer
-  "Returns a new buffer where the cursor is
-  moved to the end of the buffer."
-  [buffer]
-  (doto-slider buffer slider/end))
-
 (defn find-next
   "Returns a new buffer where the cursor is moved
   to the next occurrence of the search frase."
@@ -267,18 +218,6 @@
   moved to the given mark."
   [buffer name]
   (doto-slider buffer slider/point-to-mark name))
-
-(defn end-of-line
-  "Returns a new buffer where the cursor has been
-  moved to the end of the line."
-  [buffer]
-  (doto-slider buffer slider/end-of-line))
-
-(defn beginning-of-line
-  "Returns a new buffer where the cursor has been
-  moved to the beginning of the line."
-  [buffer]
-  (doto-slider buffer slider/beginning-of-line))
 
 (defn insert-line
   "Returns a new buffer where a new line has been
@@ -329,22 +268,6 @@
   and the cursor is moved to the next line."
   [buffer]
   (doto-slider buffer slider/delete-line))
-
-(defn select-sexp-at-point
-  "Returns a buffer where the s-expression at the point (cursor)
-  has been selected.
-  The cursor is moved backwards until the first
-  startparenthesis where selection starts, and then
-  forward until the selection has balanced parenthesis."
-  [buffer]
-  (doto-slider buffer slider/select-sexp-at-point))
-
-(defn highlight-sexp-at-point
-  "Returns a buffer where the highlight marks
-  have been set matching the current s-expression.
-  It spans same text as select-sexp-at-point."
-  [buffer]
-  (doto-slider buffer slider/highlight-sexp-at-point))
 
 (defn forward-visual-line
   "Returns a buffer where the cursor has been moved
@@ -401,12 +324,6 @@
   "Returns the s-expression at the cursor position."
   [buffer]
   (slider/sexp-at-point (buffer ::slider)))
-
-(defn get-line
-  "Returns the current line as a string."
-  [buffer]
-  (-> buffer beginning-of-line (set-mark "linestart")
-             end-of-line (get-region "linestart")))
 
 (defn get-action
   "If the keymap has an action (function)

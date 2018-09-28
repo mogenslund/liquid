@@ -1,5 +1,6 @@
 (ns dk.salza.liq.apps.textapp
   (:require [dk.salza.liq.editor :as editor]
+            [dk.salza.liq.slider :refer :all]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]

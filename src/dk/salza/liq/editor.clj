@@ -396,8 +396,7 @@
   It should take a slider as input and produce a slider
   as output."
   [fun]
-  (doto-buffer buffer/apply-to-slider fun)
-  (update-mem-col))
+  (doto-buffer buffer/apply-to-slider fun))
 
 (defn get-slider
   "Get the slider from the current buffer."
@@ -431,12 +430,6 @@
   (if-let [filepath (get-filename)]
     (str (.getParent (io/file filepath)))))
 
-(defn- get-visible-content
-  "Not in use yet, since there is no functionality
-  for hiding lines, yet."
-  []
-  (-> (current-buffer) buffer/get-visible-content))
-
 (defn insert
   "Inserts a string to the current active buffer
   at the cursor position."
@@ -454,41 +447,55 @@
   "Moves the cursor forward the given amount,
   or 1 step, if no arguments are given."
   ([amount]
-    (doto-buffer buffer/forward-char amount)
+    (apply-to-slider #(slider/right % amount))
     (update-mem-col))
   ([]
-    (doto-buffer buffer/forward-char 1)
+    (apply-to-slider slider/right)
     (update-mem-col)))
 
 (defn forward-word
   "Moves the cursor to the beginning
   of the next word."
   []
-  (doto-buffer buffer/forward-word)
+  (apply-to-slider
+    #(-> %
+         (slider/right-until (partial re-find #"\s"))
+         (slider/right-until (partial re-find #"\S"))))
   (update-mem-col))
 
 (defn backward-word
   "Moves the cursor to the beginning
   of the previous word."
   []
-  (doto-buffer buffer/backward-word)
-  (update-mem-col))
+  (let [beginforward #(if (slider/beginning? %) % (slider/right %))]
+    (apply-to-slider
+      (fn [sl] (-> sl 
+                   (slider/left 1)
+                   (slider/left-until (partial re-find #"\S"))
+                   (slider/left-until (partial re-find #"\s"))
+                   beginforward)))
+    (update-mem-col)))
 
 (defn end-of-word
   "Moves the cursor to the end of the current
   word."
   []
-  (doto-buffer buffer/end-of-word)
+  (apply-to-slider
+    #(-> %
+         (slider/right 1)
+         (slider/right-until (partial re-find #"\S"))
+         (slider/right-until (partial re-find #"\s"))
+         (slider/left 1)))
   (update-mem-col))
 
 (defn backward-char
   "Moves the cursor backward the given amount,
   or 1 step, if no arguments are given."
   ([amount]
-    (doto-buffer buffer/backward-char amount)
+    (apply-to-slider #(slider/left % amount))
     (update-mem-col))
   ([]
-    (doto-buffer buffer/backward-char 1)
+    (apply-to-slider slider/left)
     (update-mem-col)))
 
 (defn delete
@@ -520,26 +527,26 @@
   "Moves the cursor to the end of the
   current line. The next hard line break."
   []
-  (doto-buffer buffer/end-of-line)
+  (apply-to-slider slider/end-of-line)
   (update-mem-col))
 
 (defn beginning-of-line
   "Moves the cursor to the beginning
   of the current line."
   []
-  (doto-buffer buffer/beginning-of-line)
+  (apply-to-slider slider/beginning-of-line)
   (update-mem-col))
 
 (defn beginning-of-buffer
   "Moves the cursor to the beginning of the buffer."
   []
-  (doto-buffer buffer/beginning-of-buffer)
+  (apply-to-slider slider/beginning)
   (update-mem-col))
 
 (defn end-of-buffer
   "Moved the cursor to the end of the buffer."
   []
-  (doto-buffer buffer/end-of-buffer)
+  (apply-to-slider slider/end)
   (update-mem-col))
 
 (defn clear
@@ -582,14 +589,14 @@
   startparenthesis where selection starts, and then
   forward until the selection has balanced parenthesis."
   []
-  (doto-buffer buffer/select-sexp-at-point))
+  (apply-to-slider slider/select-sexp-at-point))
 
 (defn highlight-sexp-at-point
   "Like select-sexp-at-point but only highlights
   start and end of s-expression.
   Toggle this to see current s-expression."
   []
-  (doto-buffer buffer/highlight-sexp-at-point))
+  (apply-to-slider slider/highlight-sexp-at-point))
 
 (defn undo
   "Execute an undo on the current buffer."
@@ -624,7 +631,11 @@
 (defn get-line
   "Returns the current line as a string."
   []
-  (-> (current-buffer) buffer/get-line))
+  (-> (get-slider)
+      slider/beginning-of-line
+      (slider/set-mark "linestart")
+      slider/end-of-line
+      (slider/get-region "linestart")))
 
 (defn get-char
   "Return the char at the point as a string."
@@ -1154,6 +1165,16 @@
                            (str/join "\n" dirty) "\n\n"
                            "Press C-M-q to quit anyway.")))))
 
+(defn- one-arg?
+  "Checks if the functions takes exactly
+  one argument."
+  [fun]
+  (and
+    fun
+    (= (map #(alength (.getParameterTypes %))
+            (.getDeclaredMethods (class fun)))
+       '( 1 1 ))))
+
 (defn handle-input
   [keyw]
   (swap! keylist conj keyw)
@@ -1166,7 +1187,7 @@
                                 (prompt-set (action :info)))
                           (reset! submap action))
           action (do (reset! submap nil)
-                     (action))
+                     (if (one-arg? action) (apply-to-slider action) (action)))
           (and selfins (= (count keyw) 1))
                  (do (reset! submap nil)
                     (selfins keyw))
