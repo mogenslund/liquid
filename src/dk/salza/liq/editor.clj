@@ -434,16 +434,16 @@
   "Inserts a string to the current active buffer
   at the cursor position."
   [string]
-  (apply-to-slider #(slider/insert % string))
   (doto-buffer #(buffer/set-undo-point (buffer/set-dirty %)))
+  (apply-to-slider #(slider/insert % string))
   (update-mem-col))
 
 (defn insert-line
   "Inserts an empty line below the current
   and move the cursor down."
   []
-  (apply-to-slider #(-> % slider/end-of-line (slider/insert "\n")))
   (doto-buffer #(buffer/set-undo-point (buffer/set-dirty %)))
+  (apply-to-slider #(-> % slider/end-of-line (slider/insert "\n")))
   (update-mem-col))
 
 (defn forward-char
@@ -506,20 +506,20 @@
   If no amount is supplied just one character
   will be deleted."
   ([amount]
-    (apply-to-slider #(slider/delete % amount))
     (doto-buffer #(buffer/set-undo-point (buffer/set-dirty %)))
+    (apply-to-slider #(slider/delete % amount))
     (update-mem-col))
   ([]
-    (apply-to-slider #(slider/delete % 1))
     (doto-buffer #(buffer/set-undo-point (buffer/set-dirty %)))
+    (apply-to-slider #(slider/delete % 1))
     (update-mem-col)))
 
 (defn delete-char
   "Deletes the character after the cursor."
   []
   (when (not (-> (get-slider) slider/end?))
-    (apply-to-slider #(-> % (slider/right 1) (slider/delete 1)))
-    (doto-buffer #(buffer/set-undo-point (buffer/set-dirty %)))))
+    (doto-buffer #(buffer/set-undo-point (buffer/set-dirty %))))
+    (apply-to-slider #(-> % (slider/right 1) (slider/delete 1))))
 
 (defn replace-char
   "Replaces the char at current point
@@ -558,8 +558,8 @@
 (defn clear
   "Clears the whole buffer."
   []
-  (apply-to-slider slider/clear)
-  (doto-buffer #(buffer/set-undo-point (buffer/set-dirty %))))
+  (doto-buffer #(buffer/set-undo-point (buffer/set-dirty %)))
+  (apply-to-slider slider/clear))
 
 (defn selection-active?
   "If something is selected."
@@ -896,8 +896,8 @@
   "Deletes the current line."
   []
   (copy-line)
-  (apply-to-slider slider/delete-line)
   (doto-buffer #(buffer/set-undo-point (buffer/set-dirty %)))
+  (apply-to-slider slider/delete-line)
   (update-mem-col))
 
 (defn delete-selection
@@ -905,8 +905,8 @@
   content will be deleted."
   []
   (when (copy-selection)
-    (apply-to-slider #(slider/delete-region % "selection"))
     (doto-buffer #(buffer/set-undo-point (buffer/set-dirty %)))
+    (apply-to-slider #(slider/delete-region % "selection"))
     (update-mem-col)
     true))
 
