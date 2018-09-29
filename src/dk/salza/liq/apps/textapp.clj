@@ -20,6 +20,10 @@
   [key fun]
   (swap! keymap-navigation assoc key fun))
 
+(defn set-insert-key
+  [key fun]
+  (swap! keymap-insert assoc key fun))
+
 (reset! keymap-navigation {:cursor-color :blue
    "\t" #(editor/set-keymap @keymap-insert)
    "M" editor/prompt-to-tmp
