@@ -73,7 +73,7 @@
         (editor/add-to-setting ::editor/snippets (str "(->> \"" tmpdir "\" ls (lrex #\"something\") p)"))
         (editor/add-to-setting ::editor/files (str tmpdir "tmp.clj"))))))
 
-(defn- set-defaults
+(defn set-defaults
   []
 
   ;; Default highlighter
