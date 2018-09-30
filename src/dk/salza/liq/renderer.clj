@@ -83,7 +83,7 @@
         syntaxhighlighter  (or (buffer/get-highlighter buffer) (fn [sl face] :plain))
         sl1 (apply-syntax-highlight sl0 rows towid cursor-color syntaxhighlighter active)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
-        dirty (buffer/get-dirty buffer)
+        dirty (buffer/dirty? buffer)
         statuslinecontent (str (format "%-6s" (-> (buffer/get-slider buffer) slider/get-linenumber))
                                timestamp
                                (if (and filename dirty) "  *  " "     ") filename)

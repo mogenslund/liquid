@@ -47,7 +47,7 @@
       (loop [c (.read r) sl (slider/create)]
         (if (not= c -1)
           (recur (.read r) (slider/insert sl (str (char c))))
-          (slider/beginning sl))))
+          (slider/set-dirty (slider/beginning sl) false))))
     (slider/create)))
 
 (defn create-from-file
@@ -160,14 +160,20 @@
   Used to mark if content has changed
   since last save."
   ([buffer dirty]
-    (if (buffer ::filename) (assoc buffer ::dirty dirty) buffer))
+    ;(if (buffer ::filename) (assoc buffer ::dirty dirty) buffer)
+    (doto-slider buffer slider/set-dirty dirty)
+    )
   ([buffer]
-    (set-dirty buffer true)))
+    ;(set-dirty buffer true)
+    (doto-slider buffer slider/set-dirty true)
+  ))
 
-(defn get-dirty
+(defn dirty?
   "Returns the dirty state of the buffer."
   [buffer]
-  (buffer ::dirty))
+  ;(buffer ::dirty)
+  (when (buffer ::filename) (-> buffer get-slider slider/dirty?))
+  )
 
 (defn get-filename
   "Returns the filename associated with the buffer."
@@ -241,7 +247,7 @@
   "Reopen file in buffer,
   if the file is not dirty."
   [buffer]
-  (if (get-dirty buffer)
+  (if (dirty? buffer)
     buffer
     (force-reopen-file buffer)))
 

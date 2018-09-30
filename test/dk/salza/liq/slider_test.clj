@@ -293,7 +293,7 @@
 
 (deftest before-test
   (let [sl1 (-> (create "a\ncd") (right 4) (set-mark "a"))
-        sl2 (-> sl1 (insert "e") (set-mark "b") (left 1))]
+        sl2 (-> sl1 (insert "e") (set-mark "b") (left 1) (set-dirty false))]
     (testing "Before function removes chars and marks after cursor."
       (is (= sl1 (before sl2))))))
 
@@ -310,7 +310,7 @@
         sl2 (-> "aaaabbb\ncccc\ndddd" (create) (right 9))
         expected (-> "a\nbaaaabbb\ncccc\nddddcde\nfg" (create) (right 12))]
     (testing "Inserting slider into another"
-      (is (= (insert-slider sl1 sl2) expected)))))
+      (is (= (-> (insert-slider sl1 sl2) (set-dirty false)) expected)))))
 
 ;(deftest frame-test
 ;  (let [sl (create "aaa\n1\n22\n333\n4444\n55555\nbb bb bbb\ncccc cccc ccccc")]

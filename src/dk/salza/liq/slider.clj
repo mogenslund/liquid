@@ -57,6 +57,7 @@
       ::point 0       ; The current point (cursor position). Starts at 0, the begining of the slider
       ::linenumber 1  ; Meta information for fast retrievel of the current line number
       ::totallines (inc (count (filter #(= % "\n") after))) ; Only to make the end function perform optimal
+      ::dirty false
       ::marks {}}))   ; A map of named positions, like "selection" -> 18.
                       ; The positions are pushed, when text is insertet
                       ; strictly before the mark.
@@ -68,11 +69,21 @@
   [sl]
   (and (map? sl) (sl ::before)))
 
+(defn set-dirty
+  ([sl dirty]
+   (assoc sl ::dirty dirty))
+  ([sl]
+   (assoc sl ::dirty true)))
+
+(defn dirty?
+  [sl]
+  (sl ::dirty))
+
 (defn clear
   "Erases everything in the slider,
   content and marks."
   [sl]
-  (create))
+  (-> (create) set-dirty))
 
 (defn beginning
   "Moves the point (cursor) to the beginning of the slider."
@@ -271,6 +282,7 @@
         ::point (+ (sl ::point) n)
         ::linenumber (+ (sl ::linenumber) linecount)
         ::totallines (+ (sl ::totallines) linecount)
+        ::dirty true
         ::marks (slide-marks (sl ::marks) (+ (sl ::point) n -1) n))))
 
 (defn insert-newline
@@ -282,6 +294,7 @@
     ::point (inc (sl ::point))
     ::linenumber (inc (sl ::linenumber))
     ::totallines (inc (sl ::totallines))
+    ::dirty true
     ::marks (slide-marks (sl ::marks) (sl ::point) 1)))
 
 (defn insert-space
@@ -291,6 +304,7 @@
   (assoc sl
     ::before (conj (sl ::before) " ")
     ::point (inc (sl ::point))
+    ::dirty true
     ::marks (slide-marks (sl ::marks) (sl ::point) 1)))
 
 (defn insert-subslider
@@ -300,6 +314,7 @@
     ::point (inc (sl ::point))
     ::marks (slide-marks (sl ::marks) (sl ::point) 1)
     ::linenumber (+ (sl ::linenumber) (subsl ::totallines) -1)
+    ::dirty true
     ::totallines (+ (sl ::totallines) (subsl ::totallines) -1)))
 
 (defn delete
@@ -317,6 +332,7 @@
         ::point (- (sl ::point) n)
         ::linenumber (- (sl ::linenumber) linecount)
         ::totallines (- (sl ::totallines) linecount)
+        ::dirty true
         ::marks (slide-marks (sl ::marks) (- (sl ::point) n) (* -1 n))))))
 
 (defn wrap
@@ -402,6 +418,7 @@
    ::point (+ (sl1 ::point) (sl2 ::point))
    ::linenumber (+ (sl1 ::linenumber) (sl2 ::linenumber) -1)
    ::totallines (+ (sl1 ::totallines) (sl2 ::totallines) -1)
+   ::dirty true
    ::marks {}})
 
 
