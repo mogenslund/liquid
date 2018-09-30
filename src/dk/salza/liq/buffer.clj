@@ -34,7 +34,6 @@
    ::slider-stack () ;; To use in connection with undo
    ::filename nil
    ::modified nil
-   ::dirty false
    ::mem-col 0
    ::highlighter nil
    ::keymap {}
@@ -61,7 +60,6 @@
    ::slider-stack () ;; To use in connection with undo
    ::filename path
    ::modified (.lastModified (io/file path))
-   ::dirty false
    ::mem-col 0
    ::highlighter nil
    ::keymap {}})
@@ -160,20 +158,14 @@
   Used to mark if content has changed
   since last save."
   ([buffer dirty]
-    ;(if (buffer ::filename) (assoc buffer ::dirty dirty) buffer)
-    (doto-slider buffer slider/set-dirty dirty)
-    )
+    (doto-slider buffer slider/set-dirty dirty))
   ([buffer]
-    ;(set-dirty buffer true)
-    (doto-slider buffer slider/set-dirty true)
-  ))
+    (doto-slider buffer slider/set-dirty true)))
 
 (defn dirty?
   "Returns the dirty state of the buffer."
   [buffer]
-  ;(buffer ::dirty)
-  (when (buffer ::filename) (-> buffer get-slider slider/dirty?))
-  )
+  (when (buffer ::filename) (-> buffer get-slider slider/dirty?)))
 
 (defn get-filename
   "Returns the filename associated with the buffer."
