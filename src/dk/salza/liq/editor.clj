@@ -1183,11 +1183,11 @@
   "Checks if the functions takes exactly
   one argument."
   [fun]
-  (and
-    fun
-    (= (map #(alength (.getParameterTypes %))
-            (.getDeclaredMethods (class fun)))
-       '( 1 1 ))))
+  (when fun
+    (let [ar (map #(alength (.getParameterTypes %))
+            (.getDeclaredMethods (class fun)))]
+    (or (= ar '(1))
+        (= ar '(1 1))))))
 
 (defn handle-input
   [keyw]
