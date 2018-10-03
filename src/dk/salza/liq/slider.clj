@@ -696,8 +696,8 @@
   "Returns slider where cursor marks has been set
   and point moved to top of window."
   [sl rows columns tow]
-  (if (beginning? sl)
-    (-> sl (set-mark "cursor") (set-point 0))
+  (if (and (beginning? sl) (not= tow 0))
+    (update-top-of-window sl rows columns 0)
     (let [sl0 (-> sl (set-mark "cursor") (set-point tow))]
       (if (< (get-mark sl0 "cursor") tow) ;; If point is before top of window
         (let [newtow (get-point (left-linebreaks sl0 (inc rows)))]
