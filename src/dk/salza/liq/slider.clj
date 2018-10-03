@@ -696,29 +696,31 @@
   "Returns slider where cursor marks has been set
   and point moved to top of window."
   [sl rows columns tow]
-  (let [sl0 (-> sl (set-mark "cursor") (set-point tow))]
-    (if (< (get-mark sl0 "cursor") tow) ;; If point is before top of window
-      (let [newtow (get-point (left-linebreaks sl0 (inc rows)))]
-        (update-top-of-window sl rows columns newtow))
-      (let [;; Add rows number of breaks
-            sllist (iterate #(wrap-and-forward-line % columns) sl0)
-            slbefore (nth (iterate #(wrap-and-forward-line % columns) sl0) (dec rows))
-            sl1 (nth (iterate #(wrap-and-forward-line % columns) sl0) rows)]
-  
-        ;; If original point is on the first rows of lines we are done
-        ;; otherwise a recenter should be performed
-        ;(futil/log (str (get-mark sl1 "cursor") ", " (get-point sl1) ", " (pr-str sl1)))
-        (if ((if (and (end? sl1) (= (get-point slbefore) (get-point sl1))) <= <) (get-mark sl1 "cursor") (get-point sl1))
-          (set-point sl1 tow)
-          (let [sl2 (loop [s sl1]
-                      (if (<= (get-mark s "cursor") (get-point s))
-                        s
-                        (recur (wrap-and-forward-line s columns))))
-                ;; Now sl2 ends with the cursor
-                sl3 (right (left-linebreaks sl2 (int (* rows 0.4))) 1)]
-            ;; sl3 now has point at new top of window
-            sl3
-            (update-top-of-window sl rows columns (get-point sl3))))))))
+  (if (beginning? sl)
+    (-> sl (set-mark "cursor") (set-point 0))
+    (let [sl0 (-> sl (set-mark "cursor") (set-point tow))]
+      (if (< (get-mark sl0 "cursor") tow) ;; If point is before top of window
+        (let [newtow (get-point (left-linebreaks sl0 (inc rows)))]
+          (update-top-of-window sl rows columns newtow))
+        (let [;; Add rows number of breaks
+              sllist (iterate #(wrap-and-forward-line % columns) sl0)
+              slbefore (nth (iterate #(wrap-and-forward-line % columns) sl0) (dec rows))
+              sl1 (nth (iterate #(wrap-and-forward-line % columns) sl0) rows)]
+    
+          ;; If original point is on the first rows of lines we are done
+          ;; otherwise a recenter should be performed
+          ;(futil/log (str (get-mark sl1 "cursor") ", " (get-point sl1) ", " (pr-str sl1)))
+          (if ((if (and (end? sl1) (= (get-point slbefore) (get-point sl1))) <= <) (get-mark sl1 "cursor") (get-point sl1))
+            (set-point sl1 tow)
+            (let [sl2 (loop [s sl1]
+                        (if (<= (get-mark s "cursor") (get-point s))
+                          s
+                          (recur (wrap-and-forward-line s columns))))
+                  ;; Now sl2 ends with the cursor
+                  sl3 (right (left-linebreaks sl2 (int (* rows 0.4))) 1)]
+              ;; sl3 now has point at new top of window
+              sl3
+              (update-top-of-window sl rows columns (get-point sl3)))))))))
 
 (defn take-lines
   "Generate list of lines with
