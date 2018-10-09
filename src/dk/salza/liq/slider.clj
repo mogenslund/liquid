@@ -734,16 +734,26 @@
             "beginning"))
     (take rows (rest (iterate #(-> % (set-mark "beginning") (forward-line columns)) sl)))))
 
+(defn find-next-regex
+  "Find next regex match. If no match
+  found ahead, position will be at end."
+  [sl regex]
+  (let [s (-> sl after get-content)
+        pos (count (first (str/split s regex 2)))]
+    (right sl pos)))
+
 (defn find-next
   "Moves the point to the next search match
   from the current point position."
   [sl search]
-  (let [s (map str (seq (str/lower-case search)))
-        len (count s)]
-    (loop [sl0 (right sl 1)]
-      (cond (= s (map str/lower-case (take len (sl0 ::after)))) sl0
-            (end? sl0) sl
-            :else (recur (right sl0 1))))))
+  (if (not (string? search))
+    (find-next-regex sl search)
+    (let [s (map str (seq (str/lower-case search)))
+          len (count s)]
+      (loop [sl0 (right sl 1)]
+        (cond (= s (map str/lower-case (take len (sl0 ::after)))) sl0
+              (end? sl0) sl
+              :else (recur (right sl0 1)))))))
 
 (defn sexp-at-point
   "Returns the sexp at the current point. If there is no
