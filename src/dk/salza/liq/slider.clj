@@ -639,22 +639,26 @@
   The content between the cursor and the
   given mark"
   [sl markname]
-  (let [subsl (get-region-as-slider sl markname)]
+  (let [d (dirty? sl)
+        subsl (get-region-as-slider sl markname)]
     (-> sl
         (delete-region markname)
         (insert-subslider subsl)
-        left)))
+        left
+        (set-dirty d))))
 
 (defn unhide
   "If current position contains hidden/collapsed
   content it will be expanded."
   [sl]
-  (let [subsl (first (sl ::after))]
+  (let [d (dirty? sl)
+        subsl (first (sl ::after))]
     (if (slider? subsl)
       (-> sl
           right
           (delete 1)
-          (insert-slider subsl))
+          (insert-slider subsl)
+          (set-dirty d))
       sl)))
 
 (defn delete-line
