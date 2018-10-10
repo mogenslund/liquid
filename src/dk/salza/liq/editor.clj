@@ -357,7 +357,7 @@
 (defn dirty-buffers
   "The names of the dirty buffers as a list."
   []
-  (map ::buffer/name (filter ::buffer/dirty (@editor ::buffers))))
+  (map buffer/get-name (filter buffer/dirty? (@editor ::buffers))))
 
 (defn dirty?
   "Returns weather current buffer is dirty."
