@@ -128,7 +128,7 @@
             column (line :column)
             content (line :line)
             key (str "k" row "-" column)
-            oldcontent (@old-lines key)] 
+            oldcontent (@old-lines key)]
             (let [oldcount (count (filter #(and (string? %) (not= % "")) oldcontent))]
               (loop [c oldcontent offset 0]
                 (when (not-empty c)
