@@ -129,7 +129,6 @@
             content (line :line)
             key (str "k" row "-" column)
             oldcontent (@old-lines key)] 
-          (when (not= oldcontent content)
             (let [oldcount (count (filter #(and (string? %) (not= % "")) oldcontent))]
               (loop [c oldcontent offset 0]
                 (when (not-empty c)
@@ -148,7 +147,7 @@
                       (let [nextcolor (or (ch :face) color)
                             nextbgcolor (or (ch :bgface) bgcolor)]
                         (draw-char g (or (ch :char) "…") row (+ column offset) nextcolor nextbgcolor)
-                        (recur (rest c) (+ offset 1) nextcolor nextbgcolor))))))))
+                        (recur (rest c) (+ offset 1) nextcolor nextbgcolor)))))))
         (swap! old-lines assoc key content)))))
 
 (defn handle-keydown
@@ -232,7 +231,8 @@
     (.addComponentListener @frame
       (proxy [ComponentListener] []
         (componentShown [c])
-        (componentMoved [c])
+        (componentMoved [c]
+		  (editor/request-fullupdate))
         (componentHidden [c])
         (componentResized [c]
           (let [wndcount (count (editor/get-windows))
