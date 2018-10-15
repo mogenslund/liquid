@@ -3,7 +3,7 @@
             [dk.salza.liq.apps.typeaheadapp :as typeaheadapp]
             [clojure.string :as str]))
 
-(defn callback
+(defn- callback
   [item]
   (editor/beginning-of-buffer)
   (editor/find-next item)

@@ -1,5 +1,6 @@
 (ns dk.salza.liq.apps.textapp
   (:require [dk.salza.liq.editor :as editor]
+            [dk.salza.liq.slider :refer :all]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
@@ -18,6 +19,10 @@
 (defn set-navigation-key
   [key fun]
   (swap! keymap-navigation assoc key fun))
+
+(defn set-insert-key
+  [key fun]
+  (swap! keymap-insert assoc key fun))
 
 (reset! keymap-navigation {:cursor-color :blue
    "\t" #(editor/set-keymap @keymap-insert)

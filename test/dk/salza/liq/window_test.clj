@@ -25,9 +25,9 @@
 (defn create-buffer
   [before after]
   (-> (buffer/create "mybuffer")
-      (buffer/insert after)
-      (buffer/beginning-of-buffer)
-      (buffer/insert before)))
+      (buffer/apply-to-slider #(slider/insert % after))
+      (buffer/apply-to-slider slider/beginning)
+      (buffer/apply-to-slider #(slider/insert % before))))
   
 
 (defn visualize

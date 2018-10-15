@@ -3,13 +3,13 @@
             [dk.salza.liq.apps.typeaheadapp :as typeaheadapp]
             [clojure.string :as str]))
 
-(defn callback
+(defn- callback
   [item]
   (editor/beginning-of-buffer)
   (editor/find-next item)
   (editor/top-align-page))
 
-(defn filter-headlines
+(defn- filter-headlines
   [content]
   (->> content (str/split-lines) (filter #(re-find #"^(\(def|function|#|;#)" %))))
 

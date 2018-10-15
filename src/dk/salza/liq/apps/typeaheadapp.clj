@@ -3,17 +3,18 @@
             [dk.salza.liq.editor :as editor]
             [clojure.string :as str]))
 
-(def state (atom {::tostringfun nil
-                  ::callback nil
-                  ::items nil
-                  ::filtered nil
-                  ::oldsearch ""
-                  ::search ""
-                  ::hit nil
-                  ::prompt ""
-                  ::selected 0}))
+(def ^:private state
+  (atom {::tostringfun nil
+         ::callback nil
+         ::items nil
+         ::filtered nil
+         ::oldsearch ""
+         ::search ""
+         ::hit nil
+         ::prompt ""
+         ::selected 0}))
 
-(defn update-state
+(defn- update-state
   []
   (let [st @state
         pat (re-pattern (str "(?i)" (str/replace (st ::search) #" " ".*")))
@@ -22,14 +23,14 @@
         hit (first (drop selected filtered))]
     (swap! state assoc ::filtered filtered ::selected selected ::hit hit)))
 
-(defn forward-lines
+(defn- forward-lines
   [sl amount]
   (loop [sl1 sl n 0]
     (if (= n amount)
       sl1
       (recur (forward-line sl1) (inc n)))))
 
-(defn update-display
+(defn- update-display
   []
   (let [st (update-state)]
     (-> (create (str (st ::prompt) (st ::search) " "))
@@ -46,35 +47,35 @@
         beginning-of-line
         editor/set-slider)))
 
-(defn update-search
+(defn- update-search
   [ch]
   (swap! state update ::search #(str % ch))
   (update-display))
 
-(defn next-res
+(defn- next-res
   []
   (swap! state update ::selected inc)
   (update-display))
 
-(defn prev-res
+(defn- prev-res
   []
   (swap! state update ::selected #(max (dec %) 0))
   (update-display))
 
-(defn delete-char
+(defn- delete-char
   []
   (when (> (count (@state ::search)) 0)
     (swap! state assoc ::search (subs (@state ::search) 0 (dec (count (@state ::search)))))
     (swap! state assoc ::selected 0)
     (update-display)))
 
-(defn execute
+(defn- execute
   []
   (editor/previous-real-buffer-same-window)
   (when-let [hit (@state ::hit)]
      ((@state ::callback) hit)))
 
-(def keymap
+(def ^:private keymap
   {:cursor-color :blue
    "C-g" editor/previous-real-buffer-same-window
    "esc" editor/previous-real-buffer-same-window

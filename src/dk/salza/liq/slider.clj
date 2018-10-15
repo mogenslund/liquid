@@ -57,6 +57,7 @@
       ::point 0       ; The current point (cursor position). Starts at 0, the begining of the slider
       ::linenumber 1  ; Meta information for fast retrievel of the current line number
       ::totallines (inc (count (filter #(= % "\n") after))) ; Only to make the end function perform optimal
+      ::dirty false
       ::marks {}}))   ; A map of named positions, like "selection" -> 18.
                       ; The positions are pushed, when text is insertet
                       ; strictly before the mark.
@@ -68,11 +69,21 @@
   [sl]
   (and (map? sl) (sl ::before)))
 
+(defn set-dirty
+  ([sl dirty]
+   (assoc sl ::dirty dirty))
+  ([sl]
+   (assoc sl ::dirty true)))
+
+(defn dirty?
+  [sl]
+  (sl ::dirty))
+
 (defn clear
   "Erases everything in the slider,
   content and marks."
   [sl]
-  (create))
+  (-> (create) set-dirty))
 
 (defn beginning
   "Moves the point (cursor) to the beginning of the slider."
@@ -271,6 +282,7 @@
         ::point (+ (sl ::point) n)
         ::linenumber (+ (sl ::linenumber) linecount)
         ::totallines (+ (sl ::totallines) linecount)
+        ::dirty true
         ::marks (slide-marks (sl ::marks) (+ (sl ::point) n -1) n))))
 
 (defn insert-newline
@@ -282,6 +294,7 @@
     ::point (inc (sl ::point))
     ::linenumber (inc (sl ::linenumber))
     ::totallines (inc (sl ::totallines))
+    ::dirty true
     ::marks (slide-marks (sl ::marks) (sl ::point) 1)))
 
 (defn insert-space
@@ -291,6 +304,7 @@
   (assoc sl
     ::before (conj (sl ::before) " ")
     ::point (inc (sl ::point))
+    ::dirty true
     ::marks (slide-marks (sl ::marks) (sl ::point) 1)))
 
 (defn insert-subslider
@@ -300,6 +314,7 @@
     ::point (inc (sl ::point))
     ::marks (slide-marks (sl ::marks) (sl ::point) 1)
     ::linenumber (+ (sl ::linenumber) (subsl ::totallines) -1)
+    ::dirty true
     ::totallines (+ (sl ::totallines) (subsl ::totallines) -1)))
 
 (defn delete
@@ -317,6 +332,7 @@
         ::point (- (sl ::point) n)
         ::linenumber (- (sl ::linenumber) linecount)
         ::totallines (- (sl ::totallines) linecount)
+        ::dirty true
         ::marks (slide-marks (sl ::marks) (- (sl ::point) n) (* -1 n))))))
 
 (defn wrap
@@ -402,6 +418,7 @@
    ::point (+ (sl1 ::point) (sl2 ::point))
    ::linenumber (+ (sl1 ::linenumber) (sl2 ::linenumber) -1)
    ::totallines (+ (sl1 ::totallines) (sl2 ::totallines) -1)
+   ::dirty true
    ::marks {}})
 
 
@@ -622,22 +639,26 @@
   The content between the cursor and the
   given mark"
   [sl markname]
-  (let [subsl (get-region-as-slider sl markname)]
+  (let [d (dirty? sl)
+        subsl (get-region-as-slider sl markname)]
     (-> sl
         (delete-region markname)
         (insert-subslider subsl)
-        left)))
+        left
+        (set-dirty d))))
 
 (defn unhide
   "If current position contains hidden/collapsed
   content it will be expanded."
   [sl]
-  (let [subsl (first (sl ::after))]
+  (let [d (dirty? sl)
+        subsl (first (sl ::after))]
     (if (slider? subsl)
       (-> sl
           right
           (delete 1)
-          (insert-slider subsl))
+          (insert-slider subsl)
+          (set-dirty d))
       sl)))
 
 (defn delete-line
@@ -679,29 +700,31 @@
   "Returns slider where cursor marks has been set
   and point moved to top of window."
   [sl rows columns tow]
-  (let [sl0 (-> sl (set-mark "cursor") (set-point tow))]
-    (if (< (get-mark sl0 "cursor") tow) ;; If point is before top of window
-      (let [newtow (get-point (left-linebreaks sl0 (inc rows)))]
-        (update-top-of-window sl rows columns newtow))
-      (let [;; Add rows number of breaks
-            sllist (iterate #(wrap-and-forward-line % columns) sl0)
-            slbefore (nth (iterate #(wrap-and-forward-line % columns) sl0) (dec rows))
-            sl1 (nth (iterate #(wrap-and-forward-line % columns) sl0) rows)]
-  
-        ;; If original point is on the first rows of lines we are done
-        ;; otherwise a recenter should be performed
-        ;(futil/log (str (get-mark sl1 "cursor") ", " (get-point sl1) ", " (pr-str sl1)))
-        (if ((if (and (end? sl1) (= (get-point slbefore) (get-point sl1))) <= <) (get-mark sl1 "cursor") (get-point sl1))
-          (set-point sl1 tow)
-          (let [sl2 (loop [s sl1]
-                      (if (<= (get-mark s "cursor") (get-point s))
-                        s
-                        (recur (wrap-and-forward-line s columns))))
-                ;; Now sl2 ends with the cursor
-                sl3 (right (left-linebreaks sl2 (int (* rows 0.4))) 1)]
-            ;; sl3 now has point at new top of window
-            sl3
-            (update-top-of-window sl rows columns (get-point sl3))))))))
+  (if (and (beginning? sl) (not= tow 0))
+    (update-top-of-window sl rows columns 0)
+    (let [sl0 (-> sl (set-mark "cursor") (set-point tow))]
+      (if (< (get-mark sl0 "cursor") tow) ;; If point is before top of window
+        (let [newtow (get-point (left-linebreaks sl0 (inc rows)))]
+          (update-top-of-window sl rows columns newtow))
+        (let [;; Add rows number of breaks
+              sllist (iterate #(wrap-and-forward-line % columns) sl0)
+              slbefore (nth (iterate #(wrap-and-forward-line % columns) sl0) (dec rows))
+              sl1 (nth (iterate #(wrap-and-forward-line % columns) sl0) rows)]
+    
+          ;; If original point is on the first rows of lines we are done
+          ;; otherwise a recenter should be performed
+          ;(futil/log (str (get-mark sl1 "cursor") ", " (get-point sl1) ", " (pr-str sl1)))
+          (if ((if (and (end? sl1) (= (get-point slbefore) (get-point sl1))) <= <) (get-mark sl1 "cursor") (get-point sl1))
+            (set-point sl1 tow)
+            (let [sl2 (loop [s sl1]
+                        (if (<= (get-mark s "cursor") (get-point s))
+                          s
+                          (recur (wrap-and-forward-line s columns))))
+                  ;; Now sl2 ends with the cursor
+                  sl3 (right (left-linebreaks sl2 (int (* rows 0.4))) 1)]
+              ;; sl3 now has point at new top of window
+              sl3
+              (update-top-of-window sl rows columns (get-point sl3)))))))))
 
 (defn take-lines
   "Generate list of lines with
@@ -715,16 +738,26 @@
             "beginning"))
     (take rows (rest (iterate #(-> % (set-mark "beginning") (forward-line columns)) sl)))))
 
+(defn find-next-regex
+  "Find next regex match. If no match
+  found ahead, position will be at end."
+  [sl regex]
+  (let [s (-> sl after get-content)
+        pos (count (first (str/split s regex 2)))]
+    (right sl pos)))
+
 (defn find-next
   "Moves the point to the next search match
   from the current point position."
   [sl search]
-  (let [s (map str (seq (str/lower-case search)))
-        len (count s)]
-    (loop [sl0 (right sl 1)]
-      (cond (= s (map str/lower-case (take len (sl0 ::after)))) sl0
-            (end? sl0) sl
-            :else (recur (right sl0 1))))))
+  (if (not (string? search))
+    (find-next-regex sl search)
+    (let [s (map str (seq (str/lower-case search)))
+          len (count s)]
+      (loop [sl0 (right sl 1)]
+        (cond (= s (map str/lower-case (take len (sl0 ::after)))) sl0
+              (end? sl0) sl
+              :else (recur (right sl0 1)))))))
 
 (defn sexp-at-point
   "Returns the sexp at the current point. If there is no

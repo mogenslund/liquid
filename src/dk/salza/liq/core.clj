@@ -19,7 +19,7 @@
             [dk.salza.liq.logging :as logging])
   (:gen-class))
 
-(def logo (str/join "\n" (list
+(def ^:private logo (str/join "\n" (list
   " "
   "       o0o"
   "     o0000"
@@ -57,11 +57,11 @@
   " "
 )))
 
-(defn is-windows
+(defn- is-windows
   []
   (re-matches #"(?i)win.*" (System/getProperty "os.name")))
 
-(defn load-user-file
+(defn- load-user-file
   [path]
   (let [file (and path (fileutil/file path))]
     (if (and file (fileutil/exists? file) (not (fileutil/folder? file)))
@@ -181,7 +181,7 @@
   (editor/end-of-buffer))
 
 
-(defn read-arg
+(defn- read-arg
   "Reads the value of an argument.
   If the argument is on the form --arg=value
   then (read-args args \"--arg=\") vil return
@@ -195,12 +195,12 @@
                                 %)
                       args))))
 
-(defn read-arg-int
+(defn- read-arg-int
   [args arg]
   (let [strres (read-arg args arg)]
     (when strres (Integer/parseInt strres))))
 
-(defn print-help-and-exit
+(defn- print-help-and-exit
   []
   (println (str/join "\n" (list
      ""
@@ -225,7 +225,7 @@
   )))
   (System/exit 0))
 
-(defn print-version-and-exit
+(defn- print-version-and-exit
   []
   (let [proj (clojure.java.io/resource "project.clj")]
     (if proj

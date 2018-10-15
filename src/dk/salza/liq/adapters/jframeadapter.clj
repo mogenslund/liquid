@@ -12,23 +12,23 @@
            [javax.swing JFrame ImageIcon JPanel]))
 
 
-(def frame (atom nil))
-(def panel (atom nil))
-(def pane (atom nil))
-(def old-lines (atom {}))
-(def updater (atom (future nil)))
-(def rows (atom 46))
-(def columns (atom 160))
+(def ^:private frame (atom nil))
+(def ^:private panel (atom nil))
+(def ^:private pane (atom nil))
+(def ^:private old-lines (atom {}))
+(def ^:private updater (atom (future nil)))
+(def ^:private rows (atom 46))
+(def ^:private columns (atom 160))
 
-(defn is-windows
+(defn- is-windows
   []
   (re-matches #"(?i)win.*" (System/getProperty "os.name")))
 
-(defn hexcolor
+(defn- hexcolor
   [h]
   (Color/decode (str "0x" h)))
 
-(def colors
+(def ^:private colors
   {:plain (hexcolor "e4e4ef")
    :type1 (hexcolor "ffdd33")
    :type2 (hexcolor "95a99f")
@@ -41,7 +41,7 @@
    :stringst (hexcolor "73c936")
    :default (hexcolor "aaaaaa")})
 
-(def bgcolors
+(def ^:private bgcolors
   {:plain (hexcolor "181818")
    :cursor0 (hexcolor "181818")
    :cursor1 (hexcolor "336633")
@@ -55,7 +55,7 @@
 
 (def font (atom nil))
 
-(defn update-font
+(defn- update-font
   []
   (reset! font
     (let [allfonts (into #{} (.getAvailableFontFamilyNames (GraphicsEnvironment/getLocalGraphicsEnvironment)))
@@ -70,14 +70,14 @@
       (Font. (some allfonts myfonts) Font/PLAIN @fontsize))))
 
 
-(def fontwidth (atom 8))
-(def fontheight (atom 18))
+(def ^:private fontwidth (atom 8))
+(def ^:private fontheight (atom 18))
 
-(defn view-draw
+(defn- view-draw
   []
   (.repaint @panel))
 
-(defn view-handler
+(defn- view-handler
   [key reference old new]
   (remove-watch editor/editor key)
   (when (future-done? @updater)
@@ -89,7 +89,7 @@
             (recur @editor/updates))))))
   (add-watch editor/updates key view-handler))
 
-(defn toggle-fullscreen
+(defn- toggle-fullscreen
   []
   (let [ge (GraphicsEnvironment/getLocalGraphicsEnvironment)
         screen (.getDefaultScreenDevice ge)]
@@ -98,7 +98,7 @@
           (.setFullScreenWindow screen nil)
           (.setFullScreenWindow screen @frame)))))
 
-(defn model-update
+(defn- model-update
   [input]
   (logging/log "INPUT" input)
   (if (= input "f11")
@@ -106,7 +106,7 @@
     (future
       (editor/handle-input input))))
 
-(defn draw-char
+(defn- draw-char
   [g char row col color bgcolor]
   (let [w @fontwidth
         h @fontheight]
@@ -115,7 +115,7 @@
     (.setColor g (colors color))
     (.drawString g char (* col w) (- (* row h) (quot @fontsize 4) 1))))
 
-(defn draw
+(defn- draw
   [g]
   (let [lineslist (renderer/render-screen)]
     (.setFont g @font)
@@ -150,7 +150,7 @@
                         (recur (rest c) (+ offset 1) nextcolor nextbgcolor)))))))
         (swap! old-lines assoc key content)))))
 
-(defn handle-keydown
+(defn- handle-keydown
   [e]
   (let [code (.getExtendedKeyCode e)
         raw (int (.getKeyChar e))

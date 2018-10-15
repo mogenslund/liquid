@@ -5,15 +5,15 @@
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.coreutil :refer :all]))
 
-(def state (atom {}))
+(def ^:private state (atom {}))
 
-(defn expand-home
+(defn- expand-home
   [s]
   (if (str/starts-with? s "~")
     (str/replace-first s "~" (System/getProperty "user.home"))
     s))
 
-(defn reset-state
+(defn- reset-state
   [path]
   (swap! state assoc
                ::search ""
@@ -21,7 +21,7 @@
                ::selected nil
                ::hit nil))
 
-(defn update-display
+(defn- update-display
   []
   (let [pat (re-pattern (str "(?i)" (str/replace (@state ::search) #" " ".*") "[^/]*$"))
         fullpat (re-pattern (str "(?i)" (str/replace (@state ::search) #" " ".*") ".*$"))
@@ -56,7 +56,7 @@
     (editor/point-to-mark "typeaheadcursor")
   ))
 
-(defn insert
+(defn- insert
   [st]
   (when (not (re-matches #"[/\\]" st)) ; Ignore forward and back slashes
     (swap! state update ::search #(str % st))
@@ -64,12 +64,12 @@
     ;(swap! state update ::selected #(inc (or % -1)))
     (update-display)))
 
-(defn next-res
+(defn- next-res
   []
   (swap! state update ::selected #(inc (or % -1)))
   (update-display))
 
-(defn delete
+(defn- delete
   []
   (when (> (count (@state ::search)) 0)
     (swap! state update ::search #(subs % 0 (dec (count (@state ::search)))))
@@ -77,7 +77,7 @@
     (next-res)
     (update-display)))
 
-(defn up
+(defn- up
   []
   (swap! state update ::path #(or (.getParent (io/file %)) %))
   (swap! state assoc ::search "")
@@ -86,13 +86,13 @@
   (update-display))
 
 
-(defn prev-res
+(defn- prev-res
   []
   (when (and (@state ::selected) (> (@state ::selected) 0))
     (swap! state update ::selected dec)
     (update-display)))
 
-(defn execute
+(defn- execute
   [fun]
   (let [hit (@state ::hit)]
     (if (fileutil/folder? hit)
@@ -109,13 +109,13 @@
         (editor/previous-real-buffer-same-window)
         (fun hit)))))
 
-(defn execute-search
+(defn- execute-search
   [fun]
   (let [path (@state ::path)
         search (@state ::search)]
     (fun (fileutil/file (@state ::path) (@state ::search)))))
   
-(defn keymap
+(defn- keymap
   [fun]
   {:cursor-color :blue
    " " #(insert " ")
