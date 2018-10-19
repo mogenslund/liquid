@@ -7,7 +7,7 @@
             [clojure.string :as str]
             [clojure.java.io :as io])
   (:import [java.awt Font Color GraphicsEnvironment Dimension GraphicsDevice Window]
-           [java.awt.event InputEvent KeyListener ComponentListener]
+           [java.awt.event InputEvent KeyListener ComponentListener WindowAdapter]
            [java.awt.image BufferedImage]
            [javax.swing JFrame ImageIcon JPanel]))
 
@@ -128,7 +128,7 @@
             column (line :column)
             content (line :line)
             key (str "k" row "-" column)
-            oldcontent (@old-lines key)] 
+            oldcontent (@old-lines key)]
           (when (not= oldcontent content)
             (let [oldcount (count (filter #(and (string? %) (not= % "")) oldcontent))]
               (loop [c oldcontent offset 0]
@@ -161,7 +161,7 @@
         key (cond (<= 112 code 123) (str shift ctrl alt "f" (- code 111))
                   (= code 135) "~"
                   (= code 129) "|"
-                  (> raw 40000) (str shift (cond 
+                  (> raw 40000) (str shift (cond
                                   (= code 36) "home"
                                   (= code 35) "end"
                                   (= code 34) "pgdn"
@@ -180,7 +180,7 @@
                   (and ctrl (= raw 32)) "C- "
                   ctrl (str ctrl alt (char (+ raw 96)))
                   alt (str ctrl alt (char raw))
-                  (= raw 127) "delete" 
+                  (= raw 127) "delete"
                   (>= raw 32) (str (char raw))
                   (= raw 8) "backspace"
                   (= raw 9) "\t"
@@ -207,7 +207,7 @@
         (.setFocusTraversalKeysEnabled false)
         (.setPreferredSize (Dimension. (* columncount @fontwidth) (* rowcount @fontheight)))
         (.setDoubleBuffered true)))
-    (reset! frame 
+    (reset! frame
       (doto (JFrame. "λiquid")
         (.setDefaultCloseOperation (JFrame/EXIT_ON_CLOSE))
         (.setContentPane @panel)
@@ -218,6 +218,9 @@
             (keyPressed [e] (handle-keydown e))
             (keyReleased [e] (do))
             (keyTyped [e] (do))))
+        (.addWindowListener
+          (proxy [WindowAdapter] []
+            (windowActivated [e] (editor/request-fullupdate) (view-draw))))
         (.setIconImage (when icon (.getImage (ImageIcon. icon))))
         (.pack)
         (.show)))
@@ -243,7 +246,8 @@
               (editor/switch-to-buffer "-prompt-")
               (editor/other-window))
             (editor/switch-to-buffer buffername)
-            (editor/request-fullupdate)))))))
+            (editor/request-fullupdate)
+            (view-draw)))))))
 
 (defn jframequit
   []
