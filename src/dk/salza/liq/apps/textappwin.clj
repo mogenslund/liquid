@@ -1,6 +1,7 @@
 (ns dk.salza.liq.apps.textappwin
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.apps.promptapp :as promptapp]
+            [dk.salza.liq.apps.findfileapp :as findfileapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
@@ -52,10 +53,12 @@
    "C-l" #(do (editor/insert "[]") (editor/backward-char)) 
    "C-h" #(editor/insert "/")
    "backspace" editor/delete
+   "C-o" #(findfileapp/run editor/find-file)
    "C-g" editor/escape
    "esc" editor/escape
    "C-w" editor/kill-buffer
-   "C-s" #(promptapp/run editor/find-next '("SEARCH")) ;editor/search}
+   "C-s" editor/save-file
+   "C-f" #(promptapp/run editor/find-next '("SEARCH")) ;editor/search}
    :selfinsert editor/insert})
 
 

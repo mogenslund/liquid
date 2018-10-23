@@ -120,6 +120,8 @@
   (editor/add-interactive ":o" editor/find-file)
   (editor/add-interactive "apropos" clojure.repl/find-doc "APROPOS")
   (editor/add-interactive "Reopen files changed on disk" editor/reopen-all-files)
+  (editor/add-interactive "Windows keymap" #(editor/set-keymap @textappwin/keymap))
+  (editor/add-interactive "Liquid keymap" #(editor/set-keymap @textapp/keymap-navigation))
 
   ;; Default searchpaths
   (when (fileutil/exists? "project.clj")
