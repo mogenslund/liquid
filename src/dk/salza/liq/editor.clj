@@ -940,21 +940,17 @@
   "Swaps the current line with the one below.
   The cursor follows the the current line down."
   []
-  (delete-line)
-  (insert-line)
-  (paste)
-  (beginning-of-line))
+  (set-undo-point)
+  (apply-to-slider slider/swap-line-down)
+  (update-mem-col))
 
 (defn swap-line-up
   "Swaps the current line with the line above.
   The cursor follows the current line up."
   []
-  (delete-line)
-  (backward-line)
-  (backward-line)
-  (insert-line)
-  (paste)
-  (beginning-of-line))
+  (set-undo-point)
+  (apply-to-slider slider/swap-line-up)
+  (update-mem-col))
 
 (defn prompt-input
   [& string]

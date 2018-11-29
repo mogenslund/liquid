@@ -676,6 +676,54 @@
   [sl]
   (sl ::after))
 
+;; -----------------
+;; Derived functions
+;; -----------------
+
+
+(defn swap-line-down
+  [sl]
+  (if (-> sl end-of-line end?)
+    sl
+    (let [sl0 (beginning-of-line sl)
+          delta (- (get-point sl) (get-point sl0))
+          line (-> sl0
+                   (set-mark "swap-start")
+                   end-of-line
+                   (get-region-as-slider "swap-start"))]
+      (-> sl0
+          (set-mark "swap-start")
+          end-of-line
+          right
+          (delete-region "swap-start")
+          end-of-line
+          insert-newline
+          (insert-slider line)
+          beginning-of-line
+          (right delta)))))
+
+(defn swap-line-up
+  [sl]
+  (if (-> sl beginning-of-line beginning?)
+    sl
+    (let [sl0 (beginning-of-line sl)
+          delta (- (get-point sl) (get-point sl0))
+          line (-> sl0
+                   (set-mark "swap-start")
+                   end-of-line
+                   (get-region-as-slider "swap-start"))]
+      (-> sl0
+          (set-mark "swap-start")
+          end-of-line
+          (delete-region "swap-start")
+          (delete 1)
+          beginning-of-line
+          insert-newline
+          left
+          (insert-slider line)
+          (right delta)))))
+
+
 ;; --------------------------
 ;; Top of window calculations
 ;; --------------------------
