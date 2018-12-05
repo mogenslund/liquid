@@ -51,7 +51,7 @@
    :statusline (hexcolor "000000")
    :default (hexcolor "333333")})
 
-(def fontsize (atom 13))
+(def fontsize (atom 14))
 
 (def font (atom nil))
 
@@ -60,8 +60,9 @@
   (reset! font
     (let [allfonts (into #{} (.getAvailableFontFamilyNames (GraphicsEnvironment/getLocalGraphicsEnvironment)))
           myfonts (list
-                    "monospaced"
+                    "Lucida Sans Typewriter"
                     "Consolas"
+                    "monospaced"
                     "Inconsolata"
                     "DejaVu Sans Mono"
                     "Ubuntu Mono"
