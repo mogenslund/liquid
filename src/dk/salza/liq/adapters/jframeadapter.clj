@@ -56,20 +56,22 @@
 (def font (atom nil))
 
 (defn- update-font
-  []
-  (reset! font
-    (let [allfonts (into #{} (.getAvailableFontFamilyNames (GraphicsEnvironment/getLocalGraphicsEnvironment)))
-          myfonts (list
-                    "Lucida Sans Typewriter"
-                    "Consolas"
-                    "monospaced"
-                    "Inconsolata"
-                    "DejaVu Sans Mono"
-                    "Ubuntu Mono"
-                    "Courier"
-                  )]
-      (Font. (some allfonts myfonts) Font/PLAIN @fontsize))))
-
+  ([f]
+    (reset! font
+      (let [allfonts (into #{} (.getAvailableFontFamilyNames (GraphicsEnvironment/getLocalGraphicsEnvironment)))
+            myfonts (concat
+                      (when f (list f))
+                        (list
+                        "Lucida Sans Typewriter"
+                        "Consolas"
+                        "monospaced"
+                        "Inconsolata"
+                        "DejaVu Sans Mono"
+                        "Ubuntu Mono"
+                        "Courier"
+                      ))]
+        (Font. (some allfonts myfonts) Font/PLAIN @fontsize))))
+  ([] (update-font nil)))
 
 (def ^:private fontwidth (atom 8))
 (def ^:private fontheight (atom 18))
@@ -123,7 +125,7 @@
     (when (editor/fullupdate?)
       (reset! old-lines {})
       (.setColor g (bgcolors :plain))
-      (.fillRect g 0 0 1600 900))
+      (.fillRect g 0 0 (.getWidth @panel) (.getHeight @panel)))
     (doseq [line (apply concat lineslist)]
       (let [row (line :row)
             column (line :column)
@@ -189,10 +191,38 @@
                   true (str (char raw)))]
     (when key (model-update key))))
 
+(defn redraw-frame
+  []
+  (let [tmpg (.getGraphics (BufferedImage. 40 40 BufferedImage/TYPE_INT_RGB))]
+    (.setFont tmpg @font)
+    (reset! fontwidth (.stringWidth (.getFontMetrics tmpg) "M"))
+    (reset! fontheight (+ (.getHeight (.getFontMetrics tmpg)) 1))
+    (let [wndcount (count (editor/get-windows))
+          buffername (editor/get-name)]
+      (editor/set-frame-dimensions (quot (.getHeight @panel) @fontheight) (quot (.getWidth @panel) @fontwidth))
+      (when (= wndcount 2)
+        (editor/split-window-right 0.22)
+        (editor/switch-to-buffer "-prompt-")
+        (editor/other-window))
+      (editor/switch-to-buffer buffername)
+      (editor/request-fullupdate)
+      (editor/updated)
+      (view-draw)
+      (Thread/sleep 20)
+      (editor/request-fullupdate)
+      (editor/updated)
+      (view-draw))))
+
+(defn set-font
+  [font-name font-size]
+  (reset! fontsize font-size)
+  (update-font font-name)
+  (redraw-frame))
+
 (defn init
-  [rowcount columncount & {:keys [font-size]}]
+  [rowcount columncount & {:keys [font-name font-size]}]
   (when font-size (reset! fontsize font-size))
-  (update-font)
+  (update-font font-name)
   (let [icon (io/resource "liquid.png")
         tmpg (.getGraphics (BufferedImage. 40 40 BufferedImage/TYPE_INT_RGB))]
     (.setFont tmpg @font)
@@ -200,31 +230,31 @@
     (reset! fontheight (+ (.getHeight (.getFontMetrics tmpg)) 1))
     (reset! rows rowcount)
     (reset! columns columncount)
+
     (reset! panel
-      (doto
-        (proxy [JPanel] []
-          (paintComponent [g]
-            (draw g)))
-        (.setFocusTraversalKeysEnabled false)
-        (.setPreferredSize (Dimension. (* columncount @fontwidth) (* rowcount @fontheight)))
-        (.setDoubleBuffered true)))
-    (reset! frame
-      (doto (JFrame. "λiquid")
-        (.setDefaultCloseOperation (JFrame/EXIT_ON_CLOSE))
-        (.setContentPane @panel)
-        (.setBackground (bgcolors :plain))
-        (.setFocusTraversalKeysEnabled false)
-        (.addKeyListener
-          (proxy [KeyListener] []
-            (keyPressed [e] (handle-keydown e))
-            (keyReleased [e] (do))
-            (keyTyped [e] (do))))
-        (.addWindowListener
-          (proxy [WindowAdapter] []
-            (windowActivated [e] (editor/request-fullupdate) (view-draw))))
-        (.setIconImage (when icon (.getImage (ImageIcon. icon))))
-        (.pack)
-        (.show)))
+      (proxy [JPanel] []
+        (paintComponent [g]
+          (draw g))))
+    (.setFocusTraversalKeysEnabled @panel false)
+    (.setPreferredSize @panel (Dimension. (* @columns @fontwidth) (* @rows @fontheight)))
+    (.setDoubleBuffered @panel true)
+
+    (reset! frame (JFrame. "λiquid"))
+    (.setDefaultCloseOperation @frame (JFrame/EXIT_ON_CLOSE))
+    (.setContentPane @frame @panel)
+    (.setBackground @frame (bgcolors :plain))
+    (.setFocusTraversalKeysEnabled @frame false)
+    (.addKeyListener @frame
+      (proxy [KeyListener] []
+        (keyPressed [e] (handle-keydown e))
+        (keyReleased [e] (do))
+        (keyTyped [e] (do))))
+    (.addWindowListener @frame
+      (proxy [WindowAdapter] []
+        (windowActivated [e] (editor/request-fullupdate) (view-draw))))
+    (.setIconImage @frame (when icon (.getImage (ImageIcon. icon))))
+    (.pack @frame)
+    (.show @frame)
     (add-watch editor/updates "jframe" view-handler)
     (editor/request-fullupdate)
     (editor/updated)
@@ -238,17 +268,7 @@
         (componentShown [c])
         (componentMoved [c])
         (componentHidden [c])
-        (componentResized [c]
-          (let [wndcount (count (editor/get-windows))
-                buffername (editor/get-name)]
-            (editor/set-frame-dimensions (quot (.getHeight @panel) @fontheight) (quot (.getWidth @panel) @fontwidth))
-            (when (= wndcount 2)
-              (editor/split-window-right 0.22)
-              (editor/switch-to-buffer "-prompt-")
-              (editor/other-window))
-            (editor/switch-to-buffer buffername)
-            (editor/request-fullupdate)
-            (view-draw)))))))
+        (componentResized [c] (redraw-frame))))))
 
 (defn jframequit
   []
