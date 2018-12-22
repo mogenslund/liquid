@@ -55,6 +55,13 @@
 
 (def font (atom nil))
 
+(defn list-fonts
+  "Output a list of all fonts"
+  []
+  (str/join "\n"
+    (.getAvailableFontFamilyNames
+      (GraphicsEnvironment/getLocalGraphicsEnvironment))))
+
 (defn- update-font
   ([f]
     (reset! font

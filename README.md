@@ -16,6 +16,21 @@
 ## Website
 Find more information on [salza.dk](http://salza.dk)
 
+## Who is this for
+&lambda;iquid is absolutely not for everyone! It is for you if
+
+ * You get a kick of doing everything in Clojure
+ * You love to tinker with your editor
+ * Terminals are the best
+ * You love distractionfree power
+ * You love modal editing, like in vim
+
+## What can you do with it
+There is no made up language or syntax to extend &lambda;iquid.
+
+ * Since &lambda;iquid is pure Clojure it can be used to extend any Clojure or Java program, so the editor lives inside the program.. like magic.
+ * Turn it around, you can use any Clojure and any Java library to extend &lambda;iquid.. if the library can do it then &lambda;iquid can do it. Configure keyboard shortcuts and commands to tame the libraries. Use code to integrate.
+
 ## Demo video
 Watch these videos to get a sense of what it can and how the editor works:
 
@@ -27,13 +42,6 @@ Watch these videos to get a sense of what it can and how the editor works:
 For discussions, help, tips and support, use
 
 **[#liquid](https://clojurians.slack.com/messages/liquid/)** channel in [Clojure Slack](http://clojurians.net/)
-
-## Extensible?
-You Betcha!
-
-Extensions are not addons or plugins, but real code on top of &lambda;iquid. So any Clojure code can be used and any Java jar file for that matter. No special plugin language, just real code. So take your favorite Java library and add it to the classpath. Setup a few shortcuts in the .liq file and now &lambda;iquid integrates with your favorite tool.
-
-Include [Additives](https://github.com/mogenslund/additives) for even more functionality.
 
 ## Some extensions
 
@@ -47,7 +55,7 @@ Include [Additives](https://github.com/mogenslund/additives) for even more funct
 #### Quick start
 Download the single jar (Uberjar containing both Clojure and Liquid) [liq.jar](http://salza.dk/liq.jar)  
 
-**IMPORTANT** Please have the [Cheatsheet](http://salza.dk/cheatsheet.html) nearby when using Liquid for the first time. The keybindings are powerful, but needs to be learned.
+**IMPORTANT** Please have the [Cheatsheet](http://salza.dk/cheatsheet.html) nearby when using Liquid for the first time. The keybindings are powerful, but needs to be learned. **You will get lost without it**
 
 On Windows double click the liq.jar.  
 On Linux and Mac execute the following in a terminal:
@@ -59,6 +67,11 @@ If the terminal causes problems, like hard to see colors or artifacts when navig
     java -jar liq.jar --jframe
 
 My experience is that the terminal "Terminology", with dark background works very well.
+
+#### Starter kit
+A place to start is [Liquid Starter Kit](https://github.com/mogenslund/liquid-starter-kit)
+
+It sort of corresponds to a sample `.emacs` file. Some code you can extend to create your own version of the editor.
 
 #### Local setup and extensions
 For a recommended approach to local setup and managing extensions, please read
@@ -87,7 +100,7 @@ All other tools that I create in Clojure, which are useful as is, are easy to ma
 Example: I have a file with snippets like: `(patch "myserver")`, `(status "myserver")` and `(run-test "name-of-test")`. I just modify "myserver", if needed, and press "e" to execute the command.
 
 ## Dependencies
-Right now the only dependency is Clojure itself. I would like to keep it that way, as for core functionality. When starting Liquid, any resources can just be added to the classpath, and the code will be available from inside Liquid. So it is not a limitation to Liquid, it just means that anything requiring other dependencies should be implemented as plugins and be loaded together with Liquid. Extensions can be loaded through a .liq file in the home folder.
+Right now the only dependency is Clojure itself. I would like to keep it that way, as for core functionality. When starting &lambda;iquid, any resources can just be added to the classpath, and the code will be available from inside &lambda;iquid. So it is not a limitation to &lambda;iquid, it just means that anything requiring other dependencies should be implemented as plugins and be loaded together with &lambda;iquid. Extensions can be loaded through a .liq file in the home folder.
 
 ## Inspiration from Emacs and Vi
 From Emacs I have been inspired by extensibility. Clojure is also the language for writing extensions. That was in fact a primary motivation for creating the editor. Actually it is possible to include the editor into a project and make the editor part of the program. This thought is very similar to the REPL (read-eval-print-loop), but more like an edit-eval-render-loop.
@@ -98,6 +111,6 @@ S-expressions in clojure can be evaluated with "e", while the whole file is eval
 
 
 ## License
-Copyright &copy; 2016 Mogens Br&oslash;dsgaard Lund
+Copyright &copy; 2018 Mogens Br&oslash;dsgaard Lund
 
 Distributed under the Eclipse Public License either version 1.0 or any later version.
