@@ -55,7 +55,7 @@ For discussions, help, tips and support, use
 #### Quick start
 Download the single jar (Uberjar containing both Clojure and Liquid) [liq.jar](http://salza.dk/liq.jar)  
 
-**IMPORTANT** Please have the [Cheatsheet](http://salza.dk/cheatsheet.html) nearby when using Liquid for the first time. The keybindings are powerful, but needs to be learned. **You will get lost without it**
+**IMPORTANT** Please have the [Cheatsheet](http://salza.dk/liquid/cheatsheet.html) nearby when using Liquid for the first time. The keybindings are powerful, but needs to be learned. **You will get lost without it**
 
 On Windows double click the liq.jar.  
 On Linux and Mac execute the following in a terminal:
