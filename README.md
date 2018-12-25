@@ -52,6 +52,14 @@ For discussions, help, tips and support, use
 
 ### Download and execution
 
+#### Try it with clj
+
+You can run from command line using the `clj` command:
+
+```bash
+clj -Sdeps '{:deps {mogenslund/liquid {:mvn/version "1.0.0"}}}' -m dk.salza.liq.core
+```
+
 #### Quick start
 Download the single jar (Uberjar containing both Clojure and Liquid) [liq.jar](http://salza.dk/liq.jar)  
 
