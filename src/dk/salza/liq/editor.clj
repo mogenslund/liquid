@@ -1005,18 +1005,19 @@
   "Evaluate the given s-expression in the current
   namespace."
   [sexp]
-  (let [isprompt (= (get-name) "-prompt-")
+  (let [pr-str-str (fn [x] (if (string? x) x (pr-str x)))
+        isprompt (= (get-name) "-prompt-")
         namespace (or (clojureutil/get-namespace (current-buffer)) "user")]
     (when isprompt (other-window))
     (prompt-set "")
     (with-redefs [println prompt-append]
       (try
-        (println
+        (println (pr-str-str
           (load-string
             (str
               "(do (ns " namespace ") (in-ns '"
               namespace
-              ") " sexp ")")))
+              ") " sexp ")"))))
         (catch Exception e (do (logging/log e) (println (util/pretty-exception e)))))
       )))
 

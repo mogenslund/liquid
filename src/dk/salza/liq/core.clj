@@ -19,6 +19,8 @@
             [dk.salza.liq.logging :as logging])
   (:gen-class))
 
+(set! *print-length* 200)
+
 (def ^:private logo (str/join "\n" (list
   " "
   "       o0o"
