@@ -6,8 +6,8 @@
 
 * <b>Fluidable</b>  -  Embed your code into &lambda;iquid or &lambda;iquid into your code   
 * <b>Dependency free</b>  -  Everything is pure Clojure
-* <b>Translateable</b>  -  Tiny core, simple model, no tricks
-* <b>Destraction Free</b>  -  Typeahead and completions on demand... Your demand!
+* <b>Translatable</b>  -  Tiny core, simple model, no tricks
+* <b>Distraction Free</b>  -  Typeahead and completions on demand... Your demand!
 * <b>Comfortable keybindings</b>  -  Most used commands are close at hand
 * <b>Servable</b>  -  Run as server, local or remote
 
@@ -22,7 +22,7 @@ Find more information on [salza.dk](http://salza.dk)
  * You get a kick of doing everything in Clojure
  * You love to tinker with your editor
  * Terminals are the best
- * You love distractionfree power
+ * You love distraction-free power
  * You love modal editing, like in vim
 
 ## What can you do with it
@@ -89,14 +89,14 @@ For a recommended approach to local setup and managing extensions, please read
 #### Salza &lambda;iquid text editor is designed with clojure developers in mind
 The editor is written in pure Clojure. That is, there are no other dependencies, not even curses or lanterna!
 
-I have been using Emacs for many years. I have tweaked it a lot and implemented modes, to simulate the Vim way of switching between insert mode and normal mode for navigation. I like being able to use the whole keyboard for navigation. As you will see in the video below, I am very inspired by Emacs and Vim, but I have choosen not to try to copy or reimplement Emacs or Vim. I have only stolen the features that I need or like. I hope others will just create plugins or extensions to make the editor support other features that they like.
+I have been using Emacs for many years. I have tweaked it a lot and implemented modes, to simulate the Vim way of switching between insert mode and normal mode for navigation. I like being able to use the whole keyboard for navigation. As you will see in the video below, I am very inspired by Emacs and Vim, but I have chosen not to try to copy or re-implement Emacs or Vim. I have only stolen the features that I need or like. I hope others will just create plugins or extensions to make the editor support other features that they like.
 
 ![Liquid Text Editor](liquid01.png)
 
 I could tell a lot about the editor, but I think you should see the video below for a demonstration.
 
 
-## Technical video explaining the core datastructure of the editor
+## Technical video explaining the core data structure of the editor
 This video is for technical minded people to get a view of the inside of the construction of the editor. Useful for understanding the idea behind the editor or as inspiration for similar projects or extensions of this: [slider01](https://drive.google.com/file/d/0B5Au3PxHCmgBNjJodzNjQ2w4c2M/view?usp=sharing)
 
 ## Use cases
@@ -113,7 +113,7 @@ Right now the only dependency is Clojure itself. I would like to keep it that wa
 ## Inspiration from Emacs and Vi
 From Emacs I have been inspired by extensibility. Clojure is also the language for writing extensions. That was in fact a primary motivation for creating the editor. Actually it is possible to include the editor into a project and make the editor part of the program. This thought is very similar to the REPL (read-eval-print-loop), but more like an edit-eval-render-loop.
 
-From Vi I have stolen the concept of normal/insert mode. I really like the ability to use the whole keyboard to navigate the file and execute commands at one time, while typing text in another. The tab key is used to switch between the two modes. The color of the cursor will indicate which mode is in use. I have resisted the attempt to use the same keybindings as Vi. Some are the same, but as default I have chosen the keys jkli as navigation keys. They are located where the fingers are placed and layed out like the arrow keys. Look at jkli on the keyboard. Different up and down operations are mapped to different combinations with "i" and "k" (up and down), while different sideway actions are mapped to "j" and "l". E.g going to the end of the line is done with shift+l and the beginning of the line with shift+j.
+From Vi I have stolen the concept of normal/insert mode. I really like the ability to use the whole keyboard to navigate the file and execute commands at one time, while typing text in another. The tab key is used to switch between the two modes. The color of the cursor will indicate which mode is in use. I have resisted the attempt to use the same keybindings as Vi. Some are the same, but as default I have chosen the keys jkli as navigation keys. They are located where the fingers are placed and laid out like the arrow keys. Look at jkli on the keyboard. Different up and down operations are mapped to different combinations with "i" and "k" (up and down), while different sideway actions are mapped to "j" and "l". E.g going to the end of the line is done with shift+l and the beginning of the line with shift+j.
 
 S-expressions in clojure can be evaluated with "e", while the whole file is evaluated with shift+e.
 
