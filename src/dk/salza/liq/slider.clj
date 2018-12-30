@@ -104,6 +104,15 @@
      ::point (count tmp)
      ::linenumber (sl ::totallines))))
 
+(defn- char-part
+  "An item in a slider is either a string, a map
+  with a :char element or a sub-slider.
+  This function returns the char-part."
+  [c]
+  (cond (string? c) c
+        c (or (c :char) c)
+        :else nil))
+  
 
 (defn get-char
   "Returns the first character after the point.
@@ -111,9 +120,7 @@
   be returned."
   [sl]
   (let [c (first (sl ::after))]
-    (cond (string? c) c
-          c (or (c :char) c)
-          :else nil)))
+    (char-part c)))
 
 (defn hidden?
   "Checks if current position is a hidden
@@ -164,25 +171,22 @@
   "Returns char behind the cursor given amount back.
   If amount = 1 the char right behind the cursor will be
   returned.
-  Non strings will be filtered away.
   If there is no result, nil is returned."
   [sl amount]
-  (first (drop (- amount 1) (sl ::before))))
+  (char-part (first (drop (- amount 1) (sl ::before)))))
 
 (defn look-ahead
   "Returns char after the cursor given amount forward.
   If amount = 0 the char right after the cursor will be
   returned.
-  Non strings will be filtered away.
   If there is no result, nil is returned."
   [sl amount]
-  (first (drop amount (sl ::after))))
+  (char-part (first (drop amount (sl ::after)))))
 
 (defn string-ahead
-  "Returns next amount of chars as string.
-  Non string will be filtered away."
+  "Returns next amount of chars as string."
   [sl amount]
-  (str/join "" (take amount (sl ::after))))
+  (str/join "" (map char-part (take amount (sl ::after)))))
   
 
 (defn get-point
