@@ -95,11 +95,13 @@
 (defn pretty-exception
   [e]
   (let [message (.getMessage e)
+        cause (.getCause e)
         stacklines (map str (.getStackTrace e))
         filtered (filter #(re-find (re-pattern #"dk\.salza") %) stacklines)
         shortened (map #(re-find (re-pattern "\\w*\\.clj:\\d+") %) filtered)]
     (str
      message "\n"
+     cause "\n"
      (str/join "\n" shortened) "\n"
      (str/join "\n" filtered) "\n"
      (str/join "\n" stacklines))))
