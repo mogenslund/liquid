@@ -88,7 +88,7 @@
                                timestamp
                                (if (and filename dirty) "  *  " "     ") filename)
         statusline (conj (map str (seq (subs (format (str "%-" (+ columns 3) "s") statuslinecontent)
-                                             0 (+ columns 2)))) {:char "L" :face :plain :bgface :statusline})
+                                             0 columns))) {:char "L" :face :plain :bgface :statusline})
         lines (concat (split-to-lines (get-after-list sl1) rows) [statusline])]
       (map #(hash-map :row (+ %1 (window/get-top window))
                       :column (window/get-left window)

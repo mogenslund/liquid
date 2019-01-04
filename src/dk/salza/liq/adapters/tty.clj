@@ -19,6 +19,8 @@
 
 (defn- reset
   []
+  (tty-print "\033[?25l") ; Hide cursor
+  (tty-print "\033[?7l")  ; disable line wrap
   (reset! old-lines {}))
 
 (defn rows
@@ -90,7 +92,7 @@
             (if (= c "\t") (tty-print (char 172)) (tty-print c))))
         (if (= row (count (first lineslist)))
           (do
-            (tty-print (str "  " padding))
+            (tty-print "\033[K")
             (print-color 0))
           (print-color 10 padding)))
       (swap! old-lines assoc key content))
@@ -189,5 +191,5 @@
   (util/cmd "/bin/sh" "-c" "stty -echo raw </dev/tty")
   (tty-print "\033[0;37m\033[2J")
   (tty-print "\033[?25l") ; Hide cursor
-  (tty-print "\033[?7l") ; disable line wrap
+  (tty-print "\033[?7l")  ; disable line wrap
   (add-watch editor/updates "tty" view-handler))

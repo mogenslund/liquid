@@ -132,7 +132,9 @@
     (when (editor/fullupdate?)
       (reset! old-lines {})
       (.setColor g (bgcolors :plain))
-      (.fillRect g 0 0 (.getWidth @panel) (.getHeight @panel)))
+      (.fillRect g 0 0 (.getWidth @panel) (.getHeight @panel))
+      (.setColor g (bgcolors :statusline))
+      (.fillRect g 0 (* (- @rows 1) @fontheight) (.getWidth @panel) @fontheight))
     (doseq [line (apply concat lineslist)]
       (let [row (line :row)
             column (line :column)
