@@ -14,10 +14,12 @@
                                   (and (= ch "/") (= (-> sl (right 1) (get-char)) "/")) :comment
                                   (and (= pch "\n") (= ch " ") (= (-> sl (right 1) (get-char)) "*")) :comment
                                   (and (= pch "\n") (= ch "/") (= (-> sl (right 1) (get-char)) "*")) :comment
+                                  (= ch "\r") :red
                                   (and (= pch "") (= ch "/") (= (-> sl (right 1) (get-char)) "*")) :comment
                                   (and (or (= pch " ") (= pch "\n") (= pch "")) (re-find #"^(var|function|const|let)[ \(]" (str (string-ahead sl 9) "    "))) :type1
                                   ;(and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
                                   :else face)
+          (= face :red)     (cond (or (= ch " ") (= pch "\r")) :plain :else face)
           (= face :type1)   (cond (= pch " ") :type2
                                   (= ch "(") :plain
                                   :else face)

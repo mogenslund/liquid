@@ -12,10 +12,12 @@
                                   :else face)
           (= face :plain)   (cond (and (= ch "\"") (not= (get-char (right sl)) "\n")) :stringst
                                   (= ch ";") :comment
+                                  (= ch "\r") :red
                                   (and (= ch "#") (or (= pch "\n") (= pch "") (= (get-point sl) 0))) :comment 
                                   (and (= pch "\n") (re-matches #"\\[a-zA-Z]+\{.*" (string-ahead sl 13))) :type1
                                   (and (= ch "\\") (re-matches #"\\[a-zA-Z]" (string-ahead sl 2))) :type3
                                   :else face)
+          (= face :red)     (cond (or (= ch " ") (= pch "\r")) :plain :else face)
           (= face :type1)   (cond (re-matches #"\{" ch) :type2
                                   :else face)
           (= face :type2)   (cond (= pch "}") :plain

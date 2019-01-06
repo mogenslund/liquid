@@ -154,12 +154,18 @@
                   (let [ch (first c)]
 
                     (if (string? ch)
-                      (do
-                        (draw-char g ch row (+ column offset) color bgcolor)
+                      (let [char-sym (cond (= ch "\t") "¬"
+                                           (= ch "\r") "ɹ"
+                                           true ch)]
+                        (draw-char g char-sym row (+ column offset) color bgcolor)
                         (recur (rest c) (+ offset 1) color bgcolor))
                       (let [nextcolor (or (ch :face) color)
                             nextbgcolor (or (ch :bgface) bgcolor)]
-                        (draw-char g (or (ch :char) "…") row (+ column offset) nextcolor nextbgcolor)
+                        (let [char-sym (cond (= (ch :char) "\t") "¬"
+                                             (= (ch :char) "\r") "ɹ"
+                                             (ch :char) (ch :char)
+                                             true "…")] 
+                          (draw-char g char-sym row (+ column offset) nextcolor nextbgcolor))
                         (recur (rest c) (+ offset 1) nextcolor nextbgcolor))))))))
         (swap! old-lines assoc key content)))))
 
@@ -197,6 +203,7 @@
                   (= raw 8) "backspace"
                   (= raw 9) "\t"
                   (= raw 10) "\n"
+                  (= raw 13) "\r"
                   true (str (char raw)))]
     (when key (model-update key))))
 

@@ -12,9 +12,11 @@
                                   :else face)
           (= face :plain)   (cond (and (= ch "\"") (not= (get-char (right sl)) "\n")) :stringst
                                   (= ch "#") :comment
+                                  (= ch "\r") :red
                                   (and (or (= pch " ") (= pch "\n") (= pch "")) (re-find #"^(def)[ \(]" (str (string-ahead sl 9) "    "))) :type1
                                   ;(and (= ch ":") (re-matches #"[\( \[{\n]" pch)) :type3
                                   :else face)
+          (= face :red)     (cond (or (= ch " ") (= pch "\r")) :plain :else face)
           (= face :type1)   (cond (= pch " ") :type2
                                   (= ch "(") :plain
                                   :else face)

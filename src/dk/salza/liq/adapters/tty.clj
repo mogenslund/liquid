@@ -89,7 +89,9 @@
                     (= bgface :selection) (print-color 8)
                     (= bgface :statusline) (print-color 9)
                     :else (print-color 10)))
-            (if (= c "\t") (tty-print (char 172)) (tty-print c))))
+            (cond (= c "\t") (tty-print (char 172))
+                  (= c "\r") (tty-print (char 633))
+                  true (tty-print c))))
         (if (= row (count (first lineslist)))
           (do
             (tty-print "\033[K")
@@ -98,7 +100,6 @@
       (swap! old-lines assoc key content))
     ))
   (flush))
-
 
 (defn- view-draw
   []
