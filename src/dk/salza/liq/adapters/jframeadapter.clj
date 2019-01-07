@@ -216,6 +216,8 @@
     (let [wndcount (count (editor/get-windows))
           buffername (editor/get-name)]
       (editor/set-frame-dimensions (quot (.getHeight @panel) @fontheight) (quot (.getWidth @panel) @fontwidth))
+      (reset! rows (editor/get-frame-rows))
+      (reset! columns (editor/get-frame-columns))
       (when (= wndcount 2)
         (editor/split-window-right 0.22)
         (editor/switch-to-buffer "-prompt-")

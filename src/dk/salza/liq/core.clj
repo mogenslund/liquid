@@ -268,6 +268,7 @@
           (editor/set-frame-dimensions rows columns)
 
           (when usetty
+            (editor/set-setting :tty true)
             (tty/view-init)
             (tty/input-handler))
 
