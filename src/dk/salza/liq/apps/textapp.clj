@@ -63,6 +63,7 @@
    "G" editor/end-of-buffer
    "L" editor/end-of-line
    "x" editor/delete-char
+   "delete" editor/delete-char
    "m" editor/previous-real-buffer 
    "h" editor/run-macro
    "H" editor/record-macro
@@ -117,6 +118,7 @@
    "C-l" #(do (editor/insert "[]") (editor/backward-char)) 
    "C-h" #(editor/insert "/")
    "backspace" editor/delete
+   "delete" editor/delete-char
    "C-g" editor/escape
    "esc" editor/escape
    "C-w" editor/kill-buffer

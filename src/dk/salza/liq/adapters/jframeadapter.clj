@@ -205,7 +205,7 @@
                   (= raw 10) "\n"
                   (= raw 13) "\r"
                   true (str (char raw)))]
-    (when key (model-update key))))
+    (when (and key (not= code 65406) (not= code 16)) (model-update key))))
 
 (defn redraw-frame
   []
