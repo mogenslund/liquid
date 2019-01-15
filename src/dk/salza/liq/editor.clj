@@ -956,7 +956,7 @@
   [& string]
   (switch-to-buffer "-prompt-")
   (end-of-buffer)
-  (insert (str "\n" (str/join " " string)))
+  (insert (str/replace (str "\n" (str/join " " string)) "\r" ""))
   (backward-char 2))
 
 (defn prompt-append
@@ -964,7 +964,7 @@
   [& string]
   (when string
     (switch-to-buffer "-prompt-")
-    (insert (str (str/join " " string) "\n"))
+    (insert (str/replace (str (str/join " " string) "\n") "\r" ""))
     (previous-buffer)
     (updated)))
 
@@ -973,7 +973,7 @@
   [& string]
   (switch-to-buffer "-prompt-")
   (clear)
-  (insert (str/join " " string))
+  (insert (str/replace (str/join " " string) "\r" ""))
   (previous-buffer)
   (updated))
 
