@@ -63,6 +63,8 @@
                       ; strictly before the mark.
   ([] (create "")))
 
+(def slider create)
+
 (defn slider?
   "Returns true if the input has shape/properties
   like a slider."
