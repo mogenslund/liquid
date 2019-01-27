@@ -85,7 +85,7 @@
 
 (defn- view-draw
   []
-  (.paintImmediately @panel 0 0 (.getWidth @panel) (.getHeight @panel)))
+  (.repaint @panel))
 
 (defn- view-handler
   [key reference old new]
