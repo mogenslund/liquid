@@ -9,18 +9,20 @@
 (def ^:private updater (atom (future nil)))
 (def ^:private sysout (System/out))
 
+(def esc "\033[")
+
 (defn- tty-print
-  [arg]
-  (.print sysout arg))
+  [& args]
+  (.print sysout (str/join "" args)))
 
 (defn- tty-println
-  [arg]
-  (.println sysout arg))
+  [& args]
+  (.println sysout (str/join "" args)))
 
 (defn- reset
   []
-  (tty-print "\033[?25l") ; Hide cursor
-  (tty-print "\033[?7l")  ; disable line wrap
+  (tty-print esc "?25l") ; Hide cursor
+  (tty-print esc "?7l")  ; disable line wrap
   (reset! old-lines {}))
 
 (defn rows
@@ -48,7 +50,7 @@
 
 (defn- print-color
   [index & strings]
-  (tty-print (str "\033[" (colorpalette index) "m" (str/join strings))))
+  (tty-print esc (colorpalette index) "m" (str/join strings)))
 
 (defn- print-lines
   [lineslist]
@@ -62,7 +64,7 @@
       (let [diff (max 1 (- (count oldcontent)
                            (count content) -1))
             padding (format (str "%" diff "s") " ")]
-        (tty-print (str "\033[" row ";" column "H\033[s"))
+        (tty-print esc row ";" column "H" esc "s")
         (print-color  9 " ")
         (print-color 0)
         (print-color 10)
@@ -94,7 +96,7 @@
                   true (tty-print c))))
         (if (= row (count (first lineslist)))
           (do
-            (tty-print "\033[K")
+            (tty-print esc "K")
             (print-color 0))
           (print-color 10 padding)))
       (swap! old-lines assoc key content))
@@ -103,7 +105,7 @@
 
 (defn- view-draw
   []
-  (when (empty? @old-lines) (tty-print "\033[0;37m\033[2J"))
+  (when (empty? @old-lines) (tty-print esc "0;37m" esc "2J"))
   (print-lines (renderer/render-screen)))
 
 (defn- view-handler
@@ -190,7 +192,7 @@
 (defn view-init
   []
   (util/cmd "/bin/sh" "-c" "stty -echo raw </dev/tty")
-  (tty-print "\033[0;37m\033[2J")
-  (tty-print "\033[?25l") ; Hide cursor
-  (tty-print "\033[?7l")  ; disable line wrap
+  (tty-print esc "0;37m" esc "2J")
+  (tty-print esc "?25l") ; Hide cursor
+  (tty-print esc "?7l")  ; disable line wrap
   (add-watch editor/updates "tty" view-handler))
