@@ -45,12 +45,32 @@
         (Thread/sleep 100)
         (recur (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty")) (inc n))))))
 
-;;                 0         1          2        3          4         5        6    7      8           9     10      11      12 green  13 yellow 14 red
-(def ^:private colorpalette ["0;40" "38;5;131" "38;5;105" "38;5;11" "38;5;40" "38;5;117" "42" "44" "48;5;17" "48;5;235" "49" "48;5;52" "38;5;40" "38;5;11" "38;5;196"])
+(def ^:private colors
+  {:plain "0;40"
+   :type1 "38;5;11"
+   :type2 "38;5;40"
+   :type3 "38;5;117"
+   :green "38;5;40"
+   :yellow "38;5;11"
+   :red "38;5;196"
+   :comment "38;5;105"
+   :string "38;5;131"
+   :stringst "38;5;131"
+   :default "0;40"})
+
+(def ^:private bgcolors
+  {:plain "49"
+   :cursor0 "49"
+   :cursor1 "42"
+   :cursor2 "44"
+   :hl "48;5;52"
+   :selection "48;5;17"
+   :statusline "48;5;235"
+   :default "49"})
 
 (defn- print-color
-  [index & strings]
-  (tty-print esc (colorpalette index) "m" (str/join strings)))
+  [color & strings]
+  (tty-print esc color "m" (str/join strings)))
 
 (defn- print-lines
   [lineslist]
@@ -65,40 +85,23 @@
                            (count content) -1))
             padding (format (str "%" diff "s") " ")]
         (tty-print esc row ";" column "H" esc "s")
-        (print-color  9 " ")
-        (print-color 0)
-        (print-color 10)
+        (print-color (bgcolors :statusline) " ")
+        (print-color (colors :plain))
+        (print-color (bgcolors :plain))
         (doseq [ch (line :line)]
           (let [c (if (map? ch) (or (ch :char) "…") ch)
                 face (when (map? ch) (ch :face))
                 bgface (when (map? ch) (ch :bgface))]
-            (when face
-              (cond (= face :string) (print-color 1)
-                    (= face :stringst) (print-color 1)
-                    (= face :comment) (print-color 2)
-                    (= face :green) (print-color 12)  
-                    (= face :yellow) (print-color 13)  
-                    (= face :red) (print-color 14)  
-                    (= face :type1) (print-color 3) ; defn
-                    (= face :type2) (print-color 4) ; function
-                    (= face :type3) (print-color 5) ; keyword
-                    :else (print-color 0)))
-            (when bgface
-              (cond (= bgface :cursor0) (print-color 10)
-                    (= bgface :cursor1) (print-color 6)
-                    (= bgface :cursor2) (print-color 7)
-                    (= bgface :hl) (print-color 11)
-                    (= bgface :selection) (print-color 8)
-                    (= bgface :statusline) (print-color 9)
-                    :else (print-color 10)))
+            (when face (print-color (or (colors face) (colors :default))))
+            (when bgface (print-color (or (bgcolors bgface) (bgcolors :default))))
             (cond (= c "\t") (tty-print (char 172))
                   (= c "\r") (tty-print (char 633))
                   true (tty-print c))))
         (if (= row (count (first lineslist)))
           (do
             (tty-print esc "K")
-            (print-color 0))
-          (print-color 10 padding)))
+            (print-color (bgcolors :plain)))
+          (print-color (bgcolors :plain)  padding)))
       (swap! old-lines assoc key content))
     ))
   (flush))
