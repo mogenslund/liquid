@@ -26,15 +26,16 @@
                                       :else :cursor2)
                               (= p paren-start) :hl
                               (= (+ p 1) paren-end) :hl
-                              (and selection (>= p (min selection cursor)) (< p (max selection cursor))) :selection
                               (and selection (>= p (max selection cursor))) :plain
-                              (or (= bgface :cursor0) (= bgface :cursor1) (= bgface :cursor2) (= bgface :hl)) :plain
+                              (and selection (>= p (min selection cursor))) :selection
+                              (some #(= bgface %) [:cursor0 :cursor1 :cursor2 :hl]) :plain
                               :else bgface)
              next (if (and (= nextface face)
                            (= nextbgface bgface)
                            (not (and (= pch "\n") (or (= nextface :string) (= nextbgface :selection)))))
                       (right sl0)
-                      (if (and (or (= nextbgface :cursor0) (= nextbgface :cursor1) (= nextbgface :cursor2)) (or (= ch "\n") (end? sl0)))
+                      (if (and (some #(= nextbgface %) [:cursor0 :cursor1 :cursor2])
+                               (or (= ch "\n") (end? sl0)))
                           (-> sl0 (insert " ") left (set-meta :face nextface) (set-meta :bgface nextbgface) right right)
                           (-> sl0 (set-meta :face nextface) (set-meta :bgface nextbgface) right)))]
          (recur next

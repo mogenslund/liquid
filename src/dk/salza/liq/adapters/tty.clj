@@ -55,8 +55,7 @@
    :red "38;5;196"
    :comment "38;5;105"
    :string "38;5;131"
-   :stringst "38;5;131"
-   :default "0;40"})
+   :stringst "38;5;131"})
 
 (def ^:private bgcolors
   {:plain "49"
@@ -65,8 +64,7 @@
    :cursor2 "44"
    :hl "48;5;52"
    :selection "48;5;17"
-   :statusline "48;5;235"
-   :default "49"})
+   :statusline "48;5;235"})
 
 (defn- print-color
   [color & strings]
@@ -92,8 +90,8 @@
           (let [c (if (map? ch) (or (ch :char) "…") ch)
                 face (when (map? ch) (ch :face))
                 bgface (when (map? ch) (ch :bgface))]
-            (when face (print-color (or (colors face) (colors :default))))
-            (when bgface (print-color (or (bgcolors bgface) (bgcolors :default))))
+            (when face (print-color (or (colors face) (colors :plain))))
+            (when bgface (print-color (or (bgcolors bgface) (bgcolors :plain))))
             (cond (= c "\t") (tty-print (char 172))
                   (= c "\r") (tty-print (char 633))
                   true (tty-print c))))

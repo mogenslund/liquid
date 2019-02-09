@@ -283,13 +283,19 @@
   [sl text]
     (let [n (count text)
           linecount (count (filter #(= % \newline) text))]
-      (assoc sl
-        ::before (concat (map str (reverse text)) (sl ::before))
-        ::point (+ (sl ::point) n)
-        ::linenumber (+ (sl ::linenumber) linecount)
-        ::totallines (+ (sl ::totallines) linecount)
-        ::dirty true
-        ::marks (slide-marks (sl ::marks) (+ (sl ::point) n -1) n))))
+      (if (and (= n 1) (= linecount 0))
+        (assoc sl
+          ::before (conj (sl ::before) text)
+          ::point (+ (sl ::point) 1)
+          ::dirty true
+          ::marks (slide-marks (sl ::marks) (sl ::point) 1))
+        (assoc sl
+          ::before (concat (map str (reverse text)) (sl ::before))
+          ::point (+ (sl ::point) n)
+          ::linenumber (+ (sl ::linenumber) linecount)
+          ::totallines (+ (sl ::totallines) linecount)
+          ::dirty true
+          ::marks (slide-marks (sl ::marks) (+ (sl ::point) n -1) n)))))
 
 (defn insert-newline
   "Special function to insert newline without too
