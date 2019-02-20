@@ -3,6 +3,7 @@
   (:require [clojure.test :refer :all]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.apps.textapp :as textapp]
+            [dk.salza.liq.keymappings.navigation]
             [dk.salza.liq.window :as window]
             [dk.salza.liq.core :as core]))
 
@@ -12,7 +13,7 @@
            an interactive function like
            (editor/end-of-buffer) will not freeze
            the program"
-    (editor/set-default-keymap @textapp/keymap-navigation)
+    (editor/set-default-keymap dk.salza.liq.keymappings.navigation/keymapping)
     (editor/add-window (window/create "prompt" 1 1 30 40 "-prompt-"))
     (editor/new-buffer "-prompt-")
     (editor/add-window (window/create "main" 1 44 30 (- 100 46) "scratch")) ; todo: Change to percent given by setting. Not hard numbers

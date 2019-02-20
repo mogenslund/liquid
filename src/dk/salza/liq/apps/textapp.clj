@@ -1,9 +1,6 @@
 (ns dk.salza.liq.apps.textapp
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.slider :refer :all]
-            [dk.salza.liq.keymappings.navigation]
-            [dk.salza.liq.keymappings.normal]
-            [dk.salza.liq.keymappings.insert]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
@@ -15,22 +12,6 @@
             [dk.salza.liq.syntaxhl.webassemblyhl :as webassemblyhl]
             [dk.salza.liq.syntaxhl.latexhl :as latexhl]
             [dk.salza.liq.coreutil :refer :all]))
-
-(def keymap-insert (atom {}))
-(def keymap-navigation (atom {}))
-(def keymap-normal (atom {}))
-
-(defn set-navigation-key
-  [key fun]
-  (swap! keymap-navigation assoc key fun))
-
-(defn set-insert-key
-  [key fun]
-  (swap! keymap-insert assoc key fun))
-
-(reset! keymap-navigation dk.salza.liq.keymappings.navigation/keymapping)
-(reset! keymap-normal dk.salza.liq.keymappings.normal/keymapping)
-(reset! keymap-insert dk.salza.liq.keymappings.insert/keymapping)
 
 (defn run
   [filepath]
@@ -47,5 +28,5 @@
                           :else (editor/get-default-highlighter)) ;; In other cases use clojure/markdown
           ]
       (editor/create-buffer-from-file filepath)
-      (editor/set-keymap @keymap-navigation)
+      (editor/set-keymap "dk.salza.liq.keymappings.navigation")
       (editor/set-highlighter syntaxhl))))

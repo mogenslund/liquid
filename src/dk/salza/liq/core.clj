@@ -86,7 +86,7 @@
   (editor/set-default-typeahead-function typeaheadapp/run)
 
   ;; Default keymap
-  (editor/set-default-keymap @textapp/keymap-navigation)
+  (editor/set-default-keymap dk.salza.liq.keymappings.navigation/keymapping)
 
   ;; Default app
   (editor/set-default-app textapp/run)
@@ -129,7 +129,7 @@
   (editor/add-interactive "apropos" clojure.repl/find-doc "APROPOS")
   (editor/add-interactive "Reopen files changed on disk" editor/reopen-all-files)
   (editor/add-interactive "Windows keymap" #(editor/set-keymap @textappwin/keymap))
-  (editor/add-interactive "Liquid keymap" #(editor/set-keymap @textapp/keymap-navigation))
+  (editor/add-interactive "Liquid keymap" #(editor/set-keymap dk.salza.liq.keymappings.navigation/keymapping))
 
   ;; Default searchpaths
   (when (fileutil/exists? "project.clj")
