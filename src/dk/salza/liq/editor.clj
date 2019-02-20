@@ -63,6 +63,7 @@
   {::buffers ()
    ::windows ()
    ::global-keymap {}
+   ::keymaps {}
    ::file-eval {}
    ::frame-dimensions {::rows 40 ::columns 140}
    ::settings {::default-keymap nil
@@ -264,6 +265,12 @@
     (editor/set-eval-function \"py\" #(cshell/cmd \"python\" %))"
   [extension fun]
   (swap! editor assoc-in [::file-eval extension] fun) nil)
+
+(defn add-keymap
+  [keymap]
+  (when (keymap :id)
+    (swap! editor assoc-in [::keymaps (keymap :id)] keymap) nil))
+
 (defn add-command
   "Add a command to be availble for commandapp typeahead.
   add-interactive is in most cases more suitable."
@@ -785,7 +792,9 @@
 (defn set-keymap
   "Sets the keymap on the current buffer."
   [keymap]
-  (doto-buffer buffer/set-keymap keymap))
+  (if (and (string? keymap) ((@editor ::keymaps) keymap))
+    (doto-buffer buffer/set-keymap ((@editor ::keymaps) keymap))
+    (doto-buffer buffer/set-keymap keymap)))
 
 (defn get-keymap
   "Returns the active keymap on from the current buffer.

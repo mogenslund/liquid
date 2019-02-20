@@ -5,6 +5,9 @@
             [dk.salza.liq.adapters.jframeadapter :as jframeadapter]
             [dk.salza.liq.adapters.ghostadapter :as ghostadapter]
             [dk.salza.liq.adapters.webadapter :as webadapter]
+            [dk.salza.liq.keymappings.navigation]
+            [dk.salza.liq.keymappings.normal]
+            [dk.salza.liq.keymappings.insert]
             [dk.salza.liq.syntaxhl.clojuremdhl :as clojuremdhl]
             [dk.salza.liq.tools.fileutil :as fileutil]
             [dk.salza.liq.tools.cshell :as cshell]
@@ -87,6 +90,11 @@
 
   ;; Default app
   (editor/set-default-app textapp/run)
+
+  ;; Load keymaps
+  (editor/add-keymap dk.salza.liq.keymappings.navigation/keymapping)
+  (editor/add-keymap dk.salza.liq.keymappings.normal/keymapping)
+  (editor/add-keymap dk.salza.liq.keymappings.insert/keymapping)
 
   ;; Default global keybindings
   (editor/set-global-key "C- " #(do (editor/request-fullupdate) (commandapp/run)))

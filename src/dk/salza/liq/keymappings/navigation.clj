@@ -9,7 +9,7 @@
 (def keymapping
   {:id "dk.salza.liq.keymappings.navigation"
    :cursor-color :blue
-   ;"\t" #(editor/set-keymap @keymap-insert)
+   "\t" #(editor/set-keymap "dk.salza.liq.keymappings.insert")
    "M" editor/prompt-to-tmp
    " " #(editor/forward-page)
    "pgdn" #(editor/forward-page)
@@ -34,7 +34,7 @@
        "l" dk.salza.liq.extensions.linenavigator/run}
    "-" editor/top-next-headline
    "C-g" editor/escape
-   "esc" editor/escape
+   "esc" #(editor/set-keymap "dk.salza.liq.keymappings.normal")
    "e" editor/eval-last-sexp
    "E" editor/evaluate-file
    "C-e" editor/evaluate-file-raw
@@ -42,7 +42,7 @@
    "j" editor/backward-char
    "i" editor/backward-line
    "k" editor/forward-line
-   ;"o" (fn [] (do (editor/insert-line) (editor/set-keymap @keymap-insert)))
+   "o" (fn [] (do (editor/insert-line) (editor/set-keymap "dk.salza.liq.keymappings.insert")))
    "J" editor/beginning-of-line
    "G" editor/end-of-buffer
    "L" editor/end-of-line

@@ -6,7 +6,7 @@
 (def keymapping
   {:id "dk.salza.liq.keymappings.insert"
    :cursor-color :green
-   ;"\t" #(editor/set-keymap @keymap-navigation)
+   "\t" #(editor/set-keymap "dk.salza.liq.keymappings.navigation")
    "pgdn" #(editor/forward-page)
    "right" editor/forward-char
    "left" editor/backward-char
@@ -23,7 +23,7 @@
    "backspace" editor/delete
    "delete" editor/delete-char
    "C-g" editor/escape
-   "esc" editor/escape
+   "esc" #(editor/set-keymap "dk.salza.liq.keymappings.normal")
    "C-w" editor/kill-buffer
    "C-s" #(promptapp/run editor/find-next '("SEARCH")) ;editor/search}
    :selfinsert editor/insert})

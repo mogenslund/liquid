@@ -32,10 +32,10 @@
    "h" editor/backward-char
    "k" editor/backward-line
    "j" editor/forward-line
-;   "o" #(do (editor/insert-line) (editor/set-keymap @keymap-insert))
-;   "a" #(do (editor/forward-char) (editor/set-keymap @keymap-insert))
-;   "A" #(do (editor/end-of-line) (editor/set-keymap @keymap-insert))
-;   "i" #(editor/set-keymap @keymap-insert)
+   "o" #(do (editor/insert-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
+   "a" #(do (editor/forward-char) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
+   "A" #(do (editor/end-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
+   "i" #(editor/set-keymap "dk.salza.liq.keymappings.insert")
    "0" editor/beginning-of-line
    "J" editor/beginning-of-line
    "G" editor/end-of-buffer
@@ -49,7 +49,7 @@
    "O" editor/context-action
    "w" editor/forward-word
    "K" editor/swap-line-down
-   ;"I" #(do (editor/beginning-of-line) (editor/set-keymap @keymap-insert))
+   "I" #(do (editor/beginning-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "r" {" " #(editor/replace-char " ")
         :selfinsert editor/replace-char}
    "1" editor/select-sexp-at-point

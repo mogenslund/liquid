@@ -28,23 +28,9 @@
   [key fun]
   (swap! keymap-insert assoc key fun))
 
-(reset! keymap-navigation
-  (assoc dk.salza.liq.keymappings.navigation/keymapping
-    "\t" #(editor/set-keymap @keymap-insert)
-     "o" (fn [] (do (editor/insert-line) (editor/set-keymap @keymap-insert)))))
-
-(reset! keymap-normal
-  (assoc dk.salza.liq.keymappings.normal/keymapping
-   "o" #(do (editor/insert-line) (editor/set-keymap @keymap-insert))
-   "a" #(do (editor/forward-char) (editor/set-keymap @keymap-insert))
-   "A" #(do (editor/end-of-line) (editor/set-keymap @keymap-insert))
-   "I" #(do (editor/beginning-of-line) (editor/set-keymap @keymap-insert))
-   "i" #(editor/set-keymap @keymap-insert)))
-
-(reset! keymap-insert
-  (assoc dk.salza.liq.keymappings.insert/keymapping
-    "esc" #(editor/set-keymap @keymap-normal)
-    "\t" #(editor/set-keymap @keymap-navigation)))
+(reset! keymap-navigation dk.salza.liq.keymappings.navigation/keymapping)
+(reset! keymap-normal dk.salza.liq.keymappings.normal/keymapping)
+(reset! keymap-insert dk.salza.liq.keymappings.insert/keymapping)
 
 (defn run
   [filepath]
