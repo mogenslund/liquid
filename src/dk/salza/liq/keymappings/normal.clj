@@ -6,12 +6,12 @@
             [dk.salza.liq.extensions.folding :as folding]
             [dk.salza.liq.apps.promptapp :as promptapp]))
 
-(def keymapping
+(def basic-mappings
   {:id "dk.salza.liq.keymappings.normal"
    "M" editor/prompt-to-tmp
-   "space" #(editor/forward-page)
-   ;:C-s editor/search
-   "colon" (fn [] (editor/handle-input :C-space) (editor/handle-input :colon))
+   " " #(editor/forward-page)
+   ;"C-s" editor/search
+   ":" (fn [] (editor/handle-input "C- ") (editor/handle-input ":"))
    "right" editor/forward-char
    "left" editor/backward-char
    "up" editor/backward-line
@@ -56,13 +56,27 @@
    "y" (fn []
         (if (editor/copy-selection)
           (editor/selection-cancel)
-          (do)))
-          ;(reset! editor/submap
-          ;{"y" editor/copy-line})))
+          {"y" editor/copy-line}))
    "p" {"p" #(do (editor/insert-line) (editor/paste) (editor/beginning-of-line))
        "h" editor/paste}
    "d" {"d" #(do (or (editor/delete-selection) (editor/delete-line)) (editor/selection-cancel))}
    "s" editor/save-file
          "u" editor/undo
    "C-w" editor/kill-buffer
+   "+" {"+" #(editor/apply-to-slider folding/cycle-level-fold)
+        "0" #(editor/apply-to-slider folding/expand-all)
+        "1" #(editor/apply-to-slider (fn [sl] (folding/collapse-all (folding/fold-all-def sl))))
+        "2" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 2)))
+        "3" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 3)))
+        "4" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 4)))
+        "5" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 5)))
+        "s" #(if (editor/selection-active?) (do (editor/hide-selection) (editor/selection-cancel)) (editor/unhide))
+        "f" #(editor/apply-to-slider folding/fold-def)}
+   "c" {"p" {"p" editor/eval-last-sexp
+             "f" editor/evaluate-file}}
    "C-t" editor/tmp-test })
+
+(defn keymapping
+  [keyw]
+  (cond (= keyw "2") #(editor/prompt-append "--2--")
+        true (basic-mappings keyw)))

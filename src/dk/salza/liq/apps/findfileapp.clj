@@ -126,9 +126,11 @@
    "left" up
    "C-k" next-res
    "down" next-res
+   "C-n" next-res
    "\t" prev-res ; tab and C-i are the same in terminal
    "up" prev-res
    "C-i" prev-res
+   "C-p" prev-res
    "\n" #(execute fun)
    "M-\n" #(execute-search fun)
    "C- " #(execute-search fun)

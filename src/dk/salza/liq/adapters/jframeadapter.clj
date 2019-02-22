@@ -204,6 +204,7 @@
                   (= raw 9) "\t"
                   (= raw 10) "\n"
                   (= raw 13) "\r"
+                  (= raw 27) "esc"
                   true (str (char raw)))]
     (when (and key (not= code 65406) (not= code 16)) (model-update key))))
 

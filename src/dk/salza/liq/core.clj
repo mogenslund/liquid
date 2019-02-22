@@ -86,7 +86,7 @@
   (editor/set-default-typeahead-function typeaheadapp/run)
 
   ;; Default keymap
-  (editor/set-default-keymap dk.salza.liq.keymappings.navigation/keymapping)
+  (editor/set-default-keymap dk.salza.liq.keymappings.normal/keymapping)
 
   ;; Default app
   (editor/set-default-app textapp/run)

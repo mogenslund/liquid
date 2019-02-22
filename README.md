@@ -1,6 +1,13 @@
 # Salza &lambda;iquid text editor
 [![Clojars Project](https://img.shields.io/clojars/v/mogenslund/liquid.svg)](https://clojars.org/mogenslund/liquid)
 
+**IMPORTANT NOTICE**
+I have decided to do a turnaround and change the default keybindings to be as close to **vim and fireplace** as possible.
+
+In the transition period, documentation will be out of sync and the experience a bit ambiguous and unstable, therefore this notice! If you are an existing user, please let me know if you experience any problems.
+
+I liked my own keybindings, but I cannot ignore the huge benefit of sharing keybindings with a tool having millions of users. (When my muscle memory gets used to the decision, in a couple of month, I am sure I will be happy being able to switch between Liquid and vim without much effort.)
+
 <img align="left" src="logo.png" width="281" height="360">
 <br><br><br>
 
@@ -8,7 +15,7 @@
 * <b>Dependency free</b>  -  Everything is pure Clojure
 * <b>Translatable</b>  -  Tiny core, simple model, no tricks
 * <b>Distraction Free</b>  -  Typeahead and completions on demand... Your demand!
-* <b>Comfortable keybindings</b>  -  Most used commands are close at hand
+* <b>Comfortable keybindings</b>  -  Most sed commands are close at hand
 * <b>Servable</b>  -  Run as server, local or remote
 
 <br><br><br><br><br>

@@ -28,5 +28,5 @@
                           :else (editor/get-default-highlighter)) ;; In other cases use clojure/markdown
           ]
       (editor/create-buffer-from-file filepath)
-      (editor/set-keymap "dk.salza.liq.keymappings.navigation")
+      (editor/set-keymap "dk.salza.liq.keymappings.normal")
       (editor/set-highlighter syntaxhl))))

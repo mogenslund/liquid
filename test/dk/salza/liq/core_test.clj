@@ -57,13 +57,13 @@
   [input expected]
   (let [program (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=190"))]
     (Thread/sleep 100)
-    (send-input "ggvGdd" "\t") ; Clearing screen. Ready to type
+    (send-input "ggvGdd" "i") ; Clearing screen. Ready to type
     (apply send-input input)
     (Thread/sleep 100)
     ;(while (not (empty? @ghostadapter/input)) (Thread/sleep 10))
     (let [windowcontent (apply concat (ghostadapter/get-display))]
-;      (println "DISPLAY E:" expected)
-;      (println "DISPLAY 1:" (str/replace (short-screen-notation windowcontent) #"BR" "\n"))
+      ;(println "DISPLAY E:" expected)
+      ;(println "DISPLAY 1:" (str/replace (short-screen-notation windowcontent) #"BR" "\n"))
       (is (.contains (short-screen-notation windowcontent) expected)))))
 
 (deftest defn-highlight
