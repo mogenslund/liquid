@@ -55,8 +55,6 @@
    "O" editor/context-action
    "w" editor/forward-word
    "b" editor/backward-word
-   "C-j" editor/swap-line-down
-   "C-k" editor/swap-line-up
    "r" {" " #(editor/replace-char " ")
         :selfinsert editor/replace-char}
    "1" editor/highlight-sexp-at-point

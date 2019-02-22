@@ -49,14 +49,16 @@
    "O" editor/context-action
    "w" editor/forward-word
    "K" editor/swap-line-down
+   "C-j" editor/swap-line-down
+   "C-k" editor/swap-line-up
    "I" #(do (editor/beginning-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "r" {" " #(editor/replace-char " ")
         :selfinsert editor/replace-char}
    "1" editor/select-sexp-at-point
-   "y" (fn []
-        (if (editor/copy-selection)
-          (editor/selection-cancel)
-          {"y" editor/copy-line}))
+   "y" {:info "y: Line or selection\nc: Context\nf: Current filepath"
+       "y" #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))
+       "c" editor/copy-context
+       "f" editor/copy-file}
    "p" {"p" #(do (editor/insert-line) (editor/paste) (editor/beginning-of-line))
        "h" editor/paste}
    "d" {"d" #(do (or (editor/delete-selection) (editor/delete-line)) (editor/selection-cancel))}
