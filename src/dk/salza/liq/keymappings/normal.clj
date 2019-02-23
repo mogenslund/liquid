@@ -1,6 +1,7 @@
 (ns dk.salza.liq.keymappings.normal
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.slider :refer :all]
+            [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
             [dk.salza.liq.extensions.folding :as folding]
@@ -24,6 +25,7 @@
 
 (def keymapping ; basic-mappings
   {:id "dk.salza.liq.keymappings.normal"
+   :after-hook (fn [k] (when (not (re-find #"\d" k)) (reset-motion-repeat)))
    "0" #(if (= @motion-repeat 0) (editor/beginning-of-line) (enlarge-motion-repeat 2)) 
    "1" #(enlarge-motion-repeat 1)
    "2" #(enlarge-motion-repeat 2)
@@ -37,7 +39,7 @@
    "M" editor/prompt-to-tmp
    " " (motion-repeat-fun editor/forward-page)
    ;"C-s" editor/search
-   ":" (fn [] (editor/handle-input "C- ") (editor/handle-input ":"))
+   ":" #(do (editor/request-fullupdate) (commandapp/run ":i :"))
    "right" (motion-repeat-fun editor/forward-char)
    "left" (motion-repeat-fun editor/backward-char)
    "up" (motion-repeat-fun editor/backward-line)
@@ -103,7 +105,3 @@
              "f" editor/evaluate-file}}
    "C-t" editor/tmp-test })
 
-; (defn keymapping
-;   [keyw]
-;   (cond (= keyw "2") #(editor/prompt-append "--2--")
-;         true (basic-mappings keyw)))

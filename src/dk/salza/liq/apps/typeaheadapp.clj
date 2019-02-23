@@ -100,7 +100,7 @@
   The callback takes an item as input.
   The callback will be executed with the
   result."
-  [items tostringfun callback & {:keys [keymappings prompt]}]
+  [items tostringfun callback & {:keys [keymappings prompt pre-text]}]
   (swap! state assoc ::tostringfun tostringfun
                      ::callback callback
                      ::items items
@@ -112,4 +112,5 @@
                      ::selected 0)
   (editor/new-buffer "-typeaheadapp-")
   (editor/set-keymap (merge keymap keymappings))
+  (when pre-text (update-search pre-text))
   (update-display))

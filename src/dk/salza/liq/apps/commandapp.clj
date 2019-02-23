@@ -59,9 +59,14 @@
     (str/trim (str (first f) " " (str/replace label #"\n" "\\\\n") "\n"))))
 
 (defn run
-  []
+  [& pre-text]
   (when (and (= (first (editor/buffer-names)) "-prompt-") (> (count (editor/get-windows)) 1))
     (editor/other-window))
   (let [functions (list)]; (editor/get-available-functions)
-    (typeaheadapp/run (activate (list)) tostring execute :keymappings {"C- " function-typeahead})))
+    (typeaheadapp/run
+      (activate (list))
+      tostring
+      execute
+      :keymappings {"C- " function-typeahead}
+      :pre-text (str/join "" pre-text))))
 

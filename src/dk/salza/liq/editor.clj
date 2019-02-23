@@ -1210,7 +1210,8 @@
   (when (and @macro-record (not= keyw "Q"))
     (swap! macro-seq conj keyw))
   (let [action (if @submap (@submap keyw) (get-action keyw))
-        selfins (when (not action) (if @submap (@submap :selfinsert) (get-action :selfinsert)))]
+        selfins (when (not action) (if @submap (@submap :selfinsert) (get-action :selfinsert)))
+        after-hook (if @submap (@submap :after-hook) (get-action :after-hook))]
     (cond (map? action) (do
                           (when (and (action :info) (setting ::key-info))
                                 (prompt-set (action :info)))
@@ -1221,6 +1222,7 @@
                  (do (reset! submap nil)
                     (selfins keyw))
           :else (reset! submap nil))
+    (when after-hook (after-hook keyw))
     (updated)))
 
 (defn record-macro
