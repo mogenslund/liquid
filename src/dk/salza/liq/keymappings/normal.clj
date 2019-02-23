@@ -26,7 +26,7 @@
 (def keymapping ; basic-mappings
   {:id "dk.salza.liq.keymappings.normal"
    :after-hook (fn [k] (when (not (re-find #"\d" k)) (reset-motion-repeat)))
-   "0" #(if (= @motion-repeat 0) (editor/beginning-of-line) (enlarge-motion-repeat 2)) 
+   "0" #(if (= @motion-repeat 0) (editor/beginning-of-line) (enlarge-motion-repeat 0)) 
    "1" #(enlarge-motion-repeat 1)
    "2" #(enlarge-motion-repeat 2)
    "3" #(enlarge-motion-repeat 3)
