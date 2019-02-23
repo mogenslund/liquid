@@ -23,6 +23,19 @@
     (dotimes [n (max @motion-repeat 1)] (fun))
     (reset-motion-repeat)))
 
+(defn wrap-selection [sl p1 p2]
+  (let [m1 (get-mark sl "selection")
+        m2 (get-point sl)]
+    (if m1
+      (-> sl
+          (remove-mark "selection")
+          (set-point (max m1 m2))
+          (insert p2)
+          (set-point (min m1 m2))
+          (insert p1)
+          (set-point m2))
+      sl)))
+
 (def keymapping ; basic-mappings
   {:id "dk.salza.liq.keymappings.normal"
    :after-hook (fn [k] (when (not (re-find #"\d" k)) (reset-motion-repeat)))
@@ -39,6 +52,9 @@
    "M" editor/prompt-to-tmp
    " " (motion-repeat-fun editor/forward-page)
    ":" #(do (editor/request-fullupdate) (commandapp/run ":i :"))
+   "(" #(wrap-selection % "(" ")") ;)
+   "[" #(wrap-selection % "[" "]")
+   "{" #(wrap-selection % "{" "}")
    "right" (motion-repeat-fun editor/forward-char)
    "left" (motion-repeat-fun editor/backward-char)
    "up" (motion-repeat-fun editor/backward-line)
