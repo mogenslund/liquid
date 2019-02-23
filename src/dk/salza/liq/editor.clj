@@ -1171,16 +1171,17 @@
 (defn force-quit
   []
   (if (setting :tty)
-    (future
+    (do
       (Thread/sleep 200)
-      (print "\033[0;37m\033[2J")
-      (print "\033[?25h")
+      (.print (System/out) "\033[0;37m\033[2J")
+      (.print (System/out) "\033[?25h")
       (flush)
+      (Thread/sleep 200)
       (util/cmd "/bin/sh" "-c" "stty -echo cooked </dev/tty")
       (util/cmd "/bin/sh" "-c" "stty -echo sane </dev/tty")
       (flush)
       (Thread/sleep 100)
-      (println "")
+      (.println (System/out) "\n")
       (Thread/sleep 100)
       (System/exit 0))
     (System/exit 0)))

@@ -38,13 +38,13 @@
    "9" #(enlarge-motion-repeat 9)
    "M" editor/prompt-to-tmp
    " " (motion-repeat-fun editor/forward-page)
-   ;"C-s" editor/search
    ":" #(do (editor/request-fullupdate) (commandapp/run ":i :"))
    "right" (motion-repeat-fun editor/forward-char)
    "left" (motion-repeat-fun editor/backward-char)
    "up" (motion-repeat-fun editor/backward-line)
    "down" (motion-repeat-fun editor/forward-line)
-   "C-s" #(promptapp/run editor/find-next '("SEARCH"))
+   "/" #(promptapp/run editor/find-next '("/"))
+   "M-s" #(promptapp/run editor/search-files '("SEARCH"))
    "v" editor/selection-toggle
    "g" {"g" editor/beginning-of-buffer
        "t" editor/top-align-page
