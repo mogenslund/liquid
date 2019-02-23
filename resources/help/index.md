@@ -11,9 +11,9 @@ This is the front page. You can always get back to this with the key combination
 # Navigate the help system
 To move the cursor use
 
-  i:          Up
-  k:          Down
-  j:          Left
+  k:          Up
+  j:          Down
+  h:          Left
   l:          Right
 
 Links in the help system are encapsulated with square brackets, like this

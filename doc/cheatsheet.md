@@ -8,18 +8,19 @@ Alt/Meta: M-a M-b means hold down the Meta/Alt key while pressing a and b before
 
 Uppercase: A means shift + a
 
-## Switch keymapping
-The Tab key switches between navigation mode (blue cursor) and insert mode (green cursor).
+## Overall
+The primary taget for the keybindings is to get as close to VIM and Fireplace (for VIM) as possible.
+Use Esc to switch to normal mode.
 
 ## Mappings
-### Navigation (blue cursor)
+### Normal (blue cursor)
 <pre>
       <b>C-space</b> Start command typeahead (See Command Type ahead below)
       <b>C-space C-space</b> Typeahead to insert function from classpath
       <b>l</b>   Right (Arrow Right will also work)
-      <b>j</b>   Left (Arrow Left will also work)
-      <b>i</b>   Up (Arrow up will also work)
-      <b>k</b>   Down (Arrow down will also work)
+      <b>h</b>   Left (Arrow Left will also work)
+      <b>k</b>   Up (Arrow up will also work)
+      <b>j</b>   Down (Arrow down will also work)
       <b>space</b> Page down
       <b>m</b>   Switch to previous buffer (Usefull for swithing forth and back between two buffers)
       <b>C-o</b> Other window (Move between main and prompt windows)
@@ -39,8 +40,8 @@ The Tab key switches between navigation mode (blue cursor) and insert mode (gree
       <b>d d</b> Delete line or selection
       <b>o</b>   Insert line
       <b>r</b>   Replace with next char pressed
-      <b>I</b>   Move line up
-      <b>K</b>   Move line down
+      <b>C-k</b> Move line up
+      <b>C-j</b> Move line down
       <b>v</b>   Begin or cancel selection
 </pre>
 
@@ -52,23 +53,23 @@ The Tab key switches between navigation mode (blue cursor) and insert mode (gree
 
 ### Clojure code
 <pre>
-      <b>C-e</b> Evaluate current file without capturing output (for (re)-loading internal stuff)
-      <b>E</b>   Evaluate current file
-      <b>e</b>   Evaluate current s-expression
-      <b>1</b>   Highlight boundries of the  current s-expression
-      <b>2</b>   Select current s-expression
-          (Multiple presses will make the cursor switch between begin and end parenthesis.)
+      <b>C-e</b>   Evaluate current file without capturing output (for (re)-loading internal stuff)
+      <b>c p f</b> Evaluate current file
+      <b>c p p</b> Evaluate current s-expression
+      <b>, ,</b>   Highlight boundries of the  current s-expression
+      <b>, s</b>   Select current s-expression
+          (Repeating combination will make the cursor switch between begin and end parenthesis.)
 </pre>
 
 ### Macro recording
 <pre>
-      <b>H</b>   Start and stop recording
-      <b>h</b>   Play recording
+      <b>Q</b>   Start and stop recording
+      <b>q</b>   Play recording
 </pre>
 
 ### Searching (blue cursor)
 <pre>
-      <b>C-s</b> Search (Type a search string an press enter)
+      <b>/</b>   Search (Type a search string an press enter)
       <b>n</b>   Next search result
 </pre>
 
@@ -101,8 +102,8 @@ When typing C-space a typeahead screen is shown with the following keybindings:
 
 <pre>
       <b>space</b> Space is considered a "wildcard" in typeahead, so "some g" will match: "Something".
-      <b>C-k</b>  Select next result
-      <b>C-i</b>  Select previous result
+      <b>C-n</b>  Select next result
+      <b>C-p</b>  Select previous result
       <b>C-g</b>  Quit Command Typeahead
       <b>enter</b> Choose the selected result. If it is a snippet, the result will be pasted.
             If it is a command it will be executed. If it is a buffer, the buffer will be chosen.
@@ -113,20 +114,20 @@ When typing C-f a typeahead file chooser will be shown with the following keybin
 
 <pre>
       <b>space</b> Space is considered a "wildcard" in typeahead, so "my le" will match: "Myfile".
-      <b>C-k</b> Select the next file
-      <b>C-i</b> Select the previous file
+      <b>C-n</b> Select the next file
+      <b>C-p</b> Select the previous file
       <b>C-g</b> Quit Find File
       <b>enter</b> If the selection is a file the file will be opened.
             If it is a folder, a new typeahead will be started below that.
 </pre>
 
 ### Headline and Function Navigation
-When typing gh (blue cursor) a typeahead headline navigator will be shown with the following keybindings:
+When typing gi (blue cursor) a typeahead headline navigator will be shown with the following keybindings:
 
 <pre>
       <b>space</b> Space is considered a "wildcard" in typeahead, so "my li" will match: "My headline".
-      <b>C-k</b> Select the next headline
-      <b>C-i</b> Select the previous headline
+      <b>C-n</b> Select the next headline
+      <b>C-p</b> Select the previous headline
       <b>C-g</b> Quit Headline Navigation
       <b>enter</b> Move cursor to the selected headline or function
 </pre>

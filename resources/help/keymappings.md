@@ -11,9 +11,9 @@
   C-spc:      Start command typeahead (See Command Type ahead below)
   C-spc-spc:  (C-spc twice) Typeahead to insert function from classpath
   l:          Right (Arrow Right will also work)
-  j:          Left (Arrow Left will also work)
-  i:          Up (Arrow up will also work)
-  k:          Down (Arrow down will also work)
+  h:          Left (Arrow Left will also work)
+  k:          Up (Arrow up will also work)
+  j:          Down (Arrow down will also work)
   space:      Page down
   m:          Switch to previous buffer (Usefull for swithing forth and back between two buffers)
   C-o:        Other window (Move between main and prompt windows)
@@ -32,8 +32,8 @@
   dd:         Delete line or selection
   o:          Insert line
   r:          Replace with next char pressed
-  I:          Move line up
-  K:          Move line down
+  C-k:        Move line up
+  C-j:        Move line down
   v:          Begin or cancel selection
 
   
@@ -47,19 +47,19 @@
 
   C-e:        Evaluate current file without capturing output (for (re)-loading internal stuff)
   E:          Evaluate current file
-  e:          Evaluate current s-expression
-  1:          Highlight boundries of the  current s-expression
-  2:          Select current s-expression
-              (Multiple presses will make the cursor switch between begin and end parenthesis.)
+  cpp:        Evaluate current s-expression
+  ,,:         Highlight boundries of the  current s-expression
+  ,s:         Select current s-expression
+              (Repeating the pattern will make the cursor switch between begin and end parenthesis.)
 
 # Macro recording (blue cursor)
 
-  H:          Start and stop recording
-  h:          Play recording
+  Q:          Start and stop recording
+  q:          Play recording
 
 # Searching (blue cursor)
 
-  C-s:        Search (Type a search string an press enter)
+  /:          Search (Type a search string an press enter)
   n:          Next search result
 
 # Folding and collapsing (blue cursor)
@@ -90,8 +90,8 @@
 When typing C-space a typeahead screen is shown with the following keybindings: 
 
   space:      Space is considered a "wildcard" in typeahead, so "some g" will match: "Something".
-  C-k:        Select next result
-  C-i:        Select previous result
+  C-n:        Select next result
+  C-p:        Select previous result
   C-g:        Quit Command Typeahead
   enter:      Choose the selected result. If it is a snippet, the result will be pasted.
               If it is a command it will be executed. If it is a buffer, the buffer will be chosen.
@@ -100,17 +100,17 @@ When typing C-space a typeahead screen is shown with the following keybindings:
 When typing C-f a typeahead file chooser will be shown with the following keybindings: 
 
   space:      Space is considered a "wildcard" in typeahead, so "my le" will match: "Myfile".
-  C-k:        Select the next file
-  C-i:        Select the previous file
+  C-n:        Select the next file
+  C-p:        Select the previous file
   C-g:        Quit Find File
   enter:      If the selection is a file the file will be opened.
               If it is a folder, a new typeahead will be started below that.
 
 # Headline and Function Navigation
-When typing gh (blue cursor) a typeahead headline navigator will be shown with the following keybindings: 
+When typing gi (blue cursor) a typeahead headline navigator will be shown with the following keybindings: 
 
   space       Space is considered a "wildcard" in typeahead, so "my li" will match: "My headline".
-  C-k:        Select the next headline
-  C-i:        Select the previous headline
+  C-n:        Select the next headline
+  C-p:        Select the previous headline
   C-g:        Quit Headline Navigation
   enter:      Move cursor to the selected headline or function

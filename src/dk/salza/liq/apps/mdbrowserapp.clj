@@ -22,7 +22,7 @@
    "left" editor/backward-char
    "up" editor/backward-line
    "down" editor/forward-line
-   "C-s" #(promptapp/run editor/find-next '("SEARCH"))
+   "/" #(promptapp/run editor/find-next '("/"))
    "v" editor/selection-toggle
    "g" {"g" editor/beginning-of-buffer
        "t" editor/top-align-page
@@ -30,25 +30,26 @@
        "c" #(editor/prompt-append (str "--" (editor/get-context) "--"))
        "i" dk.salza.liq.extensions.headlinenavigator/run
        "l" dk.salza.liq.extensions.linenavigator/run}
-   "/" editor/top-next-headline
+   ;"/" editor/top-next-headline
    "C-g" editor/escape
    "esc" editor/escape
-   "e" editor/eval-last-sexp
+   "c" {"p" {"p" editor/eval-last-sexp
+             "f" editor/evaluate-file}}
    "E" editor/evaluate-file
    "C-e" editor/evaluate-file-raw
    "l" editor/forward-char
-   "j" editor/backward-char
-   "i" editor/backward-line
-   "k" editor/forward-line
-   "J" editor/beginning-of-line
+   "h" editor/backward-char
+   "k" editor/backward-line
+   "j" editor/forward-line
+   "0" editor/beginning-of-line
    "G" editor/end-of-buffer
-   "L" editor/end-of-line
+   "$" editor/end-of-line
    "m" editor/previous-real-buffer 
    "n" editor/find-next
    "O" editor/context-action
    "w" editor/forward-word
-   "1" editor/highlight-sexp-at-point
-   "2" editor/select-sexp-at-point
+   "," {"," editor/highlight-sexp-at-point
+        "s" editor/select-sexp-at-point}
    "y" {"y" #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))}
    "C-w" editor/kill-buffer
    "C-t" (fn [] (editor/tmp-test))

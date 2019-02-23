@@ -79,22 +79,22 @@
 (defn set-defaults
   []
 
+  ;; Load keymaps
+  (editor/add-keymap dk.salza.liq.keymappings.navigation/keymapping)
+  (editor/add-keymap dk.salza.liq.keymappings.normal/keymapping)
+  (editor/add-keymap dk.salza.liq.keymappings.insert/keymapping)
+
+  ;; Default keymap
+  (editor/set-default-keymap "dk.salza.liq.keymappings.normal")
+
   ;; Default highlighter
   (editor/set-default-highlighter clojuremdhl/next-face)
 
   ;; Default typeahead function
   (editor/set-default-typeahead-function typeaheadapp/run)
 
-  ;; Default keymap
-  (editor/set-default-keymap "dk.salza.liq.keymappings.normal")
-
   ;; Default app
   (editor/set-default-app textapp/run)
-
-  ;; Load keymaps
-  (editor/add-keymap dk.salza.liq.keymappings.navigation/keymapping)
-  (editor/add-keymap dk.salza.liq.keymappings.normal/keymapping)
-  (editor/add-keymap dk.salza.liq.keymappings.insert/keymapping)
 
   ;; Default global keybindings
   (editor/set-global-key "C- " #(do (editor/request-fullupdate) (commandapp/run)))
@@ -158,15 +158,15 @@
   (editor/insert (str "# Welcome to λiquid\n"
                       "To quit press C-q. To escape situation press C-g."
                       "To undo press u in navigation mode (blue cursor)\n"
-                      "Use tab to switch between insert mode (green cursor) "
-                      "and navigation mode (blue cursor).\n\n"
+                      "Keybindings are very similar to VIM and Fireplace\n"
+                      "Use Esc to switch to normal mode (blue cursor).\n\n"
                       "## Basic navigation\nIn navigation mode (blue cursor):\n\n"
-                      "  j: Left\n  l: Right\n  i: Up\n  k: Down\n\n"
+                      "  h: Left\n  l: Right\n  k: Up\n  j: Down\n\n"
                       "  C-space: Command typeahead (escape with C-g)\n"
                       "  C-f: Find file\n\n"
                       "## Evaluation\n"
-                      "Place cursor between the parenthesis below and type \"e\" "
-                      "in navigation mode, "
+                      "Place cursor between the parenthesis below and type \"c p p\" "
+                      "in normal mode, "
                       "to evaluate the expression:\n"
                       "(range 10 30)\n"
                       "(editor/end-of-buffer)\n"
