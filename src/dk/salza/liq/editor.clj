@@ -271,6 +271,12 @@
   (when (keymap :id)
     (swap! editor assoc-in [::keymaps (keymap :id)] keymap) nil))
 
+; (editor/add-keybinding "dk.salza.liq.keymappings.normal" "i" editor/forward-char)
+(defn add-keybinding
+  "Fx: (editor/add-keybinding \"dk.salza.liq.keymappings.normal\" \"i\" editor/forward-char)"
+  [mapid key bind]
+  (swap! editor assoc-in [::keymaps mapid key] bind))
+
 (defn add-command
   "Add a command to be availble for commandapp typeahead.
   add-interactive is in most cases more suitable."
@@ -1201,7 +1207,7 @@
 (defn handle-input
   [keyw]
   (swap! keylist conj keyw)
-  (when (and @macro-record (not= keyw "H"))
+  (when (and @macro-record (not= keyw "Q"))
     (swap! macro-seq conj keyw))
   (let [action (if @submap (@submap keyw) (get-action keyw))
         selfins (when (not action) (if @submap (@submap :selfinsert) (get-action :selfinsert)))]

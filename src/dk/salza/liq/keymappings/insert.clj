@@ -7,7 +7,7 @@
   {:id "dk.salza.liq.keymappings.insert"
    :cursor-color :green
    ;"\t" #(editor/set-keymap "dk.salza.liq.keymappings.navigation")
-   "\t" #(editor/set-keymap "dk.salza.liq.keymappings.normal")
+   ;"\t" #(editor/set-keymap "dk.salza.liq.keymappings.normal")
    "pgdn" #(editor/forward-page)
    "right" editor/forward-char
    "left" editor/backward-char

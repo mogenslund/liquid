@@ -6,16 +6,42 @@
             [dk.salza.liq.extensions.folding :as folding]
             [dk.salza.liq.apps.promptapp :as promptapp]))
 
-(def basic-mappings
+(def motion-repeat (atom 0))
+
+(defn reset-motion-repeat
+  []
+  (reset! motion-repeat 0))
+
+(defn enlarge-motion-repeat
+  [n]
+  (swap! motion-repeat #(min (+ (* 10 %) n) 300)))
+
+(defn motion-repeat-fun
+  [fun]
+  (fn []
+    (dotimes [n (max @motion-repeat 1)] (fun))
+    (reset-motion-repeat)))
+
+(def keymapping ; basic-mappings
   {:id "dk.salza.liq.keymappings.normal"
+   "0" #(if (= @motion-repeat 0) (editor/beginning-of-line) (enlarge-motion-repeat 2)) 
+   "1" #(enlarge-motion-repeat 1)
+   "2" #(enlarge-motion-repeat 2)
+   "3" #(enlarge-motion-repeat 3)
+   "4" #(enlarge-motion-repeat 4)
+   "5" #(enlarge-motion-repeat 5)
+   "6" #(enlarge-motion-repeat 6)
+   "7" #(enlarge-motion-repeat 7)
+   "8" #(enlarge-motion-repeat 8)
+   "9" #(enlarge-motion-repeat 9)
    "M" editor/prompt-to-tmp
-   " " #(editor/forward-page)
+   " " (motion-repeat-fun editor/forward-page)
    ;"C-s" editor/search
    ":" (fn [] (editor/handle-input "C- ") (editor/handle-input ":"))
-   "right" editor/forward-char
-   "left" editor/backward-char
-   "up" editor/backward-line
-   "down" editor/forward-line
+   "right" (motion-repeat-fun editor/forward-char)
+   "left" (motion-repeat-fun editor/backward-char)
+   "up" (motion-repeat-fun editor/backward-line)
+   "down" (motion-repeat-fun editor/forward-line)
    "C-s" #(promptapp/run editor/find-next '("SEARCH"))
    "v" editor/selection-toggle
    "g" {"g" editor/beginning-of-buffer
@@ -24,37 +50,34 @@
        "c" #(editor/prompt-append (str "--" (editor/get-context) "--"))
        "i" dk.salza.liq.extensions.headlinenavigator/run}
    "dash" editor/top-next-headline
-   "C-g" editor/escape
-   "e" editor/end-of-word
+   "C-g" #(do (editor/escape) (reset-motion-repeat))
+   "e" (motion-repeat-fun editor/end-of-word)
    "E" editor/evaluate-file
    "C-e" editor/evaluate-file-raw
-   "l" editor/forward-char
-   "h" editor/backward-char
-   "k" editor/backward-line
-   "j" editor/forward-line
+   "l" (motion-repeat-fun editor/forward-char)
+   "h" (motion-repeat-fun editor/backward-char)
+   "k" (motion-repeat-fun editor/backward-line)
+   "j" (motion-repeat-fun editor/forward-line)
    "o" #(do (editor/insert-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "a" #(do (editor/forward-char) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "A" #(do (editor/end-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "i" #(editor/set-keymap "dk.salza.liq.keymappings.insert")
-   "0" editor/beginning-of-line
    "J" editor/beginning-of-line
    "G" editor/end-of-buffer
    "$" editor/end-of-line
    "L" editor/end-of-line
-   "x" editor/delete-char
+   "x" (motion-repeat-fun editor/delete-char)
    "m" editor/previous-real-buffer 
-   "h-" editor/run-macro
-   "H" editor/record-macro
+   "q" editor/run-macro
+   "Q" editor/record-macro
    "n" editor/find-next
    "O" editor/context-action
-   "w" editor/forward-word
-   "K" editor/swap-line-down
-   "C-j" editor/swap-line-down
-   "C-k" editor/swap-line-up
+   "w" (motion-repeat-fun editor/forward-word)
+   "C-j" (motion-repeat-fun editor/swap-line-down)
+   "C-k" (motion-repeat-fun editor/swap-line-up)
    "I" #(do (editor/beginning-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "r" {" " #(editor/replace-char " ")
         :selfinsert editor/replace-char}
-   "1" editor/select-sexp-at-point
    "y" {:info "y: Line or selection\nc: Context\nf: Current filepath"
        "y" #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))
        "c" editor/copy-context
@@ -74,11 +97,13 @@
         "5" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 5)))
         "s" #(if (editor/selection-active?) (do (editor/hide-selection) (editor/selection-cancel)) (editor/unhide))
         "f" #(editor/apply-to-slider folding/fold-def)}
+   "," {"," editor/highlight-sexp-at-point
+        "s" editor/select-sexp-at-point}
    "c" {"p" {"p" editor/eval-last-sexp
              "f" editor/evaluate-file}}
    "C-t" editor/tmp-test })
 
-(defn keymapping
-  [keyw]
-  (cond (= keyw "2") #(editor/prompt-append "--2--")
-        true (basic-mappings keyw)))
+; (defn keymapping
+;   [keyw]
+;   (cond (= keyw "2") #(editor/prompt-append "--2--")
+;         true (basic-mappings keyw)))
