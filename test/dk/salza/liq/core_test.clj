@@ -57,7 +57,7 @@
   [input expected]
   (let [program (future (core/-main "--no-init-file" "--no-threads" "--ghost" "--rows=20" "--columns=190"))]
     (Thread/sleep 100)
-    (send-input "ggvGdd" "i") ; Clearing screen. Ready to type
+    (send-input "ggvGd" "i") ; Clearing screen. Ready to type
     (apply send-input input)
     (Thread/sleep 100)
     ;(while (not (empty? @ghostadapter/input)) (Thread/sleep 10))

@@ -104,13 +104,15 @@
    "y" {:info "y: Line or selection\nc: Context\nf: Current filepath"
         :direct-condition #(editor/selection-active?)
         :direct-action #(do (editor/copy-selection) (editor/selection-cancel))
-       "y" #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))
+       "y" editor/copy-line
        "c" editor/copy-context
        "f" editor/copy-file}
    "Y" editor/copy-line
    "p" {"p" #(do (editor/insert-line) (editor/paste) (editor/beginning-of-line))
        "h" editor/paste}
-   "d" {"d" #(do (or (editor/delete-selection) (editor/delete-line)) (editor/selection-cancel))}
+   "d" {:direct-condition #(editor/selection-active?)
+        :direct-action #(do (editor/delete-selection) (editor/selection-cancel))
+        "d" editor/delete-line}
    "D" editor/delete-to-end-of-line
    "s" editor/save-file
          "u" editor/undo
