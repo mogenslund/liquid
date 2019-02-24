@@ -69,14 +69,6 @@
   (swap! state update ::selected #(inc (or % -1)))
   (update-display))
 
-(defn- delete
-  []
-  (when (> (count (@state ::search)) 0)
-    (swap! state update ::search #(subs % 0 (dec (count (@state ::search)))))
-    (swap! state assoc ::selected nil)
-    (next-res)
-    (update-display)))
-
 (defn- up
   []
   (swap! state update ::path #(or (.getParent (io/file %)) %))
@@ -85,6 +77,15 @@
   (next-res)
   (update-display))
 
+(defn- delete
+  []
+  (if (> (count (@state ::search)) 0)
+    (do
+      (swap! state update ::search #(subs % 0 (dec (count (@state ::search)))))
+      (swap! state assoc ::selected nil)
+      (next-res)
+      (update-display))
+    (up)))
 
 (defn- prev-res
   []
@@ -123,6 +124,7 @@
    "C-g" editor/previous-real-buffer-same-window
    "esc" editor/previous-real-buffer-same-window
    "C-j" up
+   "C-h" up
    "left" up
    "C-k" next-res
    "down" next-res

@@ -90,19 +90,25 @@
    "Q" editor/record-macro
    "n" editor/find-next
    "O" editor/context-action
+   "W" (motion-repeat-fun editor/forward-word)
    "w" (motion-repeat-fun editor/forward-word)
    "C-j" (motion-repeat-fun editor/swap-line-down)
    "C-k" (motion-repeat-fun editor/swap-line-up)
    "I" #(do (editor/beginning-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "r" {" " #(editor/replace-char " ")
         :selfinsert editor/replace-char}
+   "f" {:selfinsert (fn [c] (editor/find-next c))}
    "y" {:info "y: Line or selection\nc: Context\nf: Current filepath"
+        :direct-condition #(editor/selection-active?)
+        :direct-action #(do (editor/copy-selection) (editor/selection-cancel))
        "y" #(do (or (editor/copy-selection) (editor/copy-line)) (editor/selection-cancel))
        "c" editor/copy-context
        "f" editor/copy-file}
+   "Y" editor/copy-line
    "p" {"p" #(do (editor/insert-line) (editor/paste) (editor/beginning-of-line))
        "h" editor/paste}
    "d" {"d" #(do (or (editor/delete-selection) (editor/delete-line)) (editor/selection-cancel))}
+   "D" editor/delete-to-end-of-line
    "s" editor/save-file
          "u" editor/undo
    "C-w" editor/kill-buffer

@@ -929,6 +929,14 @@
     (update-mem-col)
     true))
 
+(defn delete-to-end-of-line
+  []
+  (selection-set)
+  (end-of-line)
+  (delete-selection)
+  (selection-cancel))
+  
+
 (defn hide-selection
   "Hide the current selection.
   Will be collapsed into a symbol with
@@ -1210,7 +1218,10 @@
   (swap! keylist conj keyw)
   (when (and @macro-record (not= keyw "Q"))
     (swap! macro-seq conj keyw))
-  (let [action (if @submap (@submap keyw) (get-action keyw))
+  (let [raction (if @submap (@submap keyw) (get-action keyw))
+        action (if (and (map? raction) (raction :direct-condition) ((raction :direct-condition))) 
+                 (raction :direct-action)
+                 raction)
         selfins (when (not action) (if @submap (@submap :selfinsert) (get-action :selfinsert)))
         after-hook (if @submap (@submap :after-hook) (get-action :after-hook))]
     (cond (map? action) (do
