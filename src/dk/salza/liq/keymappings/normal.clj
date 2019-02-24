@@ -66,7 +66,8 @@
        "t" editor/top-align-page
        "n" editor/top-next-headline
        "c" #(editor/prompt-append (str "--" (editor/get-context) "--"))
-       "i" dk.salza.liq.extensions.headlinenavigator/run}
+       "i" dk.salza.liq.extensions.headlinenavigator/run
+       "l" dk.salza.liq.extensions.linenavigator/run}
    "dash" editor/top-next-headline
    "C-g" #(do (editor/escape) (reset-motion-repeat))
    "e" (motion-repeat-fun editor/end-of-word)

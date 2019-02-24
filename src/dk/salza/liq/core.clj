@@ -128,6 +128,7 @@
   (editor/add-interactive ":o" #(findfileapp/run editor/find-file))
   (editor/add-interactive ":edit" #(findfileapp/run editor/find-file))
   (editor/add-interactive ":e" #(findfileapp/run editor/find-file))
+  (editor/add-interactive ":bd" editor/kill-buffer)
   (editor/add-interactive "apropos" clojure.repl/find-doc "APROPOS")
   (editor/add-interactive "Reopen files changed on disk" editor/reopen-all-files)
   (editor/add-interactive "Windows keymap" #(editor/set-keymap @textappwin/keymap))
