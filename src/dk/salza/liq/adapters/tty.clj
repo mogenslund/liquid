@@ -170,6 +170,8 @@
             (= raw2 '(27 91 49 59 50 66)) "S-down"
             (= raw2 '(27 91 49 59 50 68)) "S-left"
             (= raw2 '(27 91 49 59 50 67)) "S-right"
+            (= raw2 '(27 91 49 59 53 72)) "C-home"
+            (= raw2 '(27 91 49 59 53 70)) "C-end"
             true (str (char c0))))))
 
 (defn input-handler

@@ -82,6 +82,7 @@
    "A" #(do (editor/end-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "i" #(editor/set-keymap "dk.salza.liq.keymappings.insert")
    "J" editor/beginning-of-line
+   "^" #(do (editor/beginning-of-line) (editor/find-next #"\S"))
    "G" editor/end-of-buffer
    "$" editor/end-of-line
    "L" editor/end-of-line
@@ -99,6 +100,7 @@
    "r" {" " #(editor/replace-char " ")
         :selfinsert editor/replace-char}
    "f" {:selfinsert (fn [c] (editor/find-next c))}
+   "F" {:selfinsert editor/find-char-previous}
    "y" {:info "y: Line or selection\nc: Context\nf: Current filepath"
         :direct-condition #(editor/selection-active?)
         :direct-action #(do (editor/copy-selection) (editor/selection-cancel))

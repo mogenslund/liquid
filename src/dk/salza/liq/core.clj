@@ -13,7 +13,6 @@
             [dk.salza.liq.tools.cshell :as cshell]
             [dk.salza.liq.apps.findfileapp :as findfileapp]
             [dk.salza.liq.apps.textapp :as textapp]
-            [dk.salza.liq.apps.textappwin :as textappwin]
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.apps.helpapp :as helpapp]
@@ -131,8 +130,6 @@
   (editor/add-interactive ":bd" editor/kill-buffer)
   (editor/add-interactive "apropos" clojure.repl/find-doc "APROPOS")
   (editor/add-interactive "Reopen files changed on disk" editor/reopen-all-files)
-  (editor/add-interactive "Windows keymap" #(editor/set-keymap @textappwin/keymap))
-  (editor/add-interactive "Liquid keymap" #(editor/set-keymap dk.salza.liq.keymappings.navigation/keymapping))
 
   ;; Default searchpaths
   (when (fileutil/exists? "project.clj")
@@ -172,27 +169,13 @@
                       "in normal mode, "
                       "to evaluate the expression:\n"
                       "(range 10 30)\n"
-                      "(editor/end-of-buffer)\n"
+                      "(editor/end-of-buffer)\n\n"
+                      "## Windows\n"
+                      "If you use Windows and have no experience with vim keys, press \"i\" to\n"
+                      "make the cursor green. Now use arrow keys to move around\n"
+                      "and f5 to evaluate s-expressions.\n"
                      ))
   (editor/end-of-buffer))
-
-(defn init-editor-easy
-  []
-  (editor/set-default-keymap @textappwin/keymap)
-  (editor/set-keymap @textappwin/keymap)
-  (editor/set-default-app textappwin/run)
-
-  (editor/split-window-right 0.22)
-  (editor/switch-to-buffer "-prompt-")
-  (editor/insert logo)
-  (editor/other-window)
-  (editor/switch-to-buffer "scratch")
-  (editor/insert (str "# Welcome to λiquid\n"
-                      "(range 10 30)\n"
-                      "(editor/end-of-buffer)\n"
-                     ))
-  (editor/end-of-buffer))
-
 
 (defn- read-arg
   "Reads the value of an argument.
@@ -253,11 +236,11 @@
   (cond (read-arg args "--help") (print-help-and-exit)
         (read-arg args "--version") (print-version-and-exit)
     :else
-    (let [easy (read-arg args "--easy")
+    (let [;easy (read-arg args "--easy")
           useserver (or (read-arg args "--server")
                         (read-arg args "--web"))
           usejframe (or (read-arg args "--jframe")
-                        (read-arg args "--easy")
+                        ;(read-arg args "--easy")
                         (and (not (read-arg args "--ghost")) (is-windows)))
           usetty (or (read-arg args "--tty") (not (or usejframe useserver (read-arg args "--ghost"))))
           rows (or (read-arg-int args "--rows=")
@@ -294,14 +277,14 @@
 (defn -main
   [& args]
   (apply startup args)
-  (let [easy (read-arg args "--easy")
+  (let [;easy (read-arg args "--easy")
         minimal (read-arg args "--minimal")
         userfile (when-not (read-arg args "--no-init-file") 
                    (or (read-arg args "--load=")
                      (and (not minimal)
                           (fileutil/file (System/getProperty "user.home") ".liq"))))]
     (cond minimal (do)
-          easy (init-editor-easy)
+          ;easy (init-editor-easy)
           true (init-editor))
     (load-user-file userfile)
     (when-let [filename (re-matches #"[^-].*" (or (last args) ""))]

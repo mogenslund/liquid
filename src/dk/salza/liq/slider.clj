@@ -212,7 +212,7 @@
   is not yet a hide lines functionality."
   [sl]
   (let [tostr (fn [& chs] (apply str (map #(if (string? %) % "¤") chs)))]
-    (str (apply tostr (reverse (sl ::before))) (apply tostr (sl ::after)))))  
+    (str (apply tostr (reverse (sl ::before))) (apply tostr (sl ::after)))))
 
 (defn slide-marks
   "This function will move marks strictly after

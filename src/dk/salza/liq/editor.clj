@@ -1070,6 +1070,15 @@
     (doto-buffer buffer/find-next (setting ::searchstring))
     (update-mem-col)))
 
+(defn find-char-previous
+  [c]
+  (apply-to-slider
+    (fn [sl]
+      (let [res (slider/left-until sl #(= % c))]
+        (if (= (slider/get-char res) c)
+          res
+          sl)))))
+
 (defn top-next-headline
   []
   (find-next "\n# ")
