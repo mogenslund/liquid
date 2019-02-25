@@ -3,6 +3,7 @@
             [dk.salza.liq.slider :refer :all]
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.apps.findfileapp :as findfileapp]
+            [dk.salza.liq.apps.textapp :as textapp]
             [dk.salza.liq.apps.keynavigateapp :as keynavigateapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
@@ -43,7 +44,11 @@
        "e" {:info "Evaluation"
             "e" {:info "eval-last-sexp" :action editor/eval-last-sexp}
             "b" {:info "eval-buffer" :action editor/evaluate-file}}}
+  "f" {:info "Files"
+       "f" {:info "find-file" :action #(findfileapp/run textapp/run)}}
+  "q" {:info "Quit" :action editor/quit}
   "\t" {:info "Last buffer" :action editor/previous-real-buffer}
+  " " {:info "Command typeahead" :action #(do (editor/request-fullupdate) (commandapp/run))}
   })
 
 (def keymapping ; basic-mappings
