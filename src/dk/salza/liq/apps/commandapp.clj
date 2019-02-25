@@ -14,7 +14,7 @@
   (cond (= (first hit) :buffer) (editor/switch-to-buffer (second hit))
         (= (first hit) :snippet) (editor/insert (second hit))
         (= (first hit) :file)   (textapp/run (second hit)) ;(editor/find-file (second hit))
-        (= (first hit) :command) (editor/eval-safe (second hit))
+        (= (first hit) :command) ((second (second hit)))
         (= (first hit) :interactive) (let [fun (second (second hit))
                                            params (nth (second hit) 2)]
                                        (if params

@@ -128,6 +128,11 @@
   (editor/add-interactive ":edit" #(findfileapp/run editor/find-file))
   (editor/add-interactive ":e" #(findfileapp/run editor/find-file))
   (editor/add-interactive ":bd" editor/kill-buffer)
+
+  (editor/add-command "SPC mee (eval-last-sexp)" editor/eval-last-sexp)
+  (editor/add-command "SPC meb (evaluate-file)" editor/evaluate-file)
+
+
   (editor/add-interactive "apropos" clojure.repl/find-doc "APROPOS")
   (editor/add-interactive "Reopen files changed on disk" editor/reopen-all-files)
 

@@ -280,8 +280,8 @@
 (defn add-command
   "Add a command to be availble for commandapp typeahead.
   add-interactive is in most cases more suitable."
-  [fun]
-  (add-to-setting ::commands fun) nil)
+  [label fun]
+  (add-to-setting ::commands [label fun]) nil)
 
 (defn add-searchpath
   "Add a folder to searchpaths.

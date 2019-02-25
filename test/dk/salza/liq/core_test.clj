@@ -73,7 +73,7 @@
 
 (deftest reproduce-findfile-slash
   (testing "Reproduce error when typing /a in findfile mode"
-    (screen-check ["C-o" "C-f" "/" "a"]
+    (screen-check ["C-o" "C-x" "C-f" "/" "a"]
                   "findfile")))
 
 ; (deftest temporary

@@ -2,6 +2,7 @@
   (:require [dk.salza.liq.editor :as editor]
             [dk.salza.liq.slider :refer :all]
             [dk.salza.liq.apps.commandapp :as commandapp]
+            [dk.salza.liq.apps.findfileapp :as findfileapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
             [dk.salza.liq.extensions.folding :as folding]
@@ -50,7 +51,8 @@
    "8" #(enlarge-motion-repeat 8)
    "9" #(enlarge-motion-repeat 9)
    "M" editor/prompt-to-tmp
-   " " (motion-repeat-fun editor/forward-page)
+   " " {"m" {"e" {"e" editor/eval-last-sexp}}}
+   "C-f" (motion-repeat-fun editor/forward-page)
    ":" #(do (editor/request-fullupdate) (commandapp/run ":i :"))
    "(" #(wrap-selection % "(" ")") ;)
    "[" #(wrap-selection % "[" "]")
@@ -129,6 +131,11 @@
    "," {"," editor/highlight-sexp-at-point
         "s" editor/select-sexp-at-point}
    "c" {"p" {"p" editor/eval-last-sexp
-             "f" editor/evaluate-file}}
+             "f" editor/evaluate-file}
+        "w" #(do (editor/selection-set)
+                 (editor/forward-word)
+                 (editor/delete-selection)
+                 (editor/selection-cancel)
+                 (editor/set-keymap "dk.salza.liq.keymappings.insert"))}
    "C-t" editor/tmp-test })
 
