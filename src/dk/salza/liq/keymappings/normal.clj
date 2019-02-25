@@ -3,6 +3,7 @@
             [dk.salza.liq.slider :refer :all]
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.apps.findfileapp :as findfileapp]
+            [dk.salza.liq.apps.keynavigateapp :as keynavigateapp]
             [dk.salza.liq.extensions.headlinenavigator]
             [dk.salza.liq.extensions.linenavigator]
             [dk.salza.liq.extensions.folding :as folding]
@@ -37,6 +38,14 @@
           (set-point m2))
       sl)))
 
+(def space-map {
+  "m" {:info "Some commands"
+       "e" {:info "Evaluation"
+            "e" {:info "eval-last-sexp" :action editor/eval-last-sexp}
+            "b" {:info "eval-buffer" :action editor/evaluate-file}}}
+  "\t" {:info "Last buffer" :action editor/previous-real-buffer}
+  })
+
 (def keymapping ; basic-mappings
   {:id "dk.salza.liq.keymappings.normal"
    :after-hook (fn [k] (when (not (re-find #"\d" k)) (reset-motion-repeat)))
@@ -51,7 +60,7 @@
    "8" #(enlarge-motion-repeat 8)
    "9" #(enlarge-motion-repeat 9)
    "M" editor/prompt-to-tmp
-   " " {"m" {"e" {"e" editor/eval-last-sexp}}}
+   " " #(keynavigateapp/run space-map)
    "C-f" (motion-repeat-fun editor/forward-page)
    ":" #(do (editor/request-fullupdate) (commandapp/run ":i :"))
    "(" #(wrap-selection % "(" ")") ;)
@@ -89,7 +98,7 @@
    "$" editor/end-of-line
    "L" editor/end-of-line
    "x" (motion-repeat-fun editor/delete-char)
-   "m" editor/previous-real-buffer 
+   "m" editor/previous-real-buffer
    "q" editor/run-macro
    "Q" editor/record-macro
    "n" editor/find-next
