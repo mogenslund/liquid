@@ -39,18 +39,6 @@
           (set-point m2))
       sl)))
 
-(def space-map {
-  "m" {:info "Some commands"
-       "e" {:info "Evaluation"
-            "e" {:info "eval-last-sexp" :action editor/eval-last-sexp}
-            "b" {:info "eval-buffer" :action editor/evaluate-file}}}
-  "f" {:info "Files"
-       "f" {:info "find-file" :action #(findfileapp/run textapp/run)}}
-  "q" {:info "Quit" :action editor/quit}
-  "\t" {:info "Last buffer" :action editor/previous-real-buffer}
-  " " {:info "Command typeahead" :action #(do (editor/request-fullupdate) (commandapp/run))}
-  })
-
 (def keymapping ; basic-mappings
   {:id "dk.salza.liq.keymappings.normal"
    :after-hook (fn [k] (when (not (re-find #"\d" k)) (reset-motion-repeat)))
@@ -65,7 +53,7 @@
    "8" #(enlarge-motion-repeat 8)
    "9" #(enlarge-motion-repeat 9)
    "M" editor/prompt-to-tmp
-   " " #(keynavigateapp/run space-map)
+   " " #(keynavigateapp/run (editor/get-spacemap))
    "C-f" (motion-repeat-fun editor/forward-page)
    ":" #(do (editor/request-fullupdate) (commandapp/run ":i :"))
    "(" #(wrap-selection % "(" ")") ;)
@@ -131,7 +119,7 @@
         "d" editor/delete-line}
    "D" editor/delete-to-end-of-line
    "s" editor/save-file
-         "u" editor/undo
+   "u" editor/undo
    "C-w" editor/kill-buffer
    "+" {"+" #(editor/apply-to-slider folding/cycle-level-fold)
         "0" #(editor/apply-to-slider folding/expand-all)

@@ -132,6 +132,18 @@
   (editor/add-command "SPC mee (eval-last-sexp)" editor/eval-last-sexp)
   (editor/add-command "SPC meb (evaluate-file)" editor/evaluate-file)
 
+  (editor/set-spacekey ["m"] "Clojure commands" nil)
+  (editor/set-spacekey ["m" "e"] "Evaluation" nil)
+  (editor/set-spacekey ["m" "e" "e"] "eval-last-sexp" editor/eval-last-sexp)
+  (editor/set-spacekey ["m" "e" "b"] "eval-buffer" editor/evaluate-file)
+  (editor/set-spacekey ["f"] "Files" nil)
+  (editor/set-spacekey ["f" "f"] "find-file" #(findfileapp/run textapp/run))
+  (editor/set-spacekey ["f" "s"] "save-file" editor/save-file)
+  (editor/set-spacekey ["q"] "Quit" nil)
+  (editor/set-spacekey ["q" "q"] "Quit" editor/quit)
+  (editor/set-spacekey ["\t"] "Last buffer" editor/previous-real-buffer)
+  (editor/set-spacekey [" "] "Command typeahead" #(do (editor/request-fullupdate) (commandapp/run)))
+
 
   (editor/add-interactive "apropos" clojure.repl/find-doc "APROPOS")
   (editor/add-interactive "Reopen files changed on disk" editor/reopen-all-files)

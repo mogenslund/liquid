@@ -76,7 +76,8 @@
                ::files ()
                ::snippets ()
                ::commands ()
-               ::interactive ()}})
+               ::interactive ()
+               ::spacemap {}}})
 
 (def editor
   "The ref which contains the editor data, that is
@@ -147,6 +148,15 @@
   settings part of the editor." 
   [keyw value]
   (swap! editor assoc-in [::settings keyw] value))
+
+(defn set-spacekey
+  [ks info action]
+  (swap! editor assoc-in (concat [::settings ::spacemap] ks [:info]) info)
+  (when action (swap! editor assoc-in (concat [::settings ::spacemap] ks [:action]) action)))
+
+(defn get-spacemap
+  []
+  (setting ::spacemap))
 
 (defn set-default-keymap
   "Set the keymap to be used as default when a

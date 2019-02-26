@@ -12,10 +12,17 @@
             "b" {:info "eval-buffer" :action editor/evaluate-file}}}
   })
 
+(defn key-name
+  [k]
+  (cond (= k "\t") "TAB"
+        (= k "\n") "ENTER"
+        (= k " ") "SPACE"
+        true k))
+
 (defn update-display
   []
   (let [ks (filter string? (keys @state))
-        out (map #(str % ": " ((@state %) :info)) ks)]
+        out (map #(str (format "%-7s" (str (key-name %) ":")) ((@state %) :info)) ks)]
     (editor/clear)
     (editor/insert (str/join "\n" out))))
 
