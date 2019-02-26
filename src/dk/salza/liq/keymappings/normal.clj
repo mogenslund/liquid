@@ -39,9 +39,18 @@
           (set-point m2))
       sl)))
 
+(defn change
+  [fun]
+  (fn []
+    (editor/selection-set)
+    (fun)
+    (editor/delete-selection)
+    (editor/selection-cancel)
+    (editor/set-keymap "dk.salza.liq.keymappings.insert")))
+
 (def keymapping ; basic-mappings
   {:id "dk.salza.liq.keymappings.normal"
-   :after-hook (fn [k] (when (not (re-find #"\d" k)) (reset-motion-repeat)))
+   :after-hook (fn [k] (when (not (re-find #"[\dc]" k)) (reset-motion-repeat)))
    "0" #(if (= @motion-repeat 0) (editor/beginning-of-line) (enlarge-motion-repeat 0)) 
    "1" #(enlarge-motion-repeat 1)
    "2" #(enlarge-motion-repeat 2)
@@ -96,8 +105,8 @@
    "Q" editor/record-macro
    "n" editor/find-next
    "O" editor/context-action
-   "W" (motion-repeat-fun editor/forward-word)
    "w" (motion-repeat-fun editor/forward-word)
+   "W" (motion-repeat-fun editor/forward-word2)
    "C-j" (motion-repeat-fun editor/swap-line-down)
    "C-k" (motion-repeat-fun editor/swap-line-up)
    "I" #(do (editor/beginning-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
@@ -134,10 +143,12 @@
         "s" editor/select-sexp-at-point}
    "c" {"p" {"p" editor/eval-last-sexp
              "f" editor/evaluate-file}
-        "w" #(do (editor/selection-set)
-                 (editor/forward-word)
-                 (editor/delete-selection)
-                 (editor/selection-cancel)
-                 (editor/set-keymap "dk.salza.liq.keymappings.insert"))}
+        "e" (change (motion-repeat-fun editor/end-of-word))
+        "l" (change (motion-repeat-fun editor/forward-char))
+        "h" (change (motion-repeat-fun editor/backward-char))
+        "k" (change (motion-repeat-fun editor/backward-line))
+        "j" (change (motion-repeat-fun editor/forward-line))
+        "w" (change (motion-repeat-fun editor/forward-word))
+        "W" (change (motion-repeat-fun editor/forward-word2))}
    "C-t" editor/tmp-test })
 

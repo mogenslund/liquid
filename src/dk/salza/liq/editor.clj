@@ -485,6 +485,11 @@
     (update-mem-col)))
 
 (defn forward-word
+  []
+  (apply-to-slider slider/forward-word)
+  (update-mem-col))
+
+(defn forward-word2
   "Moves the cursor to the beginning
   of the next word."
   []

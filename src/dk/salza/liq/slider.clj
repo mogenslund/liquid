@@ -531,11 +531,27 @@
       (mark-paren-end "hl1")
       (point-to-mark "cursor"))))
   
-
 (defn forward-word
+  [sl]
+  (let [iswhite (fn [c] (re-matches #"\s" c))
+        isalphanum (fn [c] (re-matches #"\p{L}" c))
+        issym (fn [c] (not (or (iswhite c) (isalphanum c))))
+        c0 (get-char sl)
+        stop-cond (cond (isalphanum c0) issym
+                        (issym c0) isalphanum
+                        true (comp not iswhite))]
+    (loop [s (right sl) sc stop-cond]
+      (cond (end? s) s
+            (sc (get-char s)) s
+            (iswhite (get-char s)) (recur (right s) (comp not iswhite))
+            true (recur (right s) sc)))))
+
+(defn forward-word2
   "Moves the point to beginning of next word or end-of-buffer"
   [sl]
-  (-> sl (right-until (partial re-find #"\s")) right (right-until (partial re-find #"\S")))) ; (not (not (re-matches #"\S" "\n")))
+  (-> sl (right-until (partial re-find #"\s"))
+      right
+      (right-until (partial re-find #"\S")))) ; (not (not (re-matches #"\S" "\n")))
 
 (defn end-of-line
   "Moves the point to the end of the line. Right before the
