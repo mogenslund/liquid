@@ -123,16 +123,17 @@
    "backspace" delete
    "C-g" editor/previous-real-buffer-same-window
    "esc" editor/previous-real-buffer-same-window
-   "C-j" up
+   "C-j" next-res
    "C-h" up
    "left" up
-   "C-k" next-res
+   "C-k" prev-res
    "down" next-res
    "C-n" next-res
    "\t" prev-res ; tab and C-i are the same in terminal
    "up" prev-res
    "C-i" prev-res
    "C-p" prev-res
+   "C-l" #(execute fun)
    "\n" #(execute fun)
    "M-\n" #(execute-search fun)
    "C- " #(execute-search fun)

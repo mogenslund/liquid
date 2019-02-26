@@ -284,9 +284,9 @@
     (view-draw)
     (.addComponentListener @frame
       (proxy [ComponentListener] []
-        (componentShown [c])
-        (componentMoved [c])
-        (componentHidden [c])
+        (componentShown [c] (redraw-frame))
+        (componentMoved [c] (redraw-frame))
+        (componentHidden [c] (redraw-frame))
         (componentResized [c] (redraw-frame))))))
 
 (defn jframequit

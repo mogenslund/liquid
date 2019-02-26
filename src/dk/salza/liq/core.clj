@@ -139,6 +139,11 @@
   (editor/set-spacekey ["f"] "Files" nil)
   (editor/set-spacekey ["f" "f"] "find-file" #(findfileapp/run textapp/run))
   (editor/set-spacekey ["f" "s"] "save-file" editor/save-file)
+  (editor/set-spacekey ["w"] "Window" nil)
+  (editor/set-spacekey ["w" "/"] "Split window vertically" editor/split-window-right)
+  (editor/set-spacekey ["w" "-"] "Split window horizontally" editor/split-window-below)
+  (editor/set-spacekey ["w" "d"] "Delete window" editor/delete-window)
+  (editor/set-spacekey ["w" "w"] "Other window" editor/other-window)
   (editor/set-spacekey ["q"] "Quit" nil)
   (editor/set-spacekey ["q" "q"] "Quit" editor/quit)
   (editor/set-spacekey ["\t"] "Last buffer" editor/previous-real-buffer)
@@ -179,8 +184,9 @@
                       "Use Esc to switch to normal mode (blue cursor).\n\n"
                       "## Basic navigation\nIn navigation mode (blue cursor):\n\n"
                       "  h: Left\n  l: Right\n  k: Up\n  j: Down\n\n"
+                      "  space: Spacemacs like feature\n"
                       "  C-space: Command typeahead (escape with C-g)\n"
-                      "  C-f: Find file\n\n"
+                      "  C-x C-f: Find file (or space f f)\n\n"
                       "## Evaluation\n"
                       "Place cursor between the parenthesis below and type \"c p p\" "
                       "in normal mode, "

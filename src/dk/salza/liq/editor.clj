@@ -152,7 +152,8 @@
 (defn set-spacekey
   [ks info action]
   (swap! editor assoc-in (concat [::settings ::spacemap] ks [:info]) info)
-  (when action (swap! editor assoc-in (concat [::settings ::spacemap] ks [:action]) action)))
+  (when action (swap! editor assoc-in (concat [::settings ::spacemap] ks [:action]) action))
+  nil)
 
 (defn get-spacemap
   []

@@ -80,13 +80,16 @@
    "C-g" editor/previous-real-buffer-same-window
    "esc" editor/previous-real-buffer-same-window
    "backspace" delete-char
-   "C-k" next-res
+   "C-h" delete-char
+   "C-k" prev-res
+   "C-j" next-res
    "C-n" next-res
    "down" next-res
    "\t" prev-res ; tab = C-i in terminal!
    "up" prev-res
    "C-i" prev-res
    "C-p" prev-res
+   "C-l" execute
    "\n" execute
    " " #(update-search " ")
    :selfinsert update-search
