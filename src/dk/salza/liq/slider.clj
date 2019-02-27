@@ -553,6 +553,23 @@
       right
       (right-until (partial re-find #"\S")))) ; (not (not (re-matches #"\S" "\n")))
 
+(defn end-of-word
+  [sl]
+  (let [iswhite (fn [c] (re-matches #"\s" c))
+        isalphanum (fn [c] (re-matches #"(\p{L}|\d)" c))
+        issym (fn [c] (not (or (iswhite c) (isalphanum c))))
+        sl0 (right-until (right sl) (comp not iswhite))
+        c0 (get-char sl0)
+        stop-cond (cond (isalphanum c0) (comp not isalphanum)
+                        (issym c0) (comp not issym)
+                        true (comp not iswhite))
+        ]
+    (loop [s (-> sl0 right) sc stop-cond]
+      (cond (end? s) (left s)
+            (sc (get-char s)) (left s)
+            (iswhite (get-char s)) (recur (right s) (comp not iswhite))
+            true (recur (right s) sc)))))
+
 (defn end-of-line
   "Moves the point to the end of the line. Right before the
   next line break."

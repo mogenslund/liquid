@@ -513,6 +513,11 @@
     (update-mem-col)))
 
 (defn end-of-word
+  []
+  (apply-to-slider slider/end-of-word)
+  (update-mem-col))
+
+(defn end-of-word2
   "Moves the cursor to the end of the current
   word."
   []

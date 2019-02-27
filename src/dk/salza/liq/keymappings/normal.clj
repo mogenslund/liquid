@@ -84,7 +84,7 @@
    "dash" editor/top-next-headline
    "C-g" #(do (editor/escape) (reset-motion-repeat))
    "e" (motion-repeat-fun editor/end-of-word)
-   "E" editor/evaluate-file
+   "E" (motion-repeat-fun editor/end-of-word2)
    "C-e" editor/evaluate-file-raw
    "l" (motion-repeat-fun editor/forward-char)
    "h" (motion-repeat-fun editor/backward-char)
@@ -143,7 +143,8 @@
         "s" editor/select-sexp-at-point}
    "c" {"p" {"p" editor/eval-last-sexp
              "f" editor/evaluate-file}
-        "e" (change (motion-repeat-fun editor/end-of-word))
+        "e" (change (motion-repeat-fun (fn [] (editor/end-of-word) (editor/forward-char))))
+        "E" (change (motion-repeat-fun (fn [] (editor/end-of-word2) (editor/forward-char))))
         "l" (change (motion-repeat-fun editor/forward-char))
         "h" (change (motion-repeat-fun editor/backward-char))
         "k" (change (motion-repeat-fun editor/backward-line))
