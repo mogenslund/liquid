@@ -534,7 +534,7 @@
 (defn forward-word
   [sl]
   (let [iswhite (fn [c] (re-matches #"\s" c))
-        isalphanum (fn [c] (re-matches #"\p{L}" c))
+        isalphanum (fn [c] (re-matches #"(\p{L}|\d)" c))
         issym (fn [c] (not (or (iswhite c) (isalphanum c))))
         c0 (get-char sl)
         stop-cond (cond (isalphanum c0) issym
