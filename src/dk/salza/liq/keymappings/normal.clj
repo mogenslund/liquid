@@ -143,8 +143,8 @@
         "s" editor/select-sexp-at-point}
    "c" {"p" {"p" editor/eval-last-sexp
              "f" editor/evaluate-file}
-        "e" (change (motion-repeat-fun (fn [] (editor/end-of-word) (editor/forward-char))))
-        "E" (change (motion-repeat-fun (fn [] (editor/end-of-word2) (editor/forward-char))))
+        "e" (change (motion-repeat-fun editor/end-of-word))
+        "E" (change (motion-repeat-fun editor/end-of-word2))
         "l" (change (motion-repeat-fun editor/forward-char))
         "h" (change (motion-repeat-fun editor/backward-char))
         "k" (change (motion-repeat-fun editor/backward-line))

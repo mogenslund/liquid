@@ -565,8 +565,8 @@
                         true (comp not iswhite))
         ]
     (loop [s (-> sl0 right) sc stop-cond]
-      (cond (end? s) (left s)
-            (sc (get-char s)) (left s)
+      (cond (end? s) s
+            (sc (get-char s)) s
             (iswhite (get-char s)) (recur (right s) (comp not iswhite))
             true (recur (right s) sc)))))
 

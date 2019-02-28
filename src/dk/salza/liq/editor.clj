@@ -525,8 +525,7 @@
     #(-> %
          (slider/right 1)
          (slider/right-until (partial re-find #"\S"))
-         (slider/right-until (partial re-find #"\s"))
-         (slider/left 1)))
+         (slider/right-until (partial re-find #"\s"))))
   (update-mem-col))
 
 (defn backward-char
