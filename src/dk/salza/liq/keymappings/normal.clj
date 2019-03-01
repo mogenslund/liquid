@@ -73,6 +73,7 @@
    "up" (motion-repeat-fun editor/backward-line)
    "down" (motion-repeat-fun editor/forward-line)
    "/" #(promptapp/run editor/find-next '("/"))
+   "?" #(promptapp/run editor/find-prev '("?"))
    "M-s" #(promptapp/run editor/search-files '("SEARCH"))
    "v" editor/selection-toggle
    "g" {"g" editor/beginning-of-buffer
@@ -103,7 +104,8 @@
    "m" editor/previous-real-buffer
    "q" editor/run-macro
    "Q" editor/record-macro
-   "n" editor/find-next
+   "n" editor/find-continue
+   "N" editor/find-continue-opposite
    "O" editor/context-action
    "w" (motion-repeat-fun editor/forward-word)
    "W" (motion-repeat-fun editor/forward-word2)

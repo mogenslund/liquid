@@ -183,6 +183,12 @@
   [buffer search]
   (doto-slider buffer slider/find-next search))
 
+(defn find-prev
+  "Returns a new buffer where the cursor is moved
+  to the next occurrence of the search frase."
+  [buffer search]
+  (doto-slider buffer slider/find-prev search))
+
 (defn set-point
   "Returns a new buffer where the cursor has been
   moved to the given point."

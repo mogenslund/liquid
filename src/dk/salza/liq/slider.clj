@@ -852,6 +852,27 @@
               (end? sl0) sl
               :else (recur (right sl0 1)))))))
 
+(defn find-prev-regex
+  "Find previous regex match. If no match
+  found ahead, position will be at beginning."
+  [sl regex]
+  (let [s (-> sl before get-content)
+        pos (count (last (str/split s regex)))]
+    (left sl pos)))
+
+(defn find-prev
+  "Moves the point to the previous search match
+  from the current point position."
+  [sl search]
+  (if (not (string? search))
+    (find-prev-regex sl search)
+    (let [s (map str (seq (str/lower-case search)))
+          len (count s)]
+      (loop [sl0 (left sl 1)]
+        (cond (= s (map str/lower-case (take len (sl0 ::after)))) sl0
+              (beginning? sl0) sl
+              :else (recur (left sl0 1)))))))
+
 (defn sexp-at-point
   "Returns the sexp at the current point. If there is no
   s-expression nil will be returned."

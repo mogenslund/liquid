@@ -1084,11 +1084,35 @@
 (defn find-next
   ([search]
     (set-setting ::searchstring search)
+    (set-setting ::searchforward true)
     (doto-buffer buffer/find-next search)
     (update-mem-col))
   ([]
     (doto-buffer buffer/find-next (setting ::searchstring))
     (update-mem-col)))
+
+(defn find-prev
+  ([search]
+    (set-setting ::searchstring search)
+    (set-setting ::searchforward false)
+    (doto-buffer buffer/find-prev search)
+    (update-mem-col))
+  ([]
+    (doto-buffer buffer/find-prev (setting ::searchstring))
+    (update-mem-col)))
+
+(defn find-continue
+  []
+  (if (setting ::searchforward)
+    (find-next)
+    (find-prev)))
+
+(defn find-continue-opposite
+  []
+  (if (setting ::searchforward)
+    (find-prev)
+    (find-next)))
+
 
 (defn find-char-previous
   [c]
