@@ -302,10 +302,12 @@
   (apply startup args)
   (let [;easy (read-arg args "--easy")
         minimal (read-arg args "--minimal")
+        f1 (fileutil/file (System/getProperty "user.home") ".liquid")
+        f2 (fileutil/file (System/getProperty "user.home") ".liq")
         userfile (when-not (read-arg args "--no-init-file") 
                    (or (read-arg args "--load=")
                      (and (not minimal)
-                          (fileutil/file (System/getProperty "user.home") ".liq"))))]
+                          (if (.exists (io/file f1)) f1 f2))))]
     (cond minimal (do)
           ;easy (init-editor-easy)
           true (init-editor))
