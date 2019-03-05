@@ -144,14 +144,10 @@
         "5" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 5)))
         "s" #(if (editor/selection-active?) (do (editor/hide-selection) (editor/selection-cancel)) (editor/unhide))
         "f" #(editor/apply-to-slider folding/fold-def)}
-   "," #(keynavigateapp/run
-         {"," {:info "Highlight sexp" :action editor/highlight-sexp-at-point}
-          "s" {:info "Select sexp" :action editor/select-sexp-at-point}
-          "g" {:info "Goto"
-               "g" {:info "Goto definition" :action editor/context-action}}
-         })
-  ; "," {"," editor/highlight-sexp-at-point
-  ;      "s" editor/select-sexp-at-point}
+  ; "," #(keynavigateapp/run ((editor/get-spacemap) "m"))
+   "," {"," editor/highlight-sexp-at-point
+        "s" editor/select-sexp-at-point
+        "g" editor/context-action}
    "c" {"p" {"p" editor/eval-last-sexp
              "f" editor/evaluate-file}
         "e" (change (motion-repeat-fun editor/end-of-word))
