@@ -77,11 +77,12 @@
    "M-s" #(promptapp/run editor/search-files '("SEARCH"))
    "v" editor/selection-toggle
    "g" {"g" editor/beginning-of-buffer
-       "t" editor/top-align-page
-       "n" editor/top-next-headline
-       "c" #(editor/prompt-append (str "--" (editor/get-context) "--"))
-       "i" dk.salza.liq.extensions.headlinenavigator/run
-       "l" dk.salza.liq.extensions.linenavigator/run}
+        "f" editor/context-action
+        "t" editor/top-align-page
+        "n" editor/top-next-headline
+        "c" #(editor/prompt-append (str "--" (editor/get-context) "--"))
+        "i" dk.salza.liq.extensions.headlinenavigator/run
+        "l" dk.salza.liq.extensions.linenavigator/run}
    "dash" editor/top-next-headline
    "C-g" #(do (editor/escape) (reset-motion-repeat))
    "e" (motion-repeat-fun editor/end-of-word)
@@ -95,7 +96,7 @@
    "a" #(do (editor/forward-char) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "A" #(do (editor/end-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "i" #(editor/set-keymap "dk.salza.liq.keymappings.insert")
-   "J" editor/beginning-of-line
+   "J" #(do (editor/end-of-line) (editor/delete-char) (editor/insert " ") (editor/backward-char))
    "^" #(do (editor/beginning-of-line) (editor/find-next #"\S"))
    "G" editor/end-of-buffer
    "$" editor/end-of-line
@@ -106,12 +107,14 @@
    "Q" editor/record-macro
    "n" editor/find-continue
    "N" editor/find-continue-opposite
-   "O" editor/context-action
+   "O" #(do (editor/insert-line-above) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "w" (motion-repeat-fun editor/forward-word)
    "W" (motion-repeat-fun editor/forward-word2)
    "C-j" (motion-repeat-fun editor/swap-line-down)
    "C-k" (motion-repeat-fun editor/swap-line-up)
-   "I" #(do (editor/beginning-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
+   "I" #(do (editor/beginning-of-line)
+            (while (= (editor/get-char) " ") (editor/forward-char))
+            (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "r" {" " #(editor/replace-char " ")
         :selfinsert editor/replace-char}
    "f" {:selfinsert (fn [c] (editor/find-next c))}
@@ -141,8 +144,14 @@
         "5" #(editor/apply-to-slider (fn [sl] (folding/unfold-all-level sl 5)))
         "s" #(if (editor/selection-active?) (do (editor/hide-selection) (editor/selection-cancel)) (editor/unhide))
         "f" #(editor/apply-to-slider folding/fold-def)}
-   "," {"," editor/highlight-sexp-at-point
-        "s" editor/select-sexp-at-point}
+   "," #(keynavigateapp/run
+         {"," {:info "Highlight sexp" :action editor/highlight-sexp-at-point}
+          "s" {:info "Select sexp" :action editor/select-sexp-at-point}
+          "g" {:info "Goto"
+               "g" {:info "Goto definition" :action editor/context-action}}
+         })
+  ; "," {"," editor/highlight-sexp-at-point
+  ;      "s" editor/select-sexp-at-point}
    "c" {"p" {"p" editor/eval-last-sexp
              "f" editor/evaluate-file}
         "e" (change (motion-repeat-fun editor/end-of-word))

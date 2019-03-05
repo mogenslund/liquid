@@ -474,6 +474,17 @@
   (apply-to-slider #(-> % slider/end-of-line (slider/insert "\n")))
   (update-mem-col))
 
+(defn insert-line-above
+  "Inserts an empty line above the current
+  and move the cursor up."
+  []
+  (set-undo-point)
+  (apply-to-slider #(-> %
+                        slider/beginning-of-line
+                        (slider/insert "\n")
+                        slider/left))
+  (update-mem-col))
+
 (defn forward-char
   "Moves the cursor forward the given amount,
   or 1 step, if no arguments are given."
