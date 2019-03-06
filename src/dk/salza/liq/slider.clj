@@ -553,6 +553,22 @@
       right
       (right-until (partial re-find #"\S")))) ; (not (not (re-matches #"\S" "\n")))
 
+(defn backward-word
+  [sl]
+  (let [iswhite (fn [c] (re-matches #"\s" c))
+        isalphanum (fn [c] (re-matches #"(\p{L}|\d)" c))
+        issym (fn [c] (not (or (iswhite c) (isalphanum c))))
+        c0 (get-char (left sl))
+        stop-cond (cond (isalphanum c0) #(or (issym %) (iswhite %))
+                        (issym c0) #(or (isalphanum %) (iswhite %))
+                        true (fn [x] false))]
+    (loop [s (left sl) sc stop-cond]
+      (cond (beginning? s) s
+            (sc (get-char (left s))) s
+            (isalphanum (get-char (left s))) (recur (left s) #(or (issym %) (iswhite %)))
+            (issym (get-char (left s))) (recur (left s) #(or (isalphanum %) (iswhite %)))
+            true (recur (left s) sc)))))
+
 (defn end-of-word
   [sl]
   (let [iswhite (fn [c] (re-matches #"\s" c))

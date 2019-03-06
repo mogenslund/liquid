@@ -511,6 +511,11 @@
   (update-mem-col))
 
 (defn backward-word
+  []
+  (apply-to-slider slider/backward-word)
+  (update-mem-col))
+
+(defn backward-word2
   "Moves the cursor to the beginning
   of the previous word."
   []

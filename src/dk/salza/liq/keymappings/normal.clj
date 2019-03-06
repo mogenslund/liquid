@@ -48,6 +48,7 @@
     (editor/selection-cancel)
     (editor/set-keymap "dk.salza.liq.keymappings.insert")))
 
+; https://github.com/emacs-evil/evil/blob/3766a521a60e6fb0073220199425de478de759ad/evil-maps.el
 (def keymapping ; basic-mappings
   {:id "dk.salza.liq.keymappings.normal"
    :after-hook (fn [k] (when (not (re-find #"[\dc]" k)) (reset-motion-repeat)))
@@ -110,6 +111,8 @@
    "O" #(do (editor/insert-line-above) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
    "w" (motion-repeat-fun editor/forward-word)
    "W" (motion-repeat-fun editor/forward-word2)
+   "b" (motion-repeat-fun editor/backward-word)
+   "B" (motion-repeat-fun editor/backward-word2)
    "C-j" (motion-repeat-fun editor/swap-line-down)
    "C-k" (motion-repeat-fun editor/swap-line-up)
    "I" #(do (editor/beginning-of-line)
