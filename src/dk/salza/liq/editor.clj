@@ -995,6 +995,18 @@
   []
   (insert (util/clipboard-content)))
 
+(defn paste-after
+  []
+  (insert-line)
+  (paste)
+  (beginning-of-line))
+
+(defn paste-before
+  []
+  (insert-line-above)
+  (paste)
+  (beginning-of-line))
+
 (defn swap-line-down
   "Swaps the current line with the one below.
   The cursor follows the the current line down."
@@ -1010,6 +1022,13 @@
   (set-undo-point)
   (apply-to-slider slider/swap-line-up)
   (update-mem-col))
+
+(defn join-lines
+  []
+  (end-of-line)
+  (delete-char)
+  (insert " ")
+  (backward-char))
 
 (defn prompt-input
   [& string]
@@ -1138,6 +1157,11 @@
         (if (= (slider/get-char res) c)
           res
           sl)))))
+
+(defn first-non-blank
+  []
+  (beginning-of-line)
+  (find-next #"\S"))
 
 (defn top-next-headline
   []

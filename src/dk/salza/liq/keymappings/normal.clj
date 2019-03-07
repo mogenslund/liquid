@@ -48,6 +48,10 @@
     (editor/selection-cancel)
     (editor/set-keymap "dk.salza.liq.keymappings.insert")))
 
+(defn insert-mode
+  []
+  (editor/set-keymap "dk.salza.liq.keymappings.insert"))
+
 ; https://github.com/emacs-evil/evil/blob/3766a521a60e6fb0073220199425de478de759ad/evil-maps.el
 (def keymapping ; basic-mappings
   {:id "dk.salza.liq.keymappings.normal"
@@ -93,12 +97,12 @@
    "h" (motion-repeat-fun editor/backward-char)
    "k" (motion-repeat-fun editor/backward-line)
    "j" (motion-repeat-fun editor/forward-line)
-   "o" #(do (editor/insert-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
-   "a" #(do (editor/forward-char) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
-   "A" #(do (editor/end-of-line) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
-   "i" #(editor/set-keymap "dk.salza.liq.keymappings.insert")
-   "J" #(do (editor/end-of-line) (editor/delete-char) (editor/insert " ") (editor/backward-char))
-   "^" #(do (editor/beginning-of-line) (editor/find-next #"\S"))
+   "o" #(do (editor/insert-line) (insert-mode))
+   "a" #(do (editor/forward-char) (insert-mode))
+   "A" #(do (editor/end-of-line) (insert-mode))
+   "i" insert-mode
+   "J" editor/join-lines
+   "^" editor/first-non-blank
    "G" editor/end-of-buffer
    "$" editor/end-of-line
    "L" editor/end-of-line
@@ -108,16 +112,14 @@
    "Q" editor/record-macro
    "n" editor/find-continue
    "N" editor/find-continue-opposite
-   "O" #(do (editor/insert-line-above) (editor/set-keymap "dk.salza.liq.keymappings.insert"))
+   "O" #(do (editor/insert-line-above) (insert-mode))
    "w" (motion-repeat-fun editor/forward-word)
    "W" (motion-repeat-fun editor/forward-word2)
    "b" (motion-repeat-fun editor/backward-word)
    "B" (motion-repeat-fun editor/backward-word2)
    "C-j" (motion-repeat-fun editor/swap-line-down)
    "C-k" (motion-repeat-fun editor/swap-line-up)
-   "I" #(do (editor/beginning-of-line)
-            (while (= (editor/get-char) " ") (editor/forward-char))
-            (editor/set-keymap "dk.salza.liq.keymappings.insert"))
+   "I" #(do (editor/first-non-blank) (insert-mode))
    "r" {" " #(editor/replace-char " ")
         :selfinsert editor/replace-char}
    "f" {:selfinsert (fn [c] (editor/find-next c))}
@@ -129,8 +131,9 @@
        "c" editor/copy-context
        "f" editor/copy-file}
    "Y" editor/copy-line
-   "p" {"p" #(do (editor/insert-line) (editor/paste) (editor/beginning-of-line))
+   "p" {"p" editor/paste-after
        "h" editor/paste}
+   "P" editor/paste-before
    "d" {:direct-condition #(editor/selection-active?)
         :direct-action #(do (editor/delete-selection) (editor/selection-cancel))
         "d" editor/delete-line}
