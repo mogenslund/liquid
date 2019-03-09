@@ -122,9 +122,11 @@ Use Esc to switch to normal mode.
 </pre>
 
 ### Quit
+<pre>
       <b>C-q</b>   Quit editor
       <b>SPC qq</b> Quit editor
       <b>C-M-q</b> Force quit editor (Will quit even though there are unsaved files.)
+</pre>
       
 ### Command Typeahead
 When typing C-SPC a typeahead screen is shown with the following keybindings:
