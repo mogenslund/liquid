@@ -66,7 +66,7 @@ For discussions, help, tips and support, use
 You can run from command line using the `clj` command:
 
 ```bash
-clj -Sdeps '{:deps {mogenslund/liquid {:mvn/version "1.1.1"}}}' -m dk.salza.liq.core
+clj -Sdeps '{:deps {mogenslund/liquid {:mvn/version "1.1.2"}}}' -m dk.salza.liq.core
 ```
 
 #### Quick start
