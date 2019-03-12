@@ -59,6 +59,28 @@
   " "
 )))
 
+(def default-tty-colors
+  {:plain "0;40"
+   :type1 "38;5;11"
+   :type2 "38;5;40"
+   :type3 "38;5;117"
+   :green "38;5;40"
+   :yellow "38;5;11"
+   :red "38;5;196"
+   :comment "38;5;105"
+   :string "38;5;131"
+   :stringst "38;5;131"})
+
+(def default-tty-bgcolors
+  {:plain "49"
+   :cursor0 "49"
+   :cursor1 "42"
+   :cursor2 "44"
+   :hl "48;5;52"
+   :selection "48;5;17"
+   :statusline "48;5;235"})
+
+
 (defn- is-windows
   []
   (re-matches #"(?i)win.*" (System/getProperty "os.name")))
@@ -94,6 +116,10 @@
 
   ;; Default app
   (editor/set-default-app textapp/run)
+
+  ;; Default colors
+  (editor/set-setting :tty-colors default-tty-colors)
+  (editor/set-setting :tty-bgcolors default-tty-bgcolors)
 
   ;; Default global keybindings
   (editor/set-global-key "C- " #(do (editor/request-fullupdate) (commandapp/run)))

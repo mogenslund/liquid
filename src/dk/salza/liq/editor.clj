@@ -147,7 +147,8 @@
   "Set keyw to value in the
   settings part of the editor." 
   [keyw value]
-  (swap! editor assoc-in [::settings keyw] value))
+  (swap! editor assoc-in [::settings keyw] value)
+  nil)
 
 (defn set-spacekey
   [ks info action]

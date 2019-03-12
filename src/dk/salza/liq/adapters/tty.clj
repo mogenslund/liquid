@@ -45,64 +45,45 @@
         (Thread/sleep 100)
         (recur (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty")) (inc n))))))
 
-(def ^:private colors
-  {:plain "0;40"
-   :type1 "38;5;11"
-   :type2 "38;5;40"
-   :type3 "38;5;117"
-   :green "38;5;40"
-   :yellow "38;5;11"
-   :red "38;5;196"
-   :comment "38;5;105"
-   :string "38;5;131"
-   :stringst "38;5;131"})
-
-(def ^:private bgcolors
-  {:plain "49"
-   :cursor0 "49"
-   :cursor1 "42"
-   :cursor2 "44"
-   :hl "48;5;52"
-   :selection "48;5;17"
-   :statusline "48;5;235"})
-
 (defn- print-color
   [color & strings]
   (tty-print esc color "m" (str/join strings)))
 
 (defn- print-lines
   [lineslist]
-  (doseq [line (apply concat lineslist)]
-    (let [row (line :row)
-          column (line :column)
-          content (line :line)
-          key (str "k" row "-" column)
-          oldcontent (@old-lines key)] 
-    (when (not= oldcontent content)
-      (let [diff (max 1 (- (count oldcontent)
-                           (count content) -1))
-            padding (format (str "%" diff "s") " ")]
-        (tty-print esc row ";" column "H" esc "s")
-        (print-color (bgcolors :statusline) " ")
-        (print-color (colors :plain))
-        (print-color (bgcolors :plain))
-        (doseq [ch (line :line)]
-          (let [c (if (map? ch) (or (ch :char) "…") ch)
-                face (when (map? ch) (ch :face))
-                bgface (when (map? ch) (ch :bgface))]
-            (when face (print-color (or (colors face) (colors :plain))))
-            (when bgface (print-color (or (bgcolors bgface) (bgcolors :plain))))
-            (cond (= c "\t") (tty-print (char 172))
-                  (= c "\r") (tty-print (char 633))
-                  true (tty-print c))))
-        (if (= row (count (first lineslist)))
-          (do
-            (tty-print esc "K")
-            (print-color (bgcolors :plain)))
-          (print-color (bgcolors :plain)  padding)))
-      (swap! old-lines assoc key content))
-    ))
-  (flush))
+  (let [colors (editor/setting :tty-colors)
+        bgcolors (editor/setting :tty-bgcolors)]
+    (doseq [line (apply concat lineslist)]
+      (let [row (line :row)
+            column (line :column)
+            content (line :line)
+            key (str "k" row "-" column)
+            oldcontent (@old-lines key)] 
+      (when (not= oldcontent content)
+        (let [diff (max 1 (- (count oldcontent)
+                             (count content) -1))
+              padding (format (str "%" diff "s") " ")]
+          (tty-print esc row ";" column "H" esc "s")
+          (print-color (bgcolors :statusline) " ")
+          (print-color (colors :plain))
+          (print-color (bgcolors :plain))
+          (doseq [ch (line :line)]
+            (let [c (if (map? ch) (or (ch :char) "…") ch)
+                  face (when (map? ch) (ch :face))
+                  bgface (when (map? ch) (ch :bgface))]
+              (when face (print-color (or (colors face) (colors :plain))))
+              (when bgface (print-color (or (bgcolors bgface) (bgcolors :plain))))
+              (cond (= c "\t") (tty-print (char 172))
+                    (= c "\r") (tty-print (char 633))
+                    true (tty-print c))))
+          (if (= row (count (first lineslist)))
+            (do
+              (tty-print esc "K")
+              (print-color (bgcolors :plain)))
+            (print-color (bgcolors :plain)  padding)))
+        (swap! old-lines assoc key content))
+      ))
+    (flush)))
 
 (defn- view-draw
   []
