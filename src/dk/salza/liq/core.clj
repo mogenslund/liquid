@@ -80,6 +80,30 @@
    :selection "48;5;17"
    :statusline "48;5;235"})
 
+(def default-jframe-colors
+  {:plain "e4e4ef"
+   :type1 "ffdd33"
+   :type2 "95a99f"
+   :type3 "ffdd33"
+   :green "73c936"
+   :yellow "ffdd33"
+   :red "ff0000"
+   :comment "cc8c3c"
+   :string "73c936"
+   :stringst "73c936"
+   :default "aaaaaa"})
+
+(def default-jframe-bgcolors
+  {:plain "181818"
+   :cursor0 "181818"
+   :cursor1 "336633"
+   :cursor2 "0000cc"
+   :hl "ffff00"
+   :selection "ff0000"
+   :statusline "000000"
+   :default "333333"})
+
+
 
 (defn- is-windows
   []
@@ -120,6 +144,8 @@
   ;; Default colors
   (editor/set-setting :tty-colors default-tty-colors)
   (editor/set-setting :tty-bgcolors default-tty-bgcolors)
+  (editor/set-setting :jframe-colors default-jframe-colors)
+  (editor/set-setting :jframe-bgcolors default-jframe-bgcolors)
 
   ;; Default global keybindings
   (editor/set-global-key "C- " #(do (editor/request-fullupdate) (commandapp/run)))

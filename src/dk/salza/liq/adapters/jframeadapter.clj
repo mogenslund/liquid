@@ -28,28 +28,14 @@
   [h]
   (Color/decode (str "0x" h)))
 
-(def ^:private colors
-  {:plain (hexcolor "e4e4ef")
-   :type1 (hexcolor "ffdd33")
-   :type2 (hexcolor "95a99f")
-   :type3 (hexcolor "ffdd33")
-   :green (hexcolor "73c936")
-   :yellow (hexcolor "ffdd33")
-   :red (hexcolor "ff0000")
-   :comment (hexcolor "cc8c3c")
-   :string (hexcolor "73c936")
-   :stringst (hexcolor "73c936")
-   :default (hexcolor "aaaaaa")})
+(defn convert-colormap
+  "Convert hex values in colormap to
+  type java.awt.Color."
+  [m]
+  (reduce (fn [r [k v]] (assoc r k (hexcolor v))) {} m))
 
-(def ^:private bgcolors
-  {:plain (hexcolor "181818")
-   :cursor0 (hexcolor "181818")
-   :cursor1 (hexcolor "336633")
-   :cursor2 (hexcolor "0000cc")
-   :hl (hexcolor "ffff00")
-   :selection (hexcolor "ff0000")
-   :statusline (hexcolor "000000")
-   :default (hexcolor "333333")})
+(def colors (atom {}))
+(def bgcolors (atom {}))
 
 (def fontsize (atom 14))
 
@@ -120,9 +106,9 @@
   [g char row col color bgcolor]
   (let [w @fontwidth
         h @fontheight]
-    (.setColor g (bgcolors bgcolor))
+    (.setColor g (@bgcolors bgcolor))
     (.fillRect g (* col w) (* (- row 1) h) w h)
-    (.setColor g (colors color))
+    (.setColor g (@colors color))
     (.drawString g char (* col w) (- (* row h) (quot @fontsize 4) 1))))
 
 (defn- draw
@@ -131,9 +117,11 @@
     (.setFont g @font)
     (when (editor/fullupdate?)
       (reset! old-lines {})
-      (.setColor g (bgcolors :plain))
+      (reset! colors (convert-colormap (editor/setting :jframe-colors)))
+      (reset! bgcolors (convert-colormap (editor/setting :jframe-bgcolors)))
+      (.setColor g (@bgcolors :plain))
       (.fillRect g 0 0 (.getWidth @panel) (.getHeight @panel))
-      (.setColor g (bgcolors :statusline))
+      (.setColor g (@bgcolors :statusline))
       (.fillRect g 0 (* (- @rows 1) @fontheight) (.getWidth @panel) @fontheight))
     (doseq [line (apply concat lineslist)]
       (let [row (line :row)
@@ -249,6 +237,8 @@
     (reset! fontheight (+ (.getHeight (.getFontMetrics tmpg)) 1))
     (reset! rows rowcount)
     (reset! columns columncount)
+    (reset! colors (convert-colormap (editor/setting :jframe-colors)))
+    (reset! bgcolors (convert-colormap (editor/setting :jframe-bgcolors)))
 
     (reset! panel
       (proxy [JPanel] []
@@ -261,7 +251,7 @@
     (reset! frame (JFrame. "λiquid"))
     (.setDefaultCloseOperation @frame (JFrame/EXIT_ON_CLOSE))
     (.setContentPane @frame @panel)
-    (.setBackground @frame (bgcolors :plain))
+    (.setBackground @frame (@bgcolors :plain))
     (.setFocusTraversalKeysEnabled @frame false)
     (.addKeyListener @frame
       (proxy [KeyListener] []
