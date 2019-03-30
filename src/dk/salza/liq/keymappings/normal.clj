@@ -136,7 +136,17 @@
    "P" editor/paste-before
    "d" {:direct-condition #(editor/selection-active?)
         :direct-action #(do (editor/delete-selection) (editor/selection-cancel))
-        "d" editor/delete-line}
+        "d" editor/delete-line
+        "e" #(do
+               (editor/selection-set)
+               (editor/end-of-word)
+               (editor/delete-selection)
+               (editor/selection-cancel))
+        "w" #(do
+               (editor/selection-set)
+               (editor/forward-word)
+               (editor/delete-selection)
+               (editor/selection-cancel))}
    "D" editor/delete-to-end-of-line
    "s" editor/save-file
    "u" editor/undo
