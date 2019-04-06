@@ -16,6 +16,7 @@
             [dk.salza.liq.apps.promptapp :as promptapp]
             [dk.salza.liq.apps.commandapp :as commandapp]
             [dk.salza.liq.apps.helpapp :as helpapp]
+            [dk.salza.liq.apps.tutorialapp :as tutorialapp]
             [dk.salza.liq.apps.typeaheadapp :as typeaheadapp]
             [dk.salza.liq.editor :as editor]
             [dk.salza.liq.logging :as logging])
@@ -159,7 +160,8 @@
                                "h" #(helpapp/help-browse "index.md")
                                "a" helpapp/help-apropos
                                "f" helpapp/help-function
-                               "k" helpapp/help-key})
+                               "k" helpapp/help-key
+                               "t" tutorialapp/run})
   (editor/set-global-key "C-x" "C-c" editor/quit)
   (editor/set-global-key "C-x" "2" editor/split-window-below)
   (editor/set-global-key "C-x" "3" editor/split-window-right)
