@@ -571,8 +571,8 @@
 
 (defn end-of-word
   [sl]
-  (let [iswhite (fn [c] (re-matches #"\s" c))
-        isalphanum (fn [c] (re-matches #"(\p{L}|\d)" c))
+  (let [iswhite (fn [c] (and c (re-matches #"\s" c)))
+        isalphanum (fn [c] (and c (re-matches #"(\p{L}|\d)" c)))
         issym (fn [c] (not (or (iswhite c) (isalphanum c))))
         sl0 (right-until (right sl) (comp not iswhite))
         c0 (get-char sl0)
