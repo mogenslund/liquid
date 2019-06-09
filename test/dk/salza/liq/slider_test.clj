@@ -27,7 +27,7 @@
 
 (defn random-textoperation
   [sl]
-  (let [r (rand-int 11)]
+  (let [r (rand-int 12)]
     (cond (= r 0) (right sl 1)
           (= r 1) (right sl (rand-int 20))
           (= r 2) (left sl 1)
@@ -35,8 +35,9 @@
           (= r 4) (delete sl 1)
           (= r 5) (delete sl (rand-int 3))
           (= r 6) (end-of-line sl)
-          (= r 7) (beginning sl)
-          (= r 8) (set-meta sl :something "abc")
+          (= r 7) (end-of-word sl)
+          (= r 8) (beginning sl)
+          (= r 9) (set-meta sl :something "abc")
           :else (insert sl (random-string (rand-int 100))))))
 
 (defn generate
