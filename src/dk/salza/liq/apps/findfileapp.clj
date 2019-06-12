@@ -143,8 +143,8 @@
 (defn run
   [fun]
   (let [context (editor/get-context)
-        path (if (and (= (context :type) :file) (re-find #"/.*/" (context :value)))
-                 (re-find #"/.*/" (context :value))
+        path (if (and (= (context :type) :file) (re-find #"/\S+/" (context :value)))
+                 (re-find #"/\S+/" (context :value))
                  (editor/get-folder))]
     (editor/new-buffer "-findfile-")
     (editor/set-keymap (keymap fun))

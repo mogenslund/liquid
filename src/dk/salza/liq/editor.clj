@@ -287,7 +287,7 @@
 (defn add-keybinding
   "Fx: (editor/add-keybinding \"dk.salza.liq.keymappings.normal\" \"i\" editor/forward-char)"
   [mapid key bind]
-  (swap! editor assoc-in [::keymaps mapid key] bind))
+  (swap! editor assoc-in [::keymaps mapid key] bind) nil)
 
 (defn add-command
   "Add a command to be availble for commandapp typeahead.

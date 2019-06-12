@@ -65,7 +65,7 @@ Use Esc to switch to normal mode.
       <b>C-o</b> Other window (Move between main and prompt windows)
       <b>m</b>   Switch to previous buffer (Useful for swithing forth and back between two buffers)
       <b>SPC TAB</b> Switch to previous buffer (Useful for swithing forth and back between two buffers)
-      <b>C-k</b> Kill buffer
+      <b>C-w</b> Kill buffer
 </pre>
 
 ### Filehandling (blue cursor)
