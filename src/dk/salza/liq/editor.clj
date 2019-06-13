@@ -21,7 +21,8 @@
             [dk.salza.liq.coreutil :refer :all]
             [dk.salza.liq.logging :as logging]
             [dk.salza.liq.tools.cshell :as cshell]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.stacktrace :as stacktrace]))
 
 (def top-of-window
   "Atom to keep track of the position
@@ -1296,6 +1297,12 @@
           (prompt-set (str "There are dirty buffers:\n\n"
                            (str/join "\n" dirty) "\n\n"
                            "Press C-M-q to quit anyway.")))))
+
+(defmacro quit-on-exception [& body]
+  `(try ~@body
+        (catch Exception e#
+          (logging/log (with-out-str (stacktrace/print-cause-trace e#)))
+          (force-quit))))
 
 (defn- one-arg?
   "Checks if the functions takes exactly

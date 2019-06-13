@@ -79,10 +79,11 @@
   (when (future-done? @updater)
     (reset! updater
       (future
-        (loop [u @editor/updates]
-          (view-draw)
-          (when (not= u @editor/updates)
-            (recur @editor/updates))))))
+        (editor/quit-on-exception
+         (loop [u @editor/updates]
+           (view-draw)
+           (when (not= u @editor/updates)
+             (recur @editor/updates)))))))
   (add-watch editor/updates key view-handler))
 
 (defn- toggle-fullscreen
