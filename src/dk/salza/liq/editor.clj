@@ -142,7 +142,8 @@
   function."
   [keyw entry]
   (when (not (some #{entry} (setting keyw)))
-    (swap! editor update-in [::settings keyw] conj entry)))
+    (swap! editor update-in [::settings keyw] conj entry)
+    nil))
 
 (defn set-setting
   "Set keyw to value in the
@@ -357,7 +358,7 @@
   It takes as input a window created using
   dk.salza.liq.window/create function."
   ([window]
-   (swap! editor update ::windows conj window))
+   (swap! editor update ::windows conj window) nil)
   ([name top left rows columns buffername]
    (add-window (window/create name top left rows columns buffername))))
 
@@ -397,14 +398,16 @@
   (let [win (get-match (get-windows) ::window/buffername buffername)]
     (if win
       (swap! editor update ::windows bump ::window/buffername buffername)
-      (swap! editor update ::windows doto-first assoc ::window/buffername buffername))))
+      (swap! editor update ::windows doto-first assoc ::window/buffername buffername)))
+  nil)
 
 (defn switch-to-buffer-same-window
   "Switch to the buffer with the given name.
   Use the same window."
   [buffername]
   (swap! editor update ::buffers bump ::buffer/name buffername)
-  (swap! editor update ::windows doto-first assoc ::window/buffername buffername))
+  (swap! editor update ::windows doto-first assoc ::window/buffername buffername)
+  nil)
 
 (defn set-undo-point
   []
@@ -779,7 +782,8 @@
   []
   (let [buffername (-> @editor ::windows second (window/get-buffername))]
     (swap! editor update ::windows rotate)
-    (swap! editor update ::buffers bump ::buffer/name buffername)))
+    (swap! editor update ::buffers bump ::buffer/name buffername))
+  nil)
 
 (defn enlarge-window-right
   [amount] 
@@ -881,7 +885,8 @@
     (swap! editor update ::buffers conj (buffer/create name)))
   (switch-to-buffer name)
   (set-highlighter (setting ::default-highlighter))
-  (set-keymap (setting ::default-keymap)))
+  (set-keymap (setting ::default-keymap))
+  nil)
 
 (defn set-frame-dimensions
   "Setting rows and columns of the window frame."
@@ -890,7 +895,8 @@
                         ::windows ())
   (add-window "scratch" 1 1 (- rows 1) (- columns 3) "scratch")
   (new-buffer "-prompt-")
-  (new-buffer "scratch"))
+  (new-buffer "scratch")
+  nil)
 
 (defn find-file
   "Opens the file with the given name
@@ -909,7 +915,8 @@
       (switch-to-buffer-same-window filepath)
       (set-keymap (setting ::default-keymap))
       (set-highlighter (setting ::default-highlighter)))
-    (switch-to-buffer-same-window filepath)))
+    (switch-to-buffer-same-window filepath))
+  nil)
 
 (defn save-file
   "If the current buffer is connected to a file,
@@ -1213,7 +1220,8 @@
 
 (defn remove-buffer
   [buffername]
-  (swap! editor update ::buffers remove-item ::buffer/name buffername))
+  (swap! editor update ::buffers remove-item ::buffer/name buffername)
+  nil)
 
 (defn kill-buffer
   []

@@ -19,6 +19,7 @@
     (editor/switch-to-buffer-same-window filepath)
     (let [syntaxhl (cond (nil? filepath) (editor/get-default-highlighter)
                          (re-matches #"^.*\.js$" filepath) javascripthl/next-face
+                         (re-matches #"^.*\.ts$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.java$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.c$" filepath) javascripthl/next-face
                          (re-matches #"^.*\.py$" filepath) pythonhl/next-face

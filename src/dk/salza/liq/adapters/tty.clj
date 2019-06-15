@@ -92,7 +92,6 @@
 
 (defn- view-handler
   [key reference old new]
-  (remove-watch editor/editor key)
   (when (editor/fullupdate?) (reset))
   (when (future-done? @updater)
     (reset! updater
@@ -101,8 +100,7 @@
          (loop [u @editor/updates]
            (view-draw)
            (when (not= u @editor/updates)
-             (recur @editor/updates)))))))
-  (add-watch editor/updates key view-handler))
+             (recur @editor/updates))))))))
 
 (defn- model-update
   [input]

@@ -46,7 +46,7 @@
     (let [clipboard (.getSystemClipboard (java.awt.Toolkit/getDefaultToolkit))]
       (try
         (.getTransferData (.getContents clipboard nil) (java.awt.datatransfer.DataFlavor/stringFlavor))
-        (catch java.lang.NullPointerException e "")))))
+        (catch Exception e "")))))
 
 (defn set-clipboard-content
   [text]

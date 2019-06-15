@@ -75,7 +75,6 @@
 
 (defn- view-handler
   [key reference old new]
-  (remove-watch editor/editor key)
   (when (future-done? @updater)
     (reset! updater
       (future
@@ -83,8 +82,7 @@
          (loop [u @editor/updates]
            (view-draw)
            (when (not= u @editor/updates)
-             (recur @editor/updates)))))))
-  (add-watch editor/updates key view-handler))
+             (recur @editor/updates))))))))
 
 (defn- toggle-fullscreen
   []
