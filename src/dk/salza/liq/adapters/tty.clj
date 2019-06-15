@@ -97,10 +97,11 @@
   (when (future-done? @updater)
     (reset! updater
       (future
-        (loop [u @editor/updates]
-          (view-draw)
-          (when (not= u @editor/updates)
-          (recur @editor/updates))))))
+        (editor/quit-on-exception
+         (loop [u @editor/updates]
+           (view-draw)
+           (when (not= u @editor/updates)
+             (recur @editor/updates)))))))
   (add-watch editor/updates key view-handler))
 
 (defn- model-update
@@ -158,20 +159,21 @@
 (defn input-handler
   []
   (future
-    (let [r (java.io.BufferedReader. *in*)
-          read-input (fn [] (raw2keyword
-                              (let [input0 (.read r)]
-                                (if (= input0 27)
-                                  (loop [res (list input0)]
-                                    (Thread/sleep 1)
-                                    (if (not (.ready r))
-                                      (reverse res)
-                                      (recur (conj res (.read r)))))
-                                  input0))))]
-      (loop [input (read-input)]
-        (logging/log "INPUT" input) 
-        (model-update input)
-        (recur (read-input))))))
+    (editor/quit-on-exception
+     (let [r (java.io.BufferedReader. *in*)
+           read-input (fn [] (raw2keyword
+                             (let [input0 (.read r)]
+                               (if (= input0 27)
+                                 (loop [res (list input0)]
+                                   (Thread/sleep 1)
+                                   (if (not (.ready r))
+                                     (reverse res)
+                                     (recur (conj res (.read r)))))
+                                 input0))))]
+       (loop [input (read-input)]
+         (logging/log "INPUT" input) 
+         (model-update input)
+         (recur (read-input)))))))
 
 (defn view-init
   []
