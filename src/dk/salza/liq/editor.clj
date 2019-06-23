@@ -287,9 +287,17 @@
 
 ; (editor/add-keybinding "dk.salza.liq.keymappings.normal" "i" editor/forward-char)
 (defn add-keybinding
-  "Fx: (editor/add-keybinding \"dk.salza.liq.keymappings.normal\" \"i\" editor/forward-char)"
-  [mapid key bind]
-  (swap! editor assoc-in [::keymaps mapid key] bind) nil)
+  "Fx: (editor/add-keybinding \"dk.salza.liq.keymappings.normal\" \"i\" editor/forward-char)
+  or: (editor/add-keybinding \"dk.salza.liq.keymappings.normal\" \"c\" \"c\" \"f\" editor/evaluate-file)"
+  ([mapid key1 bind]
+    (swap! editor assoc-in [::keymaps mapid key1] bind) nil)
+  ([mapid key1 key2 bind]
+    (swap! editor assoc-in [::keymaps mapid key1 key2] bind) nil)
+  ([mapid key1 key2 key3 bind]
+    (swap! editor assoc-in [::keymaps mapid key1 key2 key3] bind) nil)
+  ([mapid key1 key2 key3 key4 bind]
+    (swap! editor assoc-in [::keymaps mapid key1 key2 key3 key4] bind) nil))
+
 
 (defn add-command
   "Add a command to be availble for commandapp typeahead.
