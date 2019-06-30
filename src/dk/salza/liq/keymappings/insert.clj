@@ -36,6 +36,7 @@
    "C-home" editor/beginning-of-buffer
    "C-end" editor/end-of-buffer
    "C-c" #(do (editor/copy-selection) (editor/selection-cancel))
+   "C-x" #(do (editor/delete-selection) (editor/selection-cancel))
    "C-v" editor/paste
    " " #(editor/insert " ")
    "\n" #(editor/insert "\n")

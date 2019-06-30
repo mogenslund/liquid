@@ -78,6 +78,7 @@
    "up" (motion-repeat-fun editor/backward-line)
    "down" (motion-repeat-fun editor/forward-line)
    "/" #(promptapp/run editor/find-next '("/"))
+   "-" #(promptapp/run editor/find-next '("/"))
    "?" #(promptapp/run editor/find-prev '("?"))
    "M-s" #(promptapp/run editor/search-files '("SEARCH"))
    "v" editor/selection-toggle
