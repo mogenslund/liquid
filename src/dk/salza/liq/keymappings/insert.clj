@@ -15,6 +15,17 @@
     (editor/selection-toggle))
   (action))
 
+(defn rotate-parens
+  []
+  (let [sl (editor/get-slider)
+        c (str (get-char (left sl)) (get-char sl))]
+    (cond (= c "()") (do (editor/backward-char) (editor/delete-char) (editor/delete-char) (editor/insert "[]"))
+          (= c "[]") (do (editor/backward-char) (editor/delete-char) (editor/delete-char) (editor/insert "{}"))
+          (= c "{}") (do (editor/backward-char) (editor/delete-char) (editor/delete-char) (editor/insert "\"\""))
+          (= c "\"\"") (do (editor/backward-char) (editor/delete-char) (editor/delete-char) (editor/forward-char))
+          true (do (editor/insert "()")))
+    (editor/backward-char)))
+
 (def keymapping
   {:id "dk.salza.liq.keymappings.insert"
    :cursor-color :green
@@ -41,8 +52,10 @@
    " " #(editor/insert " ")
    "\n" #(editor/insert "\n")
    "C-t" #(editor/insert "\t")
-   "C-k" #(do (editor/insert "()") (editor/backward-char)) 
-   "C-l" #(do (editor/insert "[]") (editor/backward-char)) 
+   "C-j" rotate-parens
+   ;"C-j" #(do (editor/insert "()") (editor/backward-char)) 
+   ;"C-k" #(do (editor/insert "[]") (editor/backward-char)) 
+   ;"C-l" #(do (editor/insert "{}") (editor/backward-char)) 
    "C-h" #(editor/insert "/")
    "C-n" editor/forward-line
    "C-p" editor/backward-line
