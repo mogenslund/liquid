@@ -102,13 +102,13 @@
       (editor/handle-input input))))
 
 (defn- draw-char
-  [g char row col color bgcolor]
+  [g ch row col color bgcolor]
   (let [w @fontwidth
         h @fontheight]
     (.setColor g (@bgcolors bgcolor))
     (.fillRect g (* col w) (* (- row 1) h) w h)
     (.setColor g (@colors color))
-    (.drawString g char (* col w) (- (* row h) (quot @fontsize 4) 1))))
+    (.drawString g ch (* col w) (- (* row h) (quot @fontsize 4) 1))))
 
 (defn- draw
   [g]
@@ -140,17 +140,17 @@
                 (when (not-empty c)
                   (let [ch (first c)]
 
-                    (if (string? ch)
-                      (let [char-sym (cond (= ch "\t") "¬"
-                                           (= ch "\r") "ɹ"
-                                           true ch)]
+                    (if (or (string? ch) (char? ch))
+                      (let [char-sym (cond (= (str ch) "\t") "¬"
+                                           (= (str ch) "\r") "ɹ"
+                                           true (str ch))]
                         (draw-char g char-sym row (+ column offset) color bgcolor)
                         (recur (rest c) (+ offset 1) color bgcolor))
                       (let [nextcolor (or (ch :face) color)
                             nextbgcolor (or (ch :bgface) bgcolor)]
-                        (let [char-sym (cond (= (ch :char) "\t") "¬"
-                                             (= (ch :char) "\r") "ɹ"
-                                             (ch :char) (ch :char)
+                        (let [char-sym (cond (= (str (ch :char)) "\t") "¬"
+                                             (= (str (ch :char)) "\r") "ɹ"
+                                             (ch :char) (str (ch :char))
                                              true "…")] 
                           (draw-char g char-sym row (+ column offset) nextcolor nextbgcolor))
                         (recur (rest c) (+ offset 1) nextcolor nextbgcolor))))))))

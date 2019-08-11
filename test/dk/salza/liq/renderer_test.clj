@@ -7,9 +7,10 @@
 
 (defn- charval
   [c]
-  (if (string? c)
-    c
-    (or (c :char) "")))
+  (cond (char? c) (str c)
+        (string? c) c
+        (map? c) (c :char)
+        true ""))
 
 (defn get-first-line
   "Helper returns first rendered line"

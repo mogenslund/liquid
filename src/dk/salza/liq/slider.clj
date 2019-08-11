@@ -51,12 +51,12 @@
 
       before = (d c b a), after = (e f)."
   ([text]
-    (let [after (if (string? text) (map str text) text)] ; Creating with a list '("a" "b") should also work
+    (let [after (if (string? text) (seq text) text)] ; Creating with a list '("a" "b") should also work
      {::before ()     ; The list of characters before the cursor in reverse order
       ::after after   ; The list of characters after the cursor in normal order
       ::point 0       ; The current point (cursor position). Starts at 0, the begining of the slider
       ::linenumber 1  ; Meta information for fast retrievel of the current line number
-      ::totallines (inc (count (filter #(= % "\n") after))) ; Only to make the end function perform optimal
+      ::totallines (inc (count (filter #(= % \newline) after))) ; Only to make the end function perform optimal
       ::dirty false
       ::marks {}}))   ; A map of named positions, like "selection" -> 18.
                       ; The positions are pushed, when text is insertet
@@ -80,6 +80,10 @@
 (defn dirty?
   [sl]
   (sl ::dirty))
+
+(defn total-lines
+  [sl]
+  (sl ::totallines))
 
 (defn clear
   "Erases everything in the slider,
@@ -106,18 +110,29 @@
      ::point (count tmp)
      ::linenumber (sl ::totallines))))
 
+(defn get-char-charvalue
+  "Returns the first character after the point as a char"
+  [sl]
+  (let [c (first (sl ::after))]
+    (cond (char? c) c
+          (string? c) (first c)
+          (and (map? c) (c :char) (char? (c :char))) (c :char)
+          (and (map? c) (c :char) (string? (c :char))) (first (c :char)))))
+
 (defn- char-part
   "An item in a slider is either a string, a map
   with a :char element or a sub-slider.
   This function returns the char-part."
   [c]
-  (cond (string? c) c
-        c (or (c :char) c)
+  (cond (char? c) (str c)
+        (string? c) c
+        (and (map? c) (c :char)) (str (c :char))
+        c c
         :else nil))
   
 
 (defn get-char
-  "Returns the first character after the point.
+  "Returns the first character after the point as a string.
   If point is at the end of the slider, nil will
   be returned."
   [sl]
@@ -135,7 +150,8 @@
   If char is a string it will be converted to a map."
   [sl key val]
   (let [c (first (sl ::after))
-        c1 (cond (string? c) {:char c key val}
+        c1 (cond (char? c) {:char c key val}
+                 (string? c) {:char c key val}
                  (map? c) (assoc c key val)
                  :else c)]
     (if c1
@@ -154,8 +170,9 @@
 (defn is-newline?
   "Check if \\n or {:char \\n}"
   [c]
-  (not (or (and (string? c) (not= c "\n"))
-       (and (map? c) (not= (c :char) "\n")))))
+  (not (or (and (char? c) (not= c \newline))
+           (and (string? c) (not= c "\n"))
+           (and (map? c) (not= (c :char) "\n")))))
 
 (defn beginning?
   "True if and only if the point is at the
@@ -211,7 +228,7 @@
   "This is not really in use yet, since there
   is not yet a hide lines functionality."
   [sl]
-  (let [tostr (fn [& chs] (apply str (map #(if (string? %) % "¤") chs)))]
+  (let [tostr (fn [& chs] (apply str (map #(if (or (char? %) (string? %)) % "¤") chs)))]
     (str (apply tostr (reverse (sl ::before))) (apply tostr (sl ::after)))))
 
 (defn slide-marks
@@ -276,7 +293,6 @@
     (right sl (- newpoint (sl ::point)))
     (left sl (- (sl ::point) newpoint))))
 
-
 (defn insert
   "Insert text at the point. The point will be
   moved to the end of the inserted text."
@@ -285,12 +301,12 @@
           linecount (count (filter #(= % \newline) text))]
       (if (and (= n 1) (= linecount 0))
         (assoc sl
-          ::before (conj (sl ::before) text)
+          ::before (conj (sl ::before) (first text))
           ::point (+ (sl ::point) 1)
           ::dirty true
           ::marks (slide-marks (sl ::marks) (sl ::point) 1))
         (assoc sl
-          ::before (concat (map str (reverse text)) (sl ::before))
+          ::before (concat (seq (reverse text)) (sl ::before))
           ::point (+ (sl ::point) n)
           ::linenumber (+ (sl ::linenumber) linecount)
           ::totallines (+ (sl ::totallines) linecount)
@@ -302,7 +318,7 @@
   much overhead."
   [sl]
   (assoc sl
-    ::before (conj (sl ::before) "\n")
+    ::before (conj (sl ::before) \newline)
     ::point (inc (sl ::point))
     ::linenumber (inc (sl ::linenumber))
     ::totallines (inc (sl ::totallines))
@@ -314,7 +330,7 @@
   much overhead."
   [sl]
   (assoc sl
-    ::before (conj (sl ::before) " ")
+    ::before (conj (sl ::before) \space)
     ::point (inc (sl ::point))
     ::dirty true
     ::marks (slide-marks (sl ::marks) (sl ::point) 1)))
@@ -352,9 +368,9 @@
   [sl columns]
   (loop [sl1 (beginning sl) slsp nil col 0]
     (cond (end? sl1) sl1
-          (= (get-char sl1) "\n") (recur (right sl1 1) nil 0)
+          (= (get-char-charvalue sl1) \newline) (recur (right sl1 1) nil 0)
           (= col columns) (recur (insert-newline (or slsp sl1)) nil 0)
-          (= (get-char sl1) " ") (let [sl2 (right sl1 1)] (recur sl2 sl2 (inc col)))
+          (= (get-char-charvalue sl1) \space) (let [sl2 (right sl1 1)] (recur sl2 sl2 (inc col)))
           :else (recur (right sl1 1) slsp (inc col)))))
 
 (defn pad-right
@@ -362,8 +378,8 @@
   [sl columns]
   (loop [sl1 (beginning sl) col 0]
     (cond (and (end? sl1) (>= col columns)) sl1
-          (and (= (get-char sl1) "\n") (>= col columns)) (recur (right sl1 1) 0)
-          (= (get-char sl1) "\n") (recur (insert-space sl1) (inc col))
+          (and (= (get-char-charvalue sl1) \newline) (>= col columns)) (recur (right sl1 1) 0)
+          (= (get-char-charvalue sl1) \newline) (recur (insert-space sl1) (inc col))
           :else (recur (right sl1 1) (inc col)))))
 
 (defn set-mark
@@ -597,7 +613,7 @@
   of the current line."
   [sl]
   (loop [sl0 sl]
-    (if (or (empty? (sl0 ::before)) (= (first (sl0 ::before)) "\n"))
+    (if (or (empty? (sl0 ::before)) (= (first (sl0 ::before)) \newline) (= (first (sl0 ::before)) "\n"))
       sl0
       (recur (left sl0 1)))))
 
@@ -605,12 +621,12 @@
 (defn forward-line
   ([sl columns]
    (loop [s sl cand nil c 0]
-     (cond (= (get-char s) "\n") (right s 1)
+     (cond (= (get-char-charvalue s) \newline) (right s 1)
            (= c columns) (or cand s) ; If there is a candidate otherwise to current position
            (end? s) s
            :else (let [next (right s 1)]
                    (recur next
-                          (if (= (get-char s) " ") next cand)
+                          (if (= (get-char-charvalue s) \space) next cand)
                           (inc c))))))
   ([sl]
     ;; In this case just to end of buffer or efter next \n
@@ -640,7 +656,7 @@
     (loop [sl0 (-> sl (left cur-column) (forward-line columns)) n 0]
       (if (or (= n column)
               (end? sl0)
-              (= (get-char sl0) "\n"))
+              (= (get-char-charvalue sl0) \newline))
           sl0
           (recur (right sl0 1) (inc n))))))
 
@@ -663,7 +679,7 @@
 (defn get-content
   "The full content of the slider as text."
   [sl]
-  (apply str (map #(if (string? %) % (or (% :char) (get-content %))) (-> sl beginning ::after))))
+  (apply str (map #(if (or (char? %) (string? %)) % (or (% :char) (get-content %))) (-> sl beginning ::after))))
 
 (defn get-region-as-slider
   [sl markname]
@@ -800,7 +816,7 @@
   "Goes a visual line forward if the break is soft and insert a hard."
   [sl columns]
   (let [s0 (forward-line sl columns)]
-    (cond (= (-> s0 left get-char) "\n") s0
+    (cond (= (-> s0 left get-char-charvalue) \newline) s0
           (end? s0) s0
           (= (get-mark s0 "cursor") (get-point s0)) (-> s0 insert-newline (set-mark "cursor"))
           :else (insert-newline s0))))
@@ -843,7 +859,7 @@
   (map #(if (= (get-mark % "beginning") (get-point %))
           ""
           (get-region
-            (if (= (get-char (left % 1)) "\n") (left % 1) %) ; The if is to avoid ending with newline
+            (if (= (get-char-charvalue (left % 1)) \newline) (left % 1) %) ; The if is to avoid ending with newline
             "beginning"))
     (take rows (rest (iterate #(-> % (set-mark "beginning") (forward-line columns)) sl)))))
 

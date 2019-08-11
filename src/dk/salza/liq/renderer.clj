@@ -48,9 +48,9 @@
 
 (defn- newline?
   [c]
-  (if (string? c)
-    (= c "\n")
-    (= (c :char) "\n")))
+  (cond (string? c) (= c "\n")
+        (char? c) (= c \newline)
+        true (newline? (c :char))))
   
 (defn split-to-lines
   "Takes a list of chars and splits into

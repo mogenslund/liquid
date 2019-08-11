@@ -56,6 +56,10 @@
       (is (= (-> sl (right 2) (get-meta :b)) "bb"))
     )))
 
+(deftest total-lines-test
+  (testing "Total lines of one-liner"
+    (is (= (-> (slider "abc") total-lines) 1))))
+
 (deftest beginning-test
   (testing "Beginning of buffer"
     (is (= (-> (create "abc\n123") (right 10) (beginning) normalize-slider) "|abcn123"))))
@@ -70,7 +74,7 @@
 
 (deftest create-test
   (testing "Creating slider with text or as list"
-    (is (= (create "abc\ndef") (create '("a" "b" "c" "\n" "d" "e" "f"))))
+    (is (= (create "abc\ndef") (create '(\a \b \c \newline \d \e \f))))
   ))
 
 (deftest right-test
@@ -342,14 +346,14 @@
   (doseq [n (range 20)]
     (let [sl (generate (rand-int 500))]
       (testing "Point = count before"
-        (is (= (get-point sl) (count (sl :dk.salza.liq.slider/before)))))
-      (testing "Linenumber = count linebreaks in before + 1"
-        (is (= (get-linenumber sl) (+ (count (filter is-newline? (sl :dk.salza.liq.slider/before))) 1))))
-      (testing "Totallines = count linebreaks in before and linebreakes after + 1"
-        (is (= (sl :dk.salza.liq.slider/totallines)
-               (+ (count (filter is-newline? (sl :dk.salza.liq.slider/before)))
-                  (count (filter is-newline? (sl :dk.salza.liq.slider/after)))
-                  1))))
+        (is (= (get-point sl) (-> sl before get-content count))))
+      (testing "Linenumber = Total lines in before"
+        (is (= (get-linenumber sl) (total-lines (before sl)))))
+      (testing "Totallines = total lines before and total lines after - 1"
+        (is (= (total-lines sl)
+               (+ (total-lines (before sl))
+                  (total-lines (after sl))
+                  -1))))
       (testing "Insert string -> delete (count string) is invariant"
         (let [len (rand-int 100)
               text (random-string len)]

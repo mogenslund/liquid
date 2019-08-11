@@ -1,5 +1,6 @@
 (ns dk.salza.liq.helper
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [dk.salza.liq.slider :refer :all]))
 
 
 (defn normalize-slider
@@ -10,9 +11,9 @@
   | = cursor position
   - = space
   ¤ = Syntax highlighting"
-  [slider]
-  (-> (apply str (concat (reverse (slider :dk.salza.liq.slider/before))
+  [sl]
+  (-> (apply str (concat (-> sl before get-content reverse)
                          '("|")
-                         (slider :dk.salza.liq.slider/after)))
+                         (-> sl after get-content)))
       (str/replace #"\n" "n")
       (str/replace #" " "-")))

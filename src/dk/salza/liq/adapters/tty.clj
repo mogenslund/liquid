@@ -73,8 +73,8 @@
                   bgface (when (map? ch) (ch :bgface))]
               (when face (print-color (or (colors face) (colors :plain))))
               (when bgface (print-color (or (bgcolors bgface) (bgcolors :plain))))
-              (cond (= c "\t") (tty-print (char 172))
-                    (= c "\r") (tty-print (char 633))
+              (cond (= c \tab) (tty-print (char 172))
+                    (= c \return) (tty-print (char 633))
                     true (tty-print c))))
           (if (= row (count (first lineslist)))
             (do
