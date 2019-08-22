@@ -50,7 +50,8 @@
   [c]
   (cond (string? c) (= c "\n")
         (char? c) (= c \newline)
-        true (newline? (c :char))))
+        (map? c) (newline? (c :char))
+        true false))
   
 (defn split-to-lines
   "Takes a list of chars and splits into
