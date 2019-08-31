@@ -122,7 +122,7 @@
     (println (str/join "\n" s))
     (println s)))
 
-(defn pp
+(defn pseq
   "Prints a sequence line by line."
   [s]
   (if (sequential? s)
