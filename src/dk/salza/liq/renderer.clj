@@ -9,42 +9,44 @@
             [dk.salza.liq.slider :refer :all]))
 
 (defn- apply-syntax-highlight
-  [sl rows towid cursor-color syntaxhighlighter active]
-  (loop [sl0 sl n 0 face :plain bgface :plain pch "" ppch ""]
+  "Apply syntax highlight to the slider.
+  Only from tow and rows forward needs to be handled.
+  cursor-color is the color to apply to the cursor.
+  active is whether the buffer is active or not.
+  The cursor should be hidden if the buffer is not active."
+  [sl rows tow cursor-color syntaxhighlighter active]
+  (loop [sl0 sl n 0 face :plain bgface :plain pch nil ppch nil]
      (if (> n rows)
-       (set-point sl0 (editor/get-top-of-window towid))
-       (let [ch (get-char sl0)
+       (set-point sl0 tow)
+       (let [ch (get-char-charvalue sl0)
              p (get-point sl0)
              selection (get-mark sl0 "selection")
              cursor (get-mark sl0 "cursor")
-             paren-start (get-mark sl0 "hl0")
-             paren-end (get-mark sl0 "hl1")
              nextface (syntaxhighlighter sl0 face)
              nextbgface (cond (and (= p cursor) (not= cursor-color :off))
                                 (cond (not active) :cursor0
                                       (= cursor-color :green) :cursor1
                                       :else :cursor2)
-                              (= p paren-start) :hl
-                              (= (+ p 1) paren-end) :hl
+                              (= p (get-mark sl0 "hl0")) :hl ; highlighted start paren
+                              (= (+ p 1) (get-mark sl0 "hl1")) :hl ; highlighted end paren
                               (and selection (>= p (max selection cursor))) :plain
                               (and selection (>= p (min selection cursor))) :selection
                               (some #(= bgface %) [:cursor0 :cursor1 :cursor2 :hl]) :plain
                               :else bgface)
              next (if (and (= nextface face)
                            (= nextbgface bgface)
-                           (not (and (= pch "\n") (or (= nextface :string) (= nextbgface :selection)))))
+                           (not (and (= pch \newline) (or (= nextface :string) (= nextbgface :selection)))))
                       (right sl0)
                       (if (and (some #(= nextbgface %) [:cursor0 :cursor1 :cursor2])
-                               (or (= ch "\n") (end? sl0)))
+                               (or (= ch \newline) (end? sl0)))
                           (-> sl0 (insert " ") left (set-meta :face nextface) (set-meta :bgface nextbgface) right right)
                           (-> sl0 (set-meta :face nextface) (set-meta :bgface nextbgface) right)))]
          (recur next
-                (if (or (= ch "\n") (= ch nil)) (inc n) n)
+                (if (or (= ch \newline) (= ch nil)) (inc n) n)
                 nextface
                 nextbgface
                 ch
-                pch
-                )))))
+                pch)))))
 
 (defn- newline?
   [c]
@@ -63,8 +65,7 @@
                (iterate
                  (fn [x]
                    (split-with #(not (newline? %)) (rest (second x))))
-                 (split-with #(not (newline? %)) charlist))
-         )))
+                 (split-with #(not (newline? %)) charlist)))))
 
 ;;; ("a" "\n" "\n" "\n" "b" "c" "\n" "d") ---> (("a") ("") ("") ("b" "c") ("d"))
 
@@ -79,11 +80,11 @@
         sl (set-mark (buffer/get-slider buffer) "cursor")
 
         sl0 (update-top-of-window sl rows columns tow)
-        tmp-tmp-tmp (editor/set-top-of-window towid (get-point sl0))
+        _ (editor/set-top-of-window towid (get-point sl0))
 
         filename (or (buffer/get-filename buffer) (buffer/get-name buffer) "")
         syntaxhighlighter  (or (buffer/get-highlighter buffer) (fn [sl face] :plain))
-        sl1 (apply-syntax-highlight sl0 rows towid cursor-color syntaxhighlighter active)
+        sl1 (apply-syntax-highlight sl0 rows (editor/get-top-of-window towid) cursor-color syntaxhighlighter active)
         timestamp (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm") (new java.util.Date))
         dirty (buffer/dirty? buffer)
         statuslinecontent (str (format "%-6s" (-> (buffer/get-slider buffer) slider/get-linenumber))
