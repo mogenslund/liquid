@@ -19,10 +19,18 @@
   [& args]
   (.println sysout (str/join "" args)))
 
+(defn- print-color
+  [color & strings]
+  (tty-print esc color "m" (str/join strings)))
+
 (defn- reset
   []
+  (tty-print esc "0;37m" esc "2J")
   (tty-print esc "?25l") ; Hide cursor
   (tty-print esc "?7l")  ; disable line wrap
+  (tty-print esc "5000;5000H" esc "s")
+  (print-color ((editor/setting :tty-bgcolors) :statusline))
+  (tty-print esc "K")
   (reset! old-lines {}))
 
 (defn rows
@@ -44,10 +52,6 @@
         (tty-println n)
         (Thread/sleep 100)
         (recur (with-out-str (util/cmd "/bin/sh" "-c" "stty size </dev/tty")) (inc n))))))
-
-(defn- print-color
-  [color & strings]
-  (tty-print esc color "m" (str/join strings)))
 
 (defn- print-lines
   [lineslist]
@@ -76,18 +80,14 @@
               (cond (= c \tab) (tty-print (char 172))
                     (= c \return) (tty-print (char 633))
                     true (tty-print c))))
-          (if (= row (count (first lineslist)))
-            (do
-              (tty-print esc "K")
-              (print-color (bgcolors :plain)))
+          (when (< row (count (first lineslist)))
             (print-color (bgcolors :plain)  padding)))
-        (swap! old-lines assoc key content))
-      ))
+        (swap! old-lines assoc key content))))
     (flush)))
 
 (defn- view-draw
   []
-  (when (empty? @old-lines) (tty-print esc "0;37m" esc "2J"))
+  (when (empty? @old-lines) (reset))
   (print-lines (renderer/render-screen)))
 
 (defn- view-handler
@@ -176,7 +176,5 @@
 (defn view-init
   []
   (util/cmd "/bin/sh" "-c" "stty -echo raw </dev/tty")
-  (tty-print esc "0;37m" esc "2J")
-  (tty-print esc "?25l") ; Hide cursor
-  (tty-print esc "?7l")  ; disable line wrap
+  (reset)
   (add-watch editor/updates "tty" view-handler))
