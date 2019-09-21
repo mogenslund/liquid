@@ -156,12 +156,12 @@
   (editor/set-global-key "C-o" editor/other-window)
   (editor/set-global-key "C-r" #(editor/prompt-append "test"))
   (editor/set-global-key "C-h" {:info "h: Browse\na: Apropos\nf: Function\nk: Key"
-                               "C-h" #(helpapp/help-browse "index.md")
-                               "h" #(helpapp/help-browse "index.md")
-                               "a" helpapp/help-apropos
-                               "f" helpapp/help-function
-                               "k" helpapp/help-key
-                               "t" tutorialapp/run})
+                                "C-h" #(helpapp/help-browse "index.md")
+                                "h" #(helpapp/help-browse "index.md")
+                                "a" helpapp/help-apropos
+                                "f" helpapp/help-function
+                                "k" helpapp/help-key
+                                "t" tutorialapp/run})
   (editor/set-global-key "C-x" "C-c" editor/quit)
   (editor/set-global-key "C-x" "2" editor/split-window-below)
   (editor/set-global-key "C-x" "3" editor/split-window-right)
@@ -196,6 +196,7 @@
   (editor/set-spacekey ["f"] "Files" nil)
   (editor/set-spacekey ["f" "f"] "find-file" #(findfileapp/run textapp/run))
   (editor/set-spacekey ["f" "s"] "save-file" editor/save-file)
+  (editor/set-spacekey ["f" "r"] "Reload file" editor/force-reopen-file)
   (editor/set-spacekey ["w"] "Window" nil)
   (editor/set-spacekey ["w" "/"] "Split window vertically" editor/split-window-right)
   (editor/set-spacekey ["w" "-"] "Split window horizontally" editor/split-window-below)

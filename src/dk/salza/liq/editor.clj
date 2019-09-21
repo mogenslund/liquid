@@ -1341,17 +1341,18 @@
                  raction)
         selfins (when (not action) (if @submap (@submap :selfinsert) (get-action :selfinsert)))
         after-hook (if @submap (@submap :after-hook) (get-action :after-hook))]
-    (cond (map? action) (do
-                          (when (and (action :info) (setting ::key-info))
-                                (prompt-set (action :info)))
-                          (reset! submap action))
-          action (do (reset! submap nil)
-                     (if (one-arg? action) (apply-to-slider action) (action)))
-          (and selfins (= (count keyw) 1))
-                 (do (reset! submap nil)
-                    (selfins keyw))
-          :else (reset! submap nil))
-    (when after-hook (after-hook keyw))
+    (try
+      (cond (map? action) (do
+                            (when (and (action :info) (setting ::key-info))
+                                  (prompt-set (action :info)))
+                            (reset! submap action))
+            action (do (reset! submap nil)
+                       (if (one-arg? action) (apply-to-slider action) (action)))
+            (and selfins (= (count keyw) 1)) (do (reset! submap nil)
+                                                 (selfins keyw))
+            :else (reset! submap nil))
+      (when after-hook (after-hook keyw))
+      (catch Exception e (prompt-set (str "ERROR....\n" (util/pretty-exception e)))))
     (updated)))
 
 (defn record-macro

@@ -233,7 +233,7 @@
   [buffer]
   (if-let [filepath (get-filename buffer)]
     (let [sl (create-slider-from-file filepath)
-          p (-> (get-slider) slider/get-point)]
+          p (-> (get-slider buffer) slider/get-point)]
       (-> buffer
         (set-slider sl)      
         (set-dirty false)
