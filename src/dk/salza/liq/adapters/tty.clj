@@ -80,7 +80,7 @@
               (cond (= c \tab) (tty-print (char 172))
                     (= c \return) (tty-print (char 633))
                     true (tty-print c))))
-          (when (< row (count (first lineslist)))
+          (when (not= (-> line :line first :bgface) :statusline) 
             (print-color (bgcolors :plain)  padding)))
         (swap! old-lines assoc key content))))
     (flush)))
