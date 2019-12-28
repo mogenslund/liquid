@@ -15,7 +15,7 @@
 <br><br><br><br><br>
 
 ## Liquid 2.0 notice
-:exclamation:
+:warning:
 
 Hi everyone
 
