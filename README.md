@@ -15,7 +15,8 @@
 <br><br><br><br><br>
 
 ## Liquid 2.0 notice
-<aside class="notice">
+:exclamation:
+
 Hi everyone
 
 I am experimenting with what is going to be Liquid 2.0. It will contain a rewrite of the inner machinery, based on experience and feedback from Liquid 1.0. Since I need to find out, what works and what does not, I decided to commit the highly experimental code in another project: [liq2](https://github.com/mogenslund/liq2). Feel free to give it a spin. 
@@ -25,7 +26,6 @@ It now works well enough for me to know, it will replace Liquid 1.0 eventually. 
 I have used the liq2 project as my primary editor for the past month. I have also used vim a lot to learn "the feel", to be able to incorporate that into Liquid 2.0. I like being able to switch between Liquid 2.0 and vim, without hazzle. 
 
 Of course there are still a lot of vim features lacking. If you need some functionality please take a look at the code and see if you can copy, paste and modify a similar feature to behave like the one you miss. Or let me know. I just add features as I need them. 
-</aside>
 
 ## Website
 Find more information on [salza.dk](http://salza.dk)
