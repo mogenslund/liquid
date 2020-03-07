@@ -1,2 +1,30 @@
-{:paths ["src"
-         "resources"]}
+{:deps {org.clojure/data.json {:mvn/version "0.2.6"}}
+ :paths ["src"]
+ :aliases
+  {:node-build
+   {:extra-deps
+     {org.clojure/clojurescript {:git/url "https://github.com/clojure/clojurescript.git"
+                                 :sha "6ab76973ab31033b2307f88a2ebc5ad9ebd5cf3e"}}
+    :main-opts ["-m" "cljs.main" "--target" "node" "--output-to" "liq.js" "-O" "simple" "-c" "liq.core"]}
+   :browser-build
+   {:extra-deps
+     {org.clojure/clojurescript {:git/url "https://github.com/clojure/clojurescript.git"
+                                 :sha "6ab76973ab31033b2307f88a2ebc5ad9ebd5cf3e"}}
+    :main-opts ["-m" "cljs.main" "--compile" "liq.core" "--optimizations" "simple"]}
+   :test
+    {:extra-paths ["test"]
+     :extra-deps
+      {com.cognitect/test-runner
+       {:git/url "https://github.com/cognitect-labs/test-runner.git"
+        :sha "209b64504cb3bd3b99ecfec7937b358a879f55c1"}}
+     :main-opts ["-m" "cognitect.test-runner"]}
+   :dev
+    {:extra-deps {nrepl/nrepl {:mvn/version "0.6.0"}}
+     :main-opts ["-m" "nrepl.cmdline" "--port" "12000" "--interactive" "debug=true"]
+     :extra-paths ["test"]}
+   :uberjar
+    {:extra-deps {luchiniatwork/cambada {:mvn/version "1.0.0"}}
+     :main-opts ["-m" "cambada.uberjar" "-m" "liq.core" "--jframe"]}
+   :native-image
+    {:extra-deps {luchiniatwork/cambada {:mvn/version "1.0.0"}}
+     :main-opts ["-m" "cambada.native-image"  "-m" "liq.core"]}}}
