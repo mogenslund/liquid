@@ -1,5 +1,6 @@
 {:deps {org.clojure/data.json {:mvn/version "0.2.6"}}
- :paths ["src"]
+ :paths ["src"
+         "resources"]
  :aliases
   {:node-build
    {:extra-deps
@@ -23,8 +24,8 @@
      :main-opts ["-m" "nrepl.cmdline" "--port" "12000" "--interactive" "debug=true"]
      :extra-paths ["test"]}
    :uberjar
-    {:extra-deps {luchiniatwork/cambada {:mvn/version "1.0.0"}}
+    {:extra-deps {luchiniatwork/cambada {:mvn/version "1.0.2"}}
      :main-opts ["-m" "cambada.uberjar" "-m" "liq.core" "--jframe"]}
    :native-image
-    {:extra-deps {luchiniatwork/cambada {:mvn/version "1.0.0"}}
+    {:extra-deps {luchiniatwork/cambada {:mvn/version "1.0.2"}}
      :main-opts ["-m" "cambada.native-image"  "-m" "liq.core"]}}}

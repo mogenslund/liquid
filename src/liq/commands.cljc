@@ -24,7 +24,7 @@
   []
   (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
   (let [buf (editor/current-buffer)
-        part (re-find #"[^:]+" (buffer/get-word buf))
+        part (re-find #"[^:\(\)\[\]\{\}]+" (buffer/get-word buf))
         buffer-file (or (buf ::buffer/filename) ((editor/get-buffer (editor/previous-regular-buffer-id)) ::buffer/filename))
         alternative-parent (if buffer-file (util/get-folder buffer-file) ".")
         filepath (util/resolve-path part alternative-parent)]
@@ -254,7 +254,7 @@
    :end-of-word ^:motion #(buffer/end-of-word %1 %2)
    :end-of-word-ws ^:motion #(buffer/end-of-word-ws %1 %2)
    :end-of-line ^:motion (fn [buf n] (buffer/end-of-line buf))
-;   :delete-char (fn [& args] (repeat-fun buffer/delete-char args))
+  ;:delete-char (fn [& args] (repeat-fun buffer/delete-char args))
    :delete-char (fn [& args] (repeat-fun #(do (util/set-clipboard-content (str (buffer/get-char %1)) false) (buffer/delete-char %1 %2)) args))
    :copy-selection-to-clipboard #(apply-to-buffer copy-selection-to-clipboard)
    :copy-line copy-line
@@ -281,8 +281,8 @@
    :delete-outer-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region  (cut-region %))))
    :delete-outer-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region  (cut-region %))))
    :delete-to-word (fn [& args] (repeat-fun #(cut-region %1
-                                  [(%1 ::buffer/cursor)
-                                   ((buffer/left (buffer/word-forward %1 %2)) ::buffer/cursor)]) args))
+                                              [(%1 ::buffer/cursor)
+                                               ((buffer/left (buffer/word-forward %1 %2)) ::buffer/cursor)]) args))
    :delete-to-end-of-word (fn [& args] (repeat-fun #(cut-region %1 (buffer/end-of-word-region %1 %2)) args))
    :delete-to-end-of-word-ws (fn [& args] (repeat-fun #(cut-region %1 (buffer/end-of-word-ws-region %1 %2)) args))
 
@@ -335,6 +335,7 @@
    :buffers #(((editor/get-mode :buffer-chooser-mode) :init))
    :ls #(((editor/get-mode :buffer-chooser-mode) :init))
    :previous-regular-buffer editor/previous-regular-buffer
+   :help (fn [& args] (apply ((editor/get-mode :help-mode) :init) args))
    :w #(write-file)
    :wq #(do (write-file) (editor/exit-program))
    :t #(editor/open-file "/home/sosdamgx/proj/liquid/src/dk/salza/liq/slider.clj")
@@ -343,12 +344,12 @@
    :t1 #(editor/highlight-buffer)
    :ts #(editor/message (buffer/sexp-at-point (editor/current-buffer)))
    :t2 #(editor/message (buffer/get-word (editor/current-buffer)))
-   :t3 #(((editor/get-mode :typeahead-mode) :init)
+   :t3 #(((editor/get-mode :typeahead-mode) :init
              ["aaa" "bbb" "aabb" "ccc"]
              str
              (fn [res]
                (editor/previous-buffer)
-               (editor/apply-to-buffer (fn [buf] (buffer/insert-string buf res)))))
+               (editor/apply-to-buffer (fn [buf] (buffer/insert-string buf res))))))
    :t4 #(editor/message (pr-str (buffer/get-line (editor/current-buffer) 1)))
    :t5 #(editor/message (pr-str (:liq.buffer/lines (editor/current-buffer))))
    :t6 #(((editor/get-mode :info-dialog-mode) :init) "This is the info dialog")
