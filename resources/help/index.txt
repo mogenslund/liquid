@@ -1,0 +1,19 @@
+index.txt           Salza Liquid Help
+
+                                                                         k
+      Move around:  Use the cursor keys, or "h" to go left,            h   l
+                    "j" to go down, "k" to go up, "l" to go right.       j
+
+
+
+------------------------------------------------------------------------------
+
+BASIC:
+cheatsheet.txt                 Most used keybindings and commands
+command-line-options.txt       Command line Options for Liquid 
+
+
+
+??????
+How to create modes
+??????

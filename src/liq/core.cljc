@@ -3,6 +3,7 @@
             [liq.modes.fundamental-mode :as fundamental-mode]
             [liq.modes.minibuffer-mode :as minibuffer-mode]
             [liq.modes.buffer-chooser-mode :as buffer-chooser-mode]
+            [liq.modes.help-mode :as help-mode]
             [liq.modes.dired-mode :as dired-mode]
             [liq.modes.typeahead-mode :as typeahead-mode]
             [liq.modes.clojure-mode :as clojure-mode]
@@ -75,6 +76,7 @@
   (editor/add-mode :fundamental-mode fundamental-mode/mode)
   (editor/add-mode :minibuffer-mode minibuffer-mode/mode)
   (editor/add-mode :buffer-chooser-mode buffer-chooser-mode/mode)
+  (editor/add-mode :help-mode help-mode/mode)
   (editor/add-mode :typeahead-mode typeahead-mode/mode)
   (editor/add-mode :dired-mode dired-mode/mode)
   (editor/add-mode :clojure-mode clojure-mode/mode)
