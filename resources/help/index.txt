@@ -12,8 +12,5 @@ BASIC:
 cheatsheet.txt                 Most used keybindings and commands
 command-line-options.txt       Command line Options for Liquid 
 
-
-
-??????
-How to create modes
-??????
+MODIFYING LIQUID:
+creating-modes.txt

@@ -1,2 +1,164 @@
 cheatsheet.txt
 
+------------------------------------------------------------------------------
+Cursor movement
+
+h          Left
+j          Down
+k          Up
+l          Right
+%          Move to matching paren
+0          Beginning of line
+$          End of line
+gg         Beginning of buffer
+G          End of buffer
+gi         Typeahead headline and definition navigation
+zt         Scroll so cursor is on top of the window
+w          Forward to beginning of word
+W          Forward to beginning of word (including punctation)
+e          Forward to end of word 
+E          Forward to end of word (including punctation)
+b          Backward to beginning of word
+/<search>  Search
+n          Find next
+
+
+------------------------------------------------------------------------------
+Insert mode
+
+i          Insert before cursor
+a          Insert after cursor
+o          Append new line below
+O          Append new line above
+I          Insert at beginning of line (first non-blank character)
+A          Insert at line end
+
+------------------------------------------------------------------------------
+Editing
+
+v          Visual mode
+r          Replace character
+u          Undo
+ciw        Change inner  word
+ci(        Change inner ()
+ci[        Change inner []
+ci{        Change inner {}
+ca(        Change all ()
+ca[        Change all []
+ca{        Change all {}
+cc         Change entire line
+C          Change to end of line
+c$         Change to end of line
+J          Join current to line below, one space between
+gJ         Join current to line below, no space between 
+
+------------------------------------------------------------------------------
+Misc
+
+gf         Navigate to file below cursor
+
+------------------------------------------------------------------------------
+Cut and paste
+
+yy         Yank (copy) a line
+p          Put (paste) after cursor
+P          Put (paste) before cursor
+yiw        Copy inner  word
+yi(        Copy inner ()
+yi[        Copy inner []
+yi{        Copy inner {}
+ya(        Copy all ()
+ya[        Copy all []
+ya{        Copy all {}
+x          Delete cut character
+D          Delete to end of line
+diw        Delete/cut inner  word
+di(        Delete/cut inner ()
+di[        Delete/cut inner []
+di{        Delete/cut inner {}
+da(        Delete/cut all ()
+da[        Delete/cut all []
+da{        Delete/cut all {}
+
+------------------------------------------------------------------------------
+Evaluation
+
+Evaluation inside editor
+
+c p p      Evaluate current s-expression (or selection)
+C-b        Useful for returning to previous buffer from output buffer
+
+Start external REPL
+
+clj -J-Dclojure.server.repl="{:port 5555 :accept clojure.core.server/repl}"
+
+Connect to the external REPL
+
+:jack-in   <port> (e.g jack-in 5555)
+f5         Evaluate current s-expression (or selection) in external repl
+:jack-out
+
+------------------------------------------------------------------------------
+Buffers and files
+
+C-b        Previous buffer (Great for toggle between two buffers)
+:w         Write file
+:wq        Write file and quit
+:e <path>  Edit file
+:e .       Open file navigator
+C-space    Buffer navigator 
+:buffers   Buffer navigator
+
+------------------------------------------------------------------------------
+Commands
+
+:q         Quit
+:q!        Force quit
+:snake     Play snake
+Q          Record macro (Q again to stop recording)
+q          Play macro
+
+------------------------------------------------------------------------------
+Modifying
+
+Examples
+
+(ns user
+  (:require [clojure.string :as str]
+            [liq.editor :as editor]
+            [liq.buffer :as buffer]
+            [liq.modes.clojure-mode :as clojure-mode]
+            [liq.modes.minibuffer-mode :as minibuffer-mode]
+            [liq.util :as util]))
+
+(swap! editor/state
+       assoc-in
+       [::editor/modes :clojure-mode :normal "c" "p" "a"]
+       #(editor/message (str "It works " (rand-int 99))))
+
+(swap! editor/state
+       update
+       ::minibuffer-mode/commands
+       #(cons [#"^:test (\d+)" (fn [n] (editor/message n))] %))
+
+
+------------------------------------------------------------------------------
+.liq example
+
+Save a file in ~/.liq2 to load the content on startup.
+
+The example below will create an outputbuffer at the buttom of the window to make evaluation and result flow more smooth.
+
+(ns user
+  (:require [liq.editor :as editor]
+            [liq.buffer :as buffer]))
+
+(let [w (editor/get-window)
+      rows (w ::buffer/rows)
+      cols (w ::buffer/cols w)]
+  (editor/set-setting :auto-switch-to-output false)
+  (editor/apply-to-buffer "output" #(assoc % ::buffer/window {::buffer/top (- rows 5) ::buffer/left 1 ::buffer/rows 5 ::buffer/cols cols}))
+  (editor/apply-to-buffer "scratch" #(assoc % ::buffer/window {::buffer/top 1 ::buffer/left 1 ::buffer/rows (- rows 7) ::buffer/cols cols}))
+  (editor/new-buffer "-----------------------------" {:name "*delimeter*" :top (- rows 6) :left 1 :rows 1 :cols cols})
+  (editor/switch-to-buffer "scratch")
+  (editor/paint-buffer))
