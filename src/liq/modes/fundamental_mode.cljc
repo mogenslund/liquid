@@ -24,13 +24,15 @@
             "right" :right 
             "C-x" {"C-e" :eval-sexp-at-point} 
             "M-x" (fn [] ;(when (not= (@editor/state ::repeat-counter) 0) (swap! editor/state assoc ::repeat-counter 0))
-                         (switch-to-buffer "*minibuffer*")
-                         (non-repeat-fun #(-> % buffer/clear
-                                                (buffer/insert-char \M)
-                                                (buffer/insert-char \-)
-                                                (buffer/insert-char \x)
-                                                (buffer/insert-char \space))))}
-   :normal {"esc" (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
+                      (switch-to-buffer "*minibuffer*")
+                      (non-repeat-fun #(-> % buffer/clear
+                                             (buffer/insert-char \M)
+                                             (buffer/insert-char \-)
+                                             (buffer/insert-char \x)
+                                             (buffer/insert-char \space))))}
+   :normal {"esc" (fn []
+                    (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
+                    (editor/invalidate-ui))
             "C- " #(((editor/get-mode :buffer-chooser-mode) :init))
             "C-b" :previous-regular-buffer
             "t" (fn [] (apply-to-buffer #(buffer/insert-string % "Just\nTesting")))
@@ -107,7 +109,7 @@
             "D" :delete-to-line-end
             "r" {:selfinsert (fn [buf c]
                                (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
-                                 (buffer/set-char buf (first c)))}
+                               (buffer/set-char buf (first c)))}
             "c" {"p" {"p" :eval-sexp-at-point
                       "r" :raw-eval-sexp-at-point
                       "f" :evaluate-file-raw}
@@ -142,5 +144,5 @@
              "c" {"p" {"p" :eval-sexp-at-point
                        "r" :raw-eval-sexp-at-point}}
              "y" :copy-selection-to-clipboard
-             "d" :delete 
-             }})
+             "d" :delete}}) 
+             

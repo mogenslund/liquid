@@ -1,8 +1,8 @@
 (ns liq.tty-output
   (:require [liq.buffer :as buffer]
-            #?(:clj [clojure.java.io :as io]
+            #?(:clj [clojure.java.io :as io])
               ; :cljs [lumo.io :as io]
-              )
+              
             [clojure.string :as str]))
 
 (def ^:private last-buffer (atom nil))
@@ -94,6 +94,10 @@
       (tty-print esc row ";" col "H" esc "s" ch)
       (swap! char-cache assoc k footprint))))
 
+(defn invalidate-cache
+  []
+  (reset! char-cache {}))
+
 
 (defn print-buffer
   [buf]
@@ -106,46 +110,46 @@
         tow (buf ::buffer/tow) ; Top of window
         crow (-> buf ::buffer/cursor ::buffer/row)  ; Cursor row
         ccol (-> buf ::buffer/cursor ::buffer/col)] ; Cursor col
-  (when (= cache-id @last-buffer)
-    (tty-print "█")) ; To make it look like the cursor is still there while drawing.
-  (tty-print esc "?25l") ; Hide cursor
-  (when-let [statusline (buf :status-line)]
-    (print-buffer statusline))
+   (when (= cache-id @last-buffer)
+     (tty-print "█")) ; To make it look like the cursor is still there while drawing.
+   (tty-print esc "?25l") ; Hide cursor
+   (when-let [statusline (buf :status-line)]
+     (print-buffer statusline))
   ;; Looping over the rows and cols in buffer window in the terminal
-  (loop [trow top  ; Terminal row
-         tcol left ; Terminal col
-         row (tow ::buffer/row)
-         col (tow ::buffer/col)
-         cursor-row nil
-         cursor-col nil]
-    (if (< trow (+ rows top))
-      (do
-      ;; Check if row has changed...
-        (let [cursor-match (or (and (= row crow) (= col ccol))
-                               (and (= row crow) (not cursor-col) (> col ccol))
-                               (and (not cursor-row) (> row crow)))
-              cm (or (-> buf ::buffer/lines (get (dec row)) (get (dec col))) {}) ; Char map like {::buffer/char \x ::buffer/style :string} 
-              c (cond (and cursor-match (buf :status-line)) "█" 
-                      (cm ::buffer/char) (cm ::buffer/char)
-                      (and (= col (inc (buffer/col-count buf row))) (> (buffer/next-visible-row buf row) (+ row 1))) "…"
-                      (and (= col 1) (> row (buffer/line-count buf))) (str esc "36m~" esc "0m")
-                      true \space)
-              new-cursor-row (if cursor-match trow cursor-row)
-              new-cursor-col (if cursor-match tcol cursor-col)
-              color (theme (cm ::buffer/style))
-              bgcolor (if (buffer/selected? buf row col) "48;5;17" "49")
-              n-trow (if (< cols tcol) (inc trow) trow)
-              n-tcol (if (< cols tcol) left (inc tcol))
-              n-row (cond (and (< cols tcol) (> col (buffer/col-count buf row))) (buffer/next-visible-row buf row)
-                          true row)
-              n-col (cond (and (< cols tcol) (> col (buffer/col-count buf row))) 1
-                          true (inc col))]
-             (draw-char c trow tcol color bgcolor)
-            (recur n-trow n-tcol n-row n-col new-cursor-row new-cursor-col)))
-      (when (buf :status-line)
-        (tty-print esc cursor-row ";" cursor-col "H" esc "s" (or (buffer/get-char buf) \space))
-        (tty-print esc "?25h" esc cursor-row ";" cursor-col "H" esc "s")
-        (reset! last-buffer cache-id))))))
+   (loop [trow top  ; Terminal row
+          tcol left ; Terminal col
+          row (tow ::buffer/row)
+          col (tow ::buffer/col)
+          cursor-row nil
+          cursor-col nil]
+     (if (< trow (+ rows top))
+       (do
+       ;; Check if row has changed...
+         (let [cursor-match (or (and (= row crow) (= col ccol))
+                                (and (= row crow) (not cursor-col) (> col ccol))
+                                (and (not cursor-row) (> row crow)))
+               cm (or (-> buf ::buffer/lines (get (dec row)) (get (dec col))) {}) ; Char map like {::buffer/char \x ::buffer/style :string} 
+               c (cond (and cursor-match (buf :status-line)) "█" 
+                       (cm ::buffer/char) (cm ::buffer/char)
+                       (and (= col (inc (buffer/col-count buf row))) (> (buffer/next-visible-row buf row) (+ row 1))) "…"
+                       (and (= col 1) (> row (buffer/line-count buf))) (str esc "36m~" esc "0m")
+                       true \space)
+               new-cursor-row (if cursor-match trow cursor-row)
+               new-cursor-col (if cursor-match tcol cursor-col)
+               color (theme (cm ::buffer/style))
+               bgcolor (if (buffer/selected? buf row col) "48;5;17" "49")
+               n-trow (if (< cols tcol) (inc trow) trow)
+               n-tcol (if (< cols tcol) left (inc tcol))
+               n-row (cond (and (< cols tcol) (> col (buffer/col-count buf row))) (buffer/next-visible-row buf row)
+                           true row)
+               n-col (cond (and (< cols tcol) (> col (buffer/col-count buf row))) 1
+                           true (inc col))]
+              (draw-char c trow tcol color bgcolor)
+             (recur n-trow n-tcol n-row n-col new-cursor-row new-cursor-col)))
+       (when (buf :status-line)
+         (tty-print esc cursor-row ";" cursor-col "H" esc "s" (or (buffer/get-char buf) \space))
+         (tty-print esc "?25h" esc cursor-row ";" cursor-col "H" esc "s")
+         (reset! last-buffer cache-id))))))
 
 (def ^:private updater (atom nil))
 (def ^:private queue (atom []))
@@ -177,4 +181,5 @@
 
 (def output-handler
   {:printer printer
+   :invalidate invalidate-cache
    :dimensions get-dimensions})

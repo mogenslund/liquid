@@ -191,6 +191,11 @@
        ((-> @state ::output-handler :printer) (assoc (highlight-paren buf) :status-line (get-buffer "*status-line*"))))))
   ([] (paint-buffer (current-buffer-id))))
 
+(defn invalidate-ui
+  []
+  (when-let [f (-> @state ::output-handler :invalidate)]
+    (f)))
+
 (defn message
   [s & {:keys [:append :view :timer]}]
   (if append
