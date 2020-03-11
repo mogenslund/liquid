@@ -3,7 +3,8 @@
             [clojure.java.io :as io]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer]
-            [liq.util :as util]))
+            [liq.util :as util]
+            [liq.modes.clojure-mode :as clojure-mode]))
 
 (defn load-topic
   [topic]
@@ -33,6 +34,7 @@
    :normal {"q" editor/previous-buffer
             "C- " #(((editor/get-mode :buffer-chooser-mode) :init))
             "\n" load-topic-at-point
+            "C-]" load-topic-at-point
             "h" :left 
             "j" :down
             "k" :up
@@ -56,11 +58,26 @@
     :visual {"esc" #(apply-to-buffer buffer/set-normal-mode)}
     :init run
     :syntax
-     {:plain ; Context
-       {:style :plain ; style
-        :matchers {#"[-a-zA-Z0-9]+\.txt" :topic
-                   #"---.*---" :topic
-                   #"===.*===" :topic}}
-      :topic
-       {:style :definition
-        :matchers {#".|$" :plain}}}})
+      (-> clojure-mode/mode
+          :syntax
+          (assoc-in [:plain :matchers #"[-a-zA-Z0-9]+\.txt"] :topic)
+          (assoc-in [:plain :matchers #"---.*---"] :topic)
+          (assoc-in [:plain :matchers #"===.*==="] :topic)
+          (assoc :topic {:style :definition
+                         :matchers {#".|$" :plain}}))})
+     ;{:plain ; Context
+     ;  {:style :plain ; style
+     ;   :matchers {#"[-a-zA-Z0-9]+\.txt" :topic
+     ;              #"---.*---" :topic
+     ;              #"===.*===" :topic}}
+     ; :topic
+     ;  {:style :definition
+     ;   :matchers {#".|$" :plain}}}})
+
+
+
+
+
+
+
+

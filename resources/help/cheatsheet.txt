@@ -1,6 +1,6 @@
 cheatsheet.txt
 
-------------------------------------------------------------------------------
+==============================================================================
 Cursor movement
 
 h          Left
@@ -23,7 +23,7 @@ b          Backward to beginning of word
 n          Find next
 
 
-------------------------------------------------------------------------------
+==============================================================================
 Insert mode
 
 i          Insert before cursor
@@ -33,7 +33,7 @@ O          Append new line above
 I          Insert at beginning of line (first non-blank character)
 A          Insert at line end
 
-------------------------------------------------------------------------------
+==============================================================================
 Editing
 
 v          Visual mode
@@ -52,12 +52,12 @@ c$         Change to end of line
 J          Join current to line below, one space between
 gJ         Join current to line below, no space between 
 
-------------------------------------------------------------------------------
+==============================================================================
 Misc
 
 gf         Navigate to file below cursor
 
-------------------------------------------------------------------------------
+==============================================================================
 Cut and paste
 
 yy         Yank (copy) a line
@@ -80,7 +80,7 @@ da(        Delete/cut all ()
 da[        Delete/cut all []
 da{        Delete/cut all {}
 
-------------------------------------------------------------------------------
+==============================================================================
 Evaluation
 
 Evaluation inside editor
@@ -98,7 +98,7 @@ Connect to the external REPL
 f5         Evaluate current s-expression (or selection) in external repl
 :jack-out
 
-------------------------------------------------------------------------------
+==============================================================================
 Buffers and files
 
 C-b        Previous buffer (Great for toggle between two buffers)
@@ -109,7 +109,7 @@ C-b        Previous buffer (Great for toggle between two buffers)
 C-space    Buffer navigator 
 :buffers   Buffer navigator
 
-------------------------------------------------------------------------------
+==============================================================================
 Commands
 
 :q         Quit
@@ -118,7 +118,7 @@ Commands
 Q          Record macro (Q again to stop recording)
 q          Play macro
 
-------------------------------------------------------------------------------
+==============================================================================
 Modifying
 
 Examples
@@ -142,12 +142,13 @@ Examples
        #(cons [#"^:test (\d+)" (fn [n] (editor/message n))] %))
 
 
-------------------------------------------------------------------------------
+==============================================================================
 .liq example
 
 Save a file in ~/.liq2 to load the content on startup.
 
-The example below will create an outputbuffer at the buttom of the window to make evaluation and result flow more smooth.
+The example below will create an outputbuffer at the buttom of the window to 
+make evaluation and result flow more smooth.
 
 (ns user
   (:require [liq.editor :as editor]
@@ -157,8 +158,21 @@ The example below will create an outputbuffer at the buttom of the window to mak
       rows (w ::buffer/rows)
       cols (w ::buffer/cols w)]
   (editor/set-setting :auto-switch-to-output false)
-  (editor/apply-to-buffer "output" #(assoc % ::buffer/window {::buffer/top (- rows 5) ::buffer/left 1 ::buffer/rows 5 ::buffer/cols cols}))
-  (editor/apply-to-buffer "scratch" #(assoc % ::buffer/window {::buffer/top 1 ::buffer/left 1 ::buffer/rows (- rows 7) ::buffer/cols cols}))
-  (editor/new-buffer "-----------------------------" {:name "*delimeter*" :top (- rows 6) :left 1 :rows 1 :cols cols})
+  (editor/apply-to-buffer "output"
+    #(assoc % ::buffer/window {::buffer/top (- rows 5)
+                               ::buffer/left 1
+                               ::buffer/rows 5
+                               ::buffer/cols cols}))
+  (editor/apply-to-buffer "scratch"
+    #(assoc % ::buffer/window {::buffer/top 1
+                               ::buffer/left 1
+                               ::buffer/rows (- rows 7)
+                               ::buffer/cols cols}))
+  (editor/new-buffer "-----------------------------"
+                     {:name "*delimeter*"
+                      :top (- rows 6)
+                      :left 1
+                      :rows 1
+                      :cols cols})
   (editor/switch-to-buffer "scratch")
   (editor/paint-buffer))
