@@ -4,13 +4,22 @@ index.txt           Salza Liquid Help
       Move around:  Use the cursor keys, or "h" to go left,            h   l
                     "j" to go down, "k" to go up, "l" to go right.       j
 
+Jump to a subject:  Press ENTER on the subject. Usually a topic ending with
+                    .txt
+
+        Jump back:  Click C-SPACE to display a list of buffer. Navigate to
+                    the wanted one with j or k (up and down) and press ENTER. 
 
 
 ------------------------------------------------------------------------------
+INTRODUCTION:
+about-help.txt
 
 BASIC:
 cheatsheet.txt                 Most used keybindings and commands
 command-line-options.txt       Command line Options for Liquid 
 
+
 MODIFYING LIQUID:
-creating-modes.txt
+keybindings.txt
+modes.txt
