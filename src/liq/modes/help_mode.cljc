@@ -11,7 +11,7 @@
   (if-let [id (editor/get-buffer-id-by-name (str "*Help - " topic "*"))]
     (switch-to-buffer id)
     (editor/new-buffer (slurp (if (re-find #"/" topic) topic (io/resource (str "help/" topic))))
-                       {:major-modes (list :help-mode) :name (str "*Help - " topic "*")})))
+                       {:major-modes (list :help-mode :spacemacs-mode :clojure-mode :fundamental-mode) :name (str "*Help - " topic "*")})))
  
 
 ; (slurp (io/resource (str "help/" topic)))
@@ -32,31 +32,30 @@
 (def mode
   {:insert {"esc" (fn [] (apply-to-buffer #(-> % (assoc ::buffer/mode :normal) buffer/left)))}
    :normal {"q" editor/previous-buffer
-            "C- " #(((editor/get-mode :buffer-chooser-mode) :init))
+            "c" {"p" {"p" :eval-sexp-at-point
+                      "r" :raw-eval-sexp-at-point
+                      "f" :evaluate-file-raw}
+                 "i" #(fn [])
+                 "a" #(fn [])
+                 "c" #(fn [])
+                 "$" #(fn [])
+                 "e" #(fn [])
+                 "E" #(fn [])
+                 "w" #(fn [])}
+            "i" #(fn [])
+            "o" #(fn [])
+            "O" #(fn [])
+            "r" #(fn [])
+            "x" #(fn [])
+            "p" #(fn [])
+            "P" #(fn [])
+            "d" #(fn [])
+            "A" #(fn [])
+            "D" #(fn [])
+            "C" #(fn [])
+            "J" #(fn [])
             "\n" load-topic-at-point
-            "C-]" load-topic-at-point
-            "h" :left 
-            "j" :down
-            "k" :up
-            "l" :right
-            "C-b" :left
-            "C-n" :down
-            "C-p" :up
-            "C-f" :right
-            "left" :left 
-            "down" :down 
-            "up" :up 
-            "right" :right
-            "c" {"p" {"p" :eval-sexp-at-point}}
-            "0" #(apply-to-buffer buffer/beginning-of-line)
-            "$" #(apply-to-buffer buffer/end-of-line)
-            "g" {"g" #(editor/apply-to-buffer buffer/beginning-of-buffer)}
-            "G" #(apply-to-buffer buffer/end-of-buffer)
-            "/" (fn [] (switch-to-buffer "*minibuffer*")
-                       (apply-to-buffer #(-> % buffer/clear (buffer/insert-char \/))))
-            ":" (fn [] (switch-to-buffer "*minibuffer*")
-                       (apply-to-buffer #(-> % buffer/clear (buffer/insert-char \:))))}
-    :visual {"esc" #(apply-to-buffer buffer/set-normal-mode)}
+            "C-]" load-topic-at-point}
     :init run
     :syntax
       (-> clojure-mode/mode
