@@ -47,6 +47,7 @@
             "down" :down 
             "up" :up 
             "right" :right
+            "c" {"p" {"p" :eval-sexp-at-point}}
             "0" #(apply-to-buffer buffer/beginning-of-line)
             "$" #(apply-to-buffer buffer/end-of-line)
             "g" {"g" #(editor/apply-to-buffer buffer/beginning-of-buffer)}

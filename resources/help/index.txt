@@ -14,10 +14,12 @@ Jump to a subject:  Press ENTER on the subject. Usually a topic ending with
 ------------------------------------------------------------------------------
 INTRODUCTION:
 about-help.txt
+random.txt                     Temporary topic for pieces of content which
+                               does not hav a place yet.
 
 BASIC:
-cheatsheet.txt                 Most used keybindings and commands
-command-line-options.txt       Command line Options for Liquid 
+cheatsheet.txt                 Most used keybindings and commands.
+command-line-options.txt       Command line Options for Liquid.
 
 
 MODIFYING LIQUID:

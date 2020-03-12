@@ -1,0 +1,56 @@
+random.txt
+
+This topic contains parts of the help that has not yet been move into a topic.
+
+
+==============================================================================
+Evaluate code
+
+To evaluate code snippets press: c c p. If selection is active the selected 
+code will be executed. (Be aware the selection needs to contain valid code to 
+evaluate succesfully.)
+
+If nothing is selected the smallest form containing the cursor will be 
+evaluated.
+
+Examples:
+
+    (+ 1 2 (* 3 4)) 
+
+Place the cursor on "1" and press c p p. The result will be 15.
+
+Place the cursor on "3" and press c p p. Onlty the inner form will be 
+evaluated with the result 12.
+
+This priciple allows one to evaluate "test" snippets within comment tags, 
+like:
+
+    (comment (+ 1 2 (* 3 4)))
+
+
+==============================================================================
+Modify keybindings
+
+Below is an example of how to define or redefine a keybinding for an already  
+existing mode.
+
+It has been written with all details to make it clear how the parts are 
+assembled.
+
+Evaluate the code by selecting everything (of the code) and type c p p. After 
+ that pressing C-t (Ctrl+T) the cursor will move 10 times to the right. Try  
+it. 
+
+    (ns user
+      (:require [liq.editor :as editor]
+                [liq.buffer :as buffer]))
+
+    (defn move10
+      [buf]
+      (buffer/right buf 10))
+
+    (defn move10action
+      []
+      (editor/apply-to-buffer move10))
+
+    (editor/add-key-bindings :help-mode :normal {"C-t" move10action})
