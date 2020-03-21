@@ -1,0 +1,31 @@
+parinfer.txt
+
+
+==============================================================================
+Requirements
+
+This feature parasitize https://github.com/eraserhd/parinfer-rust. Parinfer 
+Rust needs to be installed, for this mode to work.
+
+
+==============================================================================
+Enabling
+
+To enable parinfer for clj and cljc files add the code below to the .liq file.
+
+This will check the file extension when a new buffer is created through the 
+new-buffer-hooks.
+
+    (ns user 
+      (:require [liq.editor :as editor]
+                [liq.buffer :as buffer]))
+
+    (swap! editor/state update ::editor/new-buffer-hooks conj
+      (fn [buf]
+        (if (and (buf ::buffer/filename)
+                 (re-matches #".*.(cljc?)" (buf ::buffer/filename)))
+          (update buf ::buffer/major-modes conj :parinfer-mode)
+          buf)))
+
+The hook functions take a buffer as input and returns a buffer. In this case 
+the returned buffer has a modified major-modes list.
