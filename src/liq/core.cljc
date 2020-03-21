@@ -46,12 +46,13 @@
 
 
 (defn load-dot-liq
-  []
-  (try
-    (let [path (util/resolve-home "~/.liq")]
-      (when (util/exists? path)
-        (load-file path)))
-   (catch Exception e (editor/message (str "Error loading .liq:\n" e)))))
+  ([p]
+   (try
+     (let [path (util/resolve-home p)]
+       (when (util/exists? path)
+         (load-file path)))
+    (catch Exception e (editor/message (str "Error loading " p ":\n" e)))))
+  ([] (load-dot-liq "~/.liq")))
 
 (defn load-extras
   []
@@ -121,7 +122,7 @@
         (editor/new-buffer "" {:name "scratch" :top 1 :left 1 :rows (- rows 7) :cols cols :major-mode :clojure-mode})))
     (editor/paint-buffer)
     (load-extras)
-    #?(:clj (load-dot-liq))))
+    #?(:clj (load-dot-liq (or (read-arg args "--init=") "~/.liq")))))
 
 #?(:cljs (set! cljs.core/*main-cli-fn* -main))
 #?(:cljs (defn init [] (-main "--browser")))
