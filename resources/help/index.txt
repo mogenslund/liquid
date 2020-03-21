@@ -25,3 +25,6 @@ command-line-options.txt       Command line Options for Liquid.
 MODIFYING LIQUID:
 keybindings.txt
 modes.txt
+
+EXTRAS:
+parinfer.txt
