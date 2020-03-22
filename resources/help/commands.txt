@@ -1,0 +1,51 @@
+commands.txt
+
+                                 Commands
+
+
+Commands are activated by typing ":" in normal mode. If for example a file is 
+open, it can be saved by typing :w. To quit Liquid type :q or :q! to force 
+quit, discarding changes.
+
+==============================================================================
+Modify commands
+
+    (ns user
+      (:require [liq.editor :as editor]
+                [liq.buffer :as buffer]))
+
+    (defn move10
+      [buf]
+      (buffer/right buf 10))
+
+    (defn move10action
+      []
+      (editor/apply-to-buffer move10))
+
+    (swap! editor/state assoc-in [:liq.editor/commands :move10] move10action)
+
+Now type :move10 in normal mode. Then ENTER. The cursor will move 10 times to 
+the right 
+
+The command can also be used for keybinding, like this:
+
+    (editor/add-key-bindings :help-mode :normal {"C-t" :move10})
+
+Example with command taking parameters:
+
+    (ns user
+      (:require [liq.editor :as editor]
+                [liq.buffer :as buffer]))
+
+    (defn move-n
+      [buf n]
+      (buffer/right buf n))
+
+    (defn move-n-action
+      [& args]
+      (let [n (Integer/parseInt (or (first args) "10"))]
+        (editor/apply-to-buffer #(move-n % n))))
+
+    (swap! editor/state assoc-in [:liq.editor/commands :moven] move-n-action)
+
+Try it by typing ":moven 20" in normal mode

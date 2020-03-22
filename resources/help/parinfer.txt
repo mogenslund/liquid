@@ -11,6 +11,14 @@ Rust needs to be installed, for this mode to work.
 ==============================================================================
 Enabling
 
+To enable parinfer in the current buffer use the command :parinfer or just :p.
+
+To disable use :parinferoff or just :poff.
+
+
+==============================================================================
+Set parinfer is default for Clojure files
+
 To enable parinfer for clj and cljc files add the code below to the .liq file.
 
 This will check the file extension when a new buffer is created through the 

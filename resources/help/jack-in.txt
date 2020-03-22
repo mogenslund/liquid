@@ -1,0 +1,27 @@
+jack-in.txt
+
+                        Connecting to a REPL
+
+
+If liquid is added as a dependency to a project, it is possible to start 
+liquid just like a REPL itself, so evaluation is executed in the context of 
+the project. If liquid is started as standalone it is still possible to 
+connect to an external REPL using
+
+    :jack-in 5555
+
+if for example the port of the REPL is 5555.
+
+Before connecting start the REPL with the command:
+
+    clj -J-Dclojure.server.repl=
+                             "{:port 5555 :accept clojure.core.server/repl}"
+
+(It might look a bit different on a Windows machine.)
+
+To disconnect from the REPL use
+
+    :jack-out
+
+To evaluate expressions use F5. The binding c p p still evaluates within the 
+editor, while F5 sends to the REPL.

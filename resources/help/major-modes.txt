@@ -1,0 +1,41 @@
+major-modes.txt
+
+
+                            Major modes
+
+
+Modes have the form
+
+    {:insert {}
+     :normal {}
+     :visual {}
+     :syntax {}
+     :init (fn [])}
+
+Modes are "saved" in the editor state, like this:
+
+    (editor/add-mode :my-mode mode)
+
+or
+
+    (swap! editor/state update ::editor/modes assoc :my-mode mode)
+
+Major modes are associated with buffers through the ::buffer/major-modes
+keyword in the buffer. It contains a list of major modes:
+
+    ::buffer/major-modes (list :mode1 :mode2)
+
+It defines a priority of modes to choose from when resolving a key press.
+
+If for example the mode is :normal and a key like "f3" is pressed, the editor
+will first look for a function in :normal in :mode1 defined for "f3". If there
+is no hit, it will look in :mode2 etc.
+
+Syntax highligthing will choosen from the first mode in the list containing a
+:syntax keyword. This allows one to add a mode only redefining parts of the
+mode, like keybindings and not necessarily syntax highlighting and visa versa.
+
+See syntax-highlighting.txt for more details around syntax highlighting.
+
+See keybindings.txt for more details around keybindings.
+
