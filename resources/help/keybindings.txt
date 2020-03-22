@@ -1,1 +1,31 @@
 keybindings.txt
+
+
+
+==============================================================================
+Modify keybindings
+
+Below is an example of how to define or redefine a keybinding for an already  
+existing mode.
+
+It has been written with all details to make it clear how the parts are 
+assembled.
+
+Evaluate the code by selecting everything (of the code) and type c p p. After 
+ that pressing C-t (Ctrl+T) the cursor will move 10 times to the right. Try  
+it. 
+
+    (ns user
+      (:require [liq.editor :as editor]
+                [liq.buffer :as buffer]))
+
+    (defn move10
+      [buf]
+      (buffer/right buf 10))
+
+    (defn move10action
+      []
+      (editor/apply-to-buffer move10))
+
+    (editor/add-key-bindings :help-mode :normal {"C-t" move10action})
+

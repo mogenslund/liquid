@@ -1,4 +1,10 @@
-index.txt           Salza Liquid Help
+index.txt
+
+
+
+                            Salza Liquid Help
+
+
 
                                                                          k
       Move around:  Use the cursor keys, or "h" to go left,            h   l
@@ -20,6 +26,9 @@ random.txt                     Temporary topic for pieces of content which
 BASIC:
 cheatsheet.txt                 Most used keybindings and commands.
 command-line-options.txt       Command line Options for Liquid.
+major-modes.txt
+commands.txt
+evaluation.txt
 
 
 MODIFYING LIQUID:
@@ -28,3 +37,5 @@ modes.txt
 
 EXTRAS:
 parinfer.txt
+jack-in.txt
+cool-stuff.txt

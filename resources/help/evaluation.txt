@@ -1,0 +1,25 @@
+evaluation.txt
+
+                                Evaluation
+
+To evaluate code snippets press: c c p. If selection is active the selected 
+code will be executed. (Be aware the selection needs to contain valid code to 
+evaluate succesfully.)
+
+If nothing is selected the smallest form containing the cursor will be 
+evaluated.
+
+Examples:
+
+    (+ 1 2 (* 3 4)) 
+
+Place the cursor on "1" and press c p p. The result will be 15.
+
+Place the cursor on "3" and press c p p. Onlty the inner form will be 
+evaluated with the result 12.
+
+This priciple allows one to evaluate "test" snippets within comment tags, 
+like:
+
+    (comment (+ 1 2 (* 3 4)))
+
