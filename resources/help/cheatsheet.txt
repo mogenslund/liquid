@@ -53,6 +53,22 @@ J          Join current to line below, one space between
 gJ         Join current to line below, no space between 
 
 ==============================================================================
+Visual mode
+
+c          Change selection
+d          Delete selection
+iw         Expand selection inner word
+i(         Expand selection inner ()
+i[         Expand selection inner []
+i{         Expand selection inner {}
+i"         Expand selection inner "
+a(         Expand selection outer ()
+a[         Expand selection outer []
+a{         Expand selection outer {}
+a"         Expand selection outer "
+
+
+==============================================================================
 Misc
 
 gf         Navigate to file below cursor
@@ -85,7 +101,7 @@ Evaluation
 
 Evaluation inside editor
 
-c p p      Evaluate current s-expression (or selection)
+c p p      Evaluate current s-expression
 C-b        Useful for returning to previous buffer from output buffer
 
 Start external REPL

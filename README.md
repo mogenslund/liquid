@@ -8,26 +8,11 @@
 * <b>Fluidable</b>  -  Embed your code into &lambda;iquid or &lambda;iquid into your code   
 * <b>Dependency free</b>  -  Everything is pure Clojure
 * <b>Translatable</b>  -  Tiny core, simple model, no tricks
-* <b>Distraction Free</b>  -  Typeahead and completions on demand... Your demand!
-* <b>Comfortable keybindings</b>  -  Most sed commands are close at hand
-* <b>Servable</b>  -  Run as server, local or remote
+* <b>Comfortable keybindings</b>  -  Most used commands are close at hand
 
 <br><br><br><br><br>
 
-## Liquid 2.0 notice
-:warning:
-
-Hi everyone
-
-I am experimenting with what is going to be Liquid 2.0. It will contain a rewrite of the inner machinery, based on experience and feedback from Liquid 1.0. Since I need to find out what works and what does not, I decided to commit the highly experimental code in the [liq2](https://github.com/mogenslund/liquid/tree/liq2) branch. Feel free to give it a spin. 
-
-It now works well enough for me to know that it will replace Liquid 1.0 eventually. Since it is different in many ways, please let me know, if you use Liquid 1.0 now and have concerns! The experimental project uses namespace "liq2". When the transition is done, it will be renamed "liq". I will start the transition once Liquid 2.0 has matured enough.
-
-I have used the liq2 project as my primary editor for the past month. I have also used vim a lot to learn "the feel", to be able to incorporate that into Liquid 2.0. I like being able to switch between Liquid 2.0 and vim, without hazzle. 
-
-Of course there are still a lot of vim features lacking. If you need some functionality please take a look at the code and see if you can copy, paste and modify a similar feature to behave like the one you miss. Or let me know. I just add features as I need them. 
-
-## Website
+# Website
 Find more information on [salza.dk](http://salza.dk)
 
 ## Who is this for
@@ -45,60 +30,24 @@ There is no made up language or syntax to extend &lambda;iquid.
  * Since &lambda;iquid is pure Clojure it can be used to extend any Clojure or Java program, so the editor lives inside the program.. like magic.
  * Turn it around, you can use any Clojure and any Java library to extend &lambda;iquid.. if the library can do it then &lambda;iquid can do it. Configure keyboard shortcuts and commands to tame the libraries. Use code to integrate.
 
-## Demo video
-Watch these videos to get a sense of what it can and how the editor works:
-
-[Demo](https://www.youtube.com/watch?v=B3pYpnYlXgU&feature=youtu.be)
-
-[liquid01](https://drive.google.com/file/d/0B5Au3PxHCmgBM2MySHl4aUVWTEE/view?usp=sharing)
-
 ## Community
 For discussions, help, tips and support, use
 
 **[#liquid](https://clojurians.slack.com/messages/liquid/)** channel in [Clojure Slack](http://clojurians.net/)
 
-## Some extensions
-
- * [Additives](https://github.com/mogenslund/additives)
- * [Liquid-vim](https://github.com/mogenslund/liquid-vim)
-
 ## Installation
 
 ### Download and execution
 
-#### Try it with clj
-
-You can run from command line using the `clj` command:
-
-```bash
-clj -Sdeps '{:deps {mogenslund/liquid {:mvn/version "1.1.3"}}}' -m dk.salza.liq.core
-```
-
 #### Quick start
-Download the single jar (Uberjar containing both Clojure and Liquid) [liq.jar](http://salza.dk/liq.jar)  
-
-**IMPORTANT** Please have the [Cheatsheet](http://salza.dk/liquid/cheatsheet.html) nearby when using Liquid for the first time. The keybindings are powerful, but needs to be learned. **You will get lost without it**
-
-On Windows double click the liq.jar.  
-On Linux and Mac execute the following in a terminal:
-
-    java -jar liq.jar
-
-If the terminal causes problems, like hard to see colors or artifacts when navigating, try the JFrame implementation:
-
-    java -jar liq.jar --jframe
-
-My experience is that the terminal "Terminology", with dark background works very well.
+????? todo Inline clj deps command
 
 #### Starter kit
+????? todo Update liquid-starter-kit
+
 A place to start is [Liquid Starter Kit](https://github.com/mogenslund/liquid-starter-kit)
 
 It sort of corresponds to a sample `.emacs` file. Some code you can extend to create your own version of the editor.
-
-#### Local setup and extensions
-For a recommended approach to local setup and managing extensions, please read
-
-[Basic Setup](http://salza.dk/setupbasic.html)
 
 #### Salza &lambda;iquid text editor is designed with clojure developers in mind
 The editor is written in pure Clojure. That is, there are no other dependencies, not even curses or lanterna!
@@ -106,12 +55,6 @@ The editor is written in pure Clojure. That is, there are no other dependencies,
 I have been using Emacs for many years. I have tweaked it a lot and implemented modes, to simulate the Vim way of switching between insert mode and normal mode for navigation. I like being able to use the whole keyboard for navigation. As you will see in the video below, I am very inspired by Emacs and Vim, but I have chosen not to try to copy or re-implement Emacs or Vim. I have only stolen the features that I need or like. I hope others will just create plugins or extensions to make the editor support other features that they like.
 
 ![Liquid Text Editor](liquid01.png)
-
-I could tell a lot about the editor, but I think you should see the video below for a demonstration.
-
-
-## Technical video explaining the core data structure of the editor
-This video is for technical minded people to get a view of the inside of the construction of the editor. Useful for understanding the idea behind the editor or as inspiration for similar projects or extensions of this: [slider01](https://drive.google.com/file/d/0B5Au3PxHCmgBNjJodzNjQ2w4c2M/view?usp=sharing)
 
 ## Use cases
  * <b>Tight integration</b> with Clojure code. It should be easy to have the same code executed from within the editor as well as outside. Using a real language for extensions provides a great advantage compared to a "home made" extension language, that only fits the specific editor.  
@@ -131,8 +74,7 @@ From Vi I have stolen the concept of normal/insert mode. I really like the abili
 
 S-expressions in clojure can be evaluated with "e", while the whole file is evaluated with shift+e.
 
-
 ## License
-Copyright &copy; 2018 Mogens Br&oslash;dsgaard Lund
+Copyright &copy; 2020 Mogens Br&oslash;dsgaard Lund
 
 Distributed under the Eclipse Public License either version 1.0 or any later version.

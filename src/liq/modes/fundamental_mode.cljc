@@ -141,8 +141,16 @@
             "o" :append-line
             "O" :append-line-above}
     :visual {"esc" :set-normal-mode 
-             "c" {"p" {"p" :eval-sexp-at-point
-                       "r" :raw-eval-sexp-at-point}}
+             "i" {"w" :select-inner-word
+                  "(" :select-inner-paren
+                  "[" :select-inner-bracket
+                  "{" :select-inner-brace
+                  "\"" :select-inner-quote}
+             "a" {"(" :select-outer-paren
+                  "[" :select-outer-bracket
+                  "{" :select-outer-brace
+                  "\"" :select-outer-quote}
+             "c" :change
              "y" :copy-selection-to-clipboard
              "d" :delete}}) 
              
