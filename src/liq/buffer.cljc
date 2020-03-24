@@ -113,10 +113,24 @@
   [buf]
   (assoc buf ::mem-col ((buf ::cursor) ::col)))
 
+(defn point-compare
+  [p1 p2]
+  (compare [(p1 ::row) (p1 ::col)]
+           [(p2 ::row) (p2 ::col)]))
+
 (defn set-selection
   ([buf p] (assoc buf ::selection p))
   ([buf row col] (set-selection buf {::row row ::col col}))
   ([buf] (set-selection buf (buf ::cursor))))
+
+(defn expand-selection
+  "Expand a selection with a region"
+  [buf r]
+  (cond (nil? (buf ::selection)) (assoc buf ::selection (first r) ::cursor (second r))
+        (= (buf ::selection) (buf ::cursor)) (assoc buf ::selection (first r) ::cursor (second r))
+        (< (point-compare (buf ::cursor) (buf ::selection)) 0) (assoc buf ::cursor (first r))
+        (> (point-compare (buf ::cursor) (buf ::selection)) 0) (assoc buf ::cursor (second r))
+        true buf))
 
 (defn get-selection
   [buf]
@@ -154,11 +168,6 @@
 (defn dirty?
   [buf]
   (buf ::dirty))
-
-(defn point-compare
-  [p1 p2]
-  (compare [(p1 ::row) (p1 ::col)]
-           [(p2 ::row) (p2 ::col)]))
 
 (defn adjust-hidden-rows
   [buf row n]

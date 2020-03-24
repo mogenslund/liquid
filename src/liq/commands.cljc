@@ -286,6 +286,7 @@
    :delete-to-end-of-word (fn [& args] (repeat-fun #(cut-region %1 (buffer/end-of-word-region %1 %2)) args))
    :delete-to-end-of-word-ws (fn [& args] (repeat-fun #(cut-region %1 (buffer/end-of-word-ws-region %1 %2)) args))
 
+   :change (fn [] (non-repeat-fun #(->> % delete set-insert-mode)))
    :change-inner-word (fn [] (non-repeat-fun #(->> % buffer/word-region (cut-region %) set-insert-mode)))
    :change-inner-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (cut-region %) set-insert-mode)))
    :change-inner-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (shrink-region %) (cut-region %) set-insert-mode)))
@@ -300,6 +301,16 @@
    :change-to-end-of-word (fn [& args] (repeat-fun #(set-insert-mode (cut-region %1 (buffer/end-of-word-region %1 %2))) args))
    :change-to-end-of-word-ws (fn [& args] (repeat-fun #(set-insert-mode (cut-region %1 (buffer/end-of-word-ws-region %1 %2))) args))
 
+   :select-inner-word (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/word-region %))))
+   :select-inner-paren (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/paren-region %)))))
+   :select-inner-bracket (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/bracket-region %)))))
+   :select-inner-brace (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/brace-region %)))))
+   :select-inner-quote (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/quote-region %)))))
+   :select-outer-paren (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/paren-region %))))
+   :select-outer-bracket (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/bracket-region %))))
+   :select-outer-brace (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/brace-region %))))
+   :select-outer-quote (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/quote-region %))))
+
    :insert-at-line-end #(non-repeat-fun buffer/insert-at-line-end)
    :insert-at-beginning-of-line #(non-repeat-fun buffer/insert-at-beginning-of-line)
    :delete-to-line-end #(non-repeat-fun buffer/delete-to-line-end)
@@ -309,6 +320,7 @@
    :join-lines #(non-repeat-fun buffer/join-lines)
    :join-lines-space #(non-repeat-fun buffer/join-lines-space)
 
+   :eval #(eval-sexp-at-point (editor/current-buffer))
    :eval-sexp-at-point #(eval-sexp-at-point (editor/current-buffer))
    :raw-eval-sexp-at-point #(raw-eval-sexp-at-point (editor/current-buffer))
    :evaluate-file-raw evaluate-file-raw
