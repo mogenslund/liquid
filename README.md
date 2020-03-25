@@ -1,7 +1,5 @@
 # Salza &lambda;iquid text editor
 
-[![Clojars Project](https://img.shields.io/clojars/v/mogenslund/liquid.svg)](https://clojars.org/mogenslund/liquid)
-
 <img align="left" src="logo.png" width="281" height="360">
 <br><br><br>
 
@@ -11,9 +9,6 @@
 * <b>Comfortable keybindings</b>  -  Most used commands are close at hand
 
 <br><br><br><br><br>
-
-# Website
-Find more information on [salza.dk](http://salza.dk)
 
 ## Who is this for
 &lambda;iquid is absolutely not for everyone! It is for you if
