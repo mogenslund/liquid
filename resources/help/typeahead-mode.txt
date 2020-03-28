@@ -1,0 +1,26 @@
+index.txt typeahead-mode.txt                                          salza.dk
+
+
+                            Typeahead mode
+
+
+==============================================================================
+Usage
+
+Typeahead mode is a mode that can be activated for selected an item from a 
+list using typeahead.
+
+The function takes a list of items, which can be anything. A to-string 
+function which should provide a string representation of the items in the 
+list. This will be used to be able to match an input string. A callback 
+function, which is the function that will be called with the result item. 
+
+    (ns user
+      (:require [liq.modes.typeahead-mode :as typeahead-mode]))
+
+
+    (def res (atom ""))
+    (typeahead-mode/run ["apple" "ananas" "pineapple" "grape" "kiwi"]
+                        str
+                        #(reset! res %))
+    (deref res)

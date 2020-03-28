@@ -50,6 +50,7 @@
   (let [st @state
         index (max (- (-> (editor/current-buffer) ::buffer/cursor ::buffer/row) 2) 0)
         res (first (drop index (st ::filtered)))] 
+    (editor/previous-buffer)
     ((st ::callback) res)))
 
 (defn handle-input
