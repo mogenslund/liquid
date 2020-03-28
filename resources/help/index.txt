@@ -38,5 +38,6 @@ modes.txt
 
 EXTRAS:
 parinfer.txt
+typeahead-mode.txt
 jack-in.txt
 cool-stuff.txt

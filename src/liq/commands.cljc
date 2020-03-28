@@ -153,7 +153,6 @@
     (((editor/get-mode :typeahead-mode) :init) headlines 
                                                second
                                                (fn [res]
-                                                 (editor/previous-buffer)
                                                  (apply-to-buffer #(-> %
                                                                        (assoc ::buffer/cursor {::buffer/row (first res) ::buffer/col 1})
                                                                        (assoc ::buffer/tow {::buffer/row (first res) ::buffer/col 1})))))))
