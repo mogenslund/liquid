@@ -1,0 +1,47 @@
+file-handling.txt major-modes.txt                                     salza.dk
+
+
+                            File handling
+
+
+==============================================================================
+Finding files
+
+Finding files or editing files is handles by dired-mode. Activating 
+dired-mode is done with the :e command.
+
+The :e command might or might not take parameters. Here are some different 
+examples
+
+    :e /tmp/tmp.clj - Will open the file /tmp/tmp.clj
+    :e /tmp         - Will open dired-mode with /tmp as current directory.
+    :e              - Will open dired-mode with the folder of the current file
+                      as current directory.
+    :e .            - Will open dired-mode with the folder of the current file
+                      as current directory.
+    :Ex             - Will open dired-mode with the folder of the current file
+                      as current directory.
+
+==============================================================================
+Dired mode
+
+Dired mode is a file browser. The content has the form:
+
+    The first line is the current directory shown with green color
+    The next lines are the subfolders shown with blue color
+    The last lines are the files in the folder
+
+Most keybindings are similar to those for normal mode (See cheatsheet.txt) 
+including the search functionality.
+
+ENTER      On a folder. Dired-mode navigates to that folder.
+ENTER      On a file. The file is opened for edit.
+
+==============================================================================
+Create new file
+
+In dired mode a new file is created by pressing % on the current directory
+(green top line). A prompt for filename input will be shown. Enter a name and
+press ENTER.
+
+

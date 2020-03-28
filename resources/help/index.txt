@@ -1,4 +1,4 @@
-index.txt
+index.txt                                                             salza.dk
 
 
 
@@ -26,6 +26,7 @@ random.txt                     Temporary topic for pieces of content which
 BASIC:
 cheatsheet.txt                 Most used keybindings and commands.
 command-line-options.txt       Command line Options for Liquid.
+file-handling.txt
 major-modes.txt
 commands.txt
 evaluation.txt

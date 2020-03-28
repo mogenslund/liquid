@@ -1,4 +1,4 @@
-commands.txt
+index.txt commands.txt                                                salza.dk
 
                                  Commands
 

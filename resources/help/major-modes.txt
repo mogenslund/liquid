@@ -1,8 +1,11 @@
-major-modes.txt
+index.txt major-modes.txt                                             salza.dk
 
 
                             Major modes
 
+
+==============================================================================
+Structure
 
 Modes have the form
 
