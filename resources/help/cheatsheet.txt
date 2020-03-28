@@ -1,7 +1,7 @@
-cheatsheet.txt
+index.txt cheatsheet.txt                                              salza.dk
 
 ==============================================================================
-Cursor movement
+Cursor movement (Normal mode)
 
 h          Left
 j          Down
@@ -34,7 +34,7 @@ I          Insert at beginning of line (first non-blank character)
 A          Insert at line end
 
 ==============================================================================
-Editing
+Editing (Normal mode)
 
 v          Visual mode
 r          Replace character
@@ -69,12 +69,12 @@ a"         Expand selection outer "
 
 
 ==============================================================================
-Misc
+Misc (Normal mode)
 
 gf         Navigate to file below cursor
 
 ==============================================================================
-Cut and paste
+Cut and paste (Normal mode)
 
 yy         Yank (copy) a line
 p          Put (paste) after cursor
