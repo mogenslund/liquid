@@ -20,8 +20,6 @@ Jump to a subject:  Press ENTER on the subject. Usually a topic ending with
 ------------------------------------------------------------------------------
 INTRODUCTION:
 about-help.txt
-random.txt                     Temporary topic for pieces of content which
-                               does not hav a place yet.
 
 BASIC:
 cheatsheet.txt                 Most used keybindings and commands.
@@ -30,7 +28,8 @@ file-handling.txt
 major-modes.txt
 commands.txt
 evaluation.txt
-
+spacemacs-mode.txt
+syntax-highlighting.txt
 
 MODIFYING LIQUID:
 keybindings.txt

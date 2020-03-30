@@ -130,6 +130,8 @@
                                 (and (not cursor-row) (> row crow)))
                cm (or (-> buf ::buffer/lines (get (dec row)) (get (dec col))) {}) ; Char map like {::buffer/char \x ::buffer/style :string} 
                c (cond (and cursor-match (buf :status-line)) "█" 
+                       (= (cm ::buffer/char) \tab) (char 172)
+                       (= (cm ::buffer/char) \return) (char 633)
                        (cm ::buffer/char) (cm ::buffer/char)
                        (and (= col (inc (buffer/col-count buf row))) (> (buffer/next-visible-row buf row) (+ row 1))) "…"
                        (and (= col 1) (> row (buffer/line-count buf))) (str esc "36m~" esc "0m")

@@ -1,1 +1,33 @@
 index.txt syntax-highlighting.txt                                     salza.dk
+
+
+                           Syntax highlighting
+
+
+==============================================================================
+Specification
+
+A major mode (see major-modes.txt) might contain an entry with key :syntax.
+This contains a specification of syntax of the given mode. A syntax definition
+has the form
+
+    {:context1
+      {:style :style1
+       :matchers {regex1 :context2
+                  regex2 :context3}}
+     :context2 {}
+     :context3 {}}
+
+A context could be like :comment or :string.
+The :style is a tag defining the style. It could be :green, :string, :comment,
+etc. These are mapped to colors through themes, that will be applied in a
+view.
+
+The matchers maps regular expressions to contexts. If for example the current
+context is :string, a regular expression matching a double quote might map to
+another context called :plain.
+
+The highlighter will walk through the text and apply a context to each
+character, using the matchers to control when to transition from one context
+to another. When contexts have been applied, the screen writer can use the
+corresponding style and a theme to know which color to apply when printing.
