@@ -1,2 +1,34 @@
 index.txt modes.txt                                                   salza.dk
 
+                                Modes
+
+Each major mode (see major-modes.txt) has some modes, which are vim like,
+like :normal, :insert, :visual. Through the use of keybindings one can switch
+between these modes. So which function a keypress should resolve to is
+decided by first reading which mode is active, then finding the first major
+mode in the modes list that has the key defined for that mode.
+
+==============================================================================
+Example
+
+Here is part of the definition for fundamental-mode:
+
+    {:insert {"C-b" :left
+              "C-n" :down}
+     :normal {"a" :insert-after-point
+              "I" :insert-at-beginning-of-line}}
+
+And here is some custom-mode:
+
+    {:insert "C-b" :up}
+
+Lets say the buffers ::major-modes list is
+
+    (list :custom-mode :fundamental-mode)
+
+If the current mode is :insert and the "C-b" keycombination is pressed, the :up
+will be choose, since :custom-mode, as the first mode has "C-b" defined for
+:insert mode.
+
+If the current mode is :insert and "C-n" is pressed, the :down action will be
+choosen from the :fundamental-mode, since it is not defined for :custom-mode.
