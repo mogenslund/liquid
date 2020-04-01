@@ -123,15 +123,6 @@
   ([buf row col] (set-selection buf {::row row ::col col}))
   ([buf] (set-selection buf (buf ::cursor))))
 
-(defn expand-selection
-  "Expand a selection with a region"
-  [buf r]
-  (cond (nil? (buf ::selection)) (assoc buf ::selection (first r) ::cursor (second r))
-        (= (buf ::selection) (buf ::cursor)) (assoc buf ::selection (first r) ::cursor (second r))
-        (< (point-compare (buf ::cursor) (buf ::selection)) 0) (assoc buf ::cursor (first r))
-        (> (point-compare (buf ::cursor) (buf ::selection)) 0) (assoc buf ::cursor (second r))
-        true buf))
-
 (defn get-selection
   [buf]
   (buf ::selection))
@@ -158,6 +149,16 @@
       set-undo-point
       (assoc ::mode :insert)
       remove-selection))
+
+(defn expand-selection
+  "Expand a selection with a region"
+  [buf r]
+  (update-mem-col
+    (cond (nil? (buf ::selection)) (assoc (set-visual-mode buf) ::selection (first r) ::cursor (second r))
+          (= (buf ::selection) (buf ::cursor)) (assoc buf ::selection (first r) ::cursor (second r))
+          (< (point-compare (buf ::cursor) (buf ::selection)) 0) (assoc buf ::cursor (first r))
+          (> (point-compare (buf ::cursor) (buf ::selection)) 0) (assoc buf ::cursor (second r))
+          true buf)))
 
 (defn set-dirty
   [buf val]

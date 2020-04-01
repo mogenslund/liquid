@@ -1,4 +1,4 @@
-index.txt typeahead-mode.txt                                          salza.dk
+help.txt typeahead-mode.txt                                           salza.dk
 
 
                             Typeahead mode

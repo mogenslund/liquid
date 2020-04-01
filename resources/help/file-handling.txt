@@ -1,4 +1,4 @@
-file-handling.txt major-modes.txt                                     salza.dk
+help.txt file-handling.txt                                            salza.dk
 
 
                             File handling

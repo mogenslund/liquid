@@ -1,4 +1,4 @@
-index.txt command-line-options.txt                                    salza.dk
+help.txt command-line-options.txt                                     salza.dk
 
                            Command line options
 

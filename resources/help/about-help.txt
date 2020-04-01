@@ -1,4 +1,4 @@
-index.txt about-help.txt                                              salza.dk
+help.txt about-help.txt                                               salza.dk
 
 ==============================================================================
 Background

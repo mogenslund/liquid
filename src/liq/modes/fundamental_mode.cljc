@@ -138,6 +138,7 @@
             "Q" editor/record-macro
             "q" editor/run-macro
             "J" :join-lines-space
+            "V" :select-line
             "o" :append-line
             "O" :append-line-above}
     :visual {"esc" :set-normal-mode 
@@ -150,6 +151,7 @@
                   "[" :select-outer-bracket
                   "{" :select-outer-brace
                   "\"" :select-outer-quote}
+             "V" :select-line
              "c" :change
              "y" :copy-selection-to-clipboard
              "d" :delete}}) 

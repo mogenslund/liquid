@@ -1,4 +1,4 @@
-index.txt syntax-highlighting.txt                                     salza.dk
+help.txt syntax-highlighting.txt                                      salza.dk
 
 
                            Syntax highlighting

@@ -1,4 +1,4 @@
-index.txt modes.txt                                                   salza.dk
+help.txt modes.txt                                                    salza.dk
 
                                 Modes
 

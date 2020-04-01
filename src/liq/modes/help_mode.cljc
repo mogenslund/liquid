@@ -27,7 +27,7 @@
 
 (defn run
   ([topic] (load-topic topic))
-  ([] (run "index.txt")))
+  ([] (run "help.txt")))
 
 (def mode
   {:insert {"esc" (fn [] (apply-to-buffer #(-> % (assoc ::buffer/mode :normal) buffer/left)))}

@@ -1,11 +1,8 @@
-index.txt spacemacs-mode.txt                                          salza.dk
+help.txt spacemacs-mode.txt                                           salza.dk
 
 
                             Spacemacs mode 
 
-
-==============================================================================
-Description
 
 Spacemacs mode is a mode that add Spacemacs like keybindings. Only few of the 
 bindings have been implemented, but enough to provide a structure. If someone 
