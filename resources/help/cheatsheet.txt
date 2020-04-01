@@ -1,4 +1,4 @@
-index.txt cheatsheet.txt                                              salza.dk
+help.txt cheatsheet.txt                                               salza.dk
 
 ==============================================================================
 Cursor movement (Normal mode)

@@ -1,4 +1,4 @@
-index.txt keybindings.txt                                             salza.dk
+help.txt keybindings.txt                                              salza.dk
 
 
 

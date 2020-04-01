@@ -57,7 +57,7 @@
 (defn txt-to-link
   [s]
   (str/replace s #"((\w|-)+)\.txt" #(str "<a href=\"" (second %1) ".html\" "
-                                         "style=\"color: #" (colors :yellow) "; text-decoration: none;\">"
+                                         "style=\"color: #" (colors :definition) "; text-decoration: none;\">"
                                          (second %1) ".txt</a>")))
 
 (comment (spit "/tmp/buf.html" (to-html (buffer/buffer "(defn abc\n  [x]\n  (str :test x))") (clojure-mode/mode :syntax))))

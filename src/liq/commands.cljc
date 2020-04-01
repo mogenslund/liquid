@@ -309,6 +309,7 @@
    :select-outer-bracket (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/bracket-region %))))
    :select-outer-brace (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/brace-region %))))
    :select-outer-quote (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/quote-region %))))
+   :select-line (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/line-region %))))
 
    :insert-at-line-end #(non-repeat-fun buffer/insert-at-line-end)
    :insert-at-beginning-of-line #(non-repeat-fun buffer/insert-at-beginning-of-line)

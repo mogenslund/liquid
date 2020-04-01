@@ -1,4 +1,4 @@
-index.txt major-modes.txt                                             salza.dk
+help.txt major-modes.txt                                              salza.dk
 
 
                             Major modes

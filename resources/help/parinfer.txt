@@ -1,4 +1,4 @@
-index.txt parinfer.txt                                                salza.dk
+help.txt parinfer.txt                                                 salza.dk
 
                                 Parinfer
 
