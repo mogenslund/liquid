@@ -132,6 +132,7 @@
       (switch-to-buffer (get-buffer-id-by-idx idx)))))
 
 (defn apply-to-buffer
+  "Apply function to buffer"
   ([idname fun]
    (if (number? idname)
      (swap! state update-in [::buffers idname] fun)

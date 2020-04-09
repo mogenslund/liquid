@@ -44,7 +44,9 @@
   css file."
   [buf hl]
   (let [hl-buf (highlighter/highlight buf hl)
-        onerow (reduce #(concat %1 [{::buffer/char \newline ::buffer/style ((last %1) ::buffer/style)}] %2) (hl-buf ::buffer/lines))]
+        onerow (reduce #(concat %1 [{::buffer/char \newline
+                                     ::buffer/style ((or (last %1) {::buffer/style :plain}) ::buffer/style)}] %2)
+                       (hl-buf ::buffer/lines))]
     (str "<html><body bgcolor=\"" (bgcolors :plain) "\">"
          "<pre><span style=\"color: #" (colors :plain) "; background-color: #" (bgcolors :plain) ";\">"
          (str/join (map #(if-let [style (% :delta-style)]
