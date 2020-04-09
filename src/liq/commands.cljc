@@ -31,6 +31,7 @@
     (editor/open-file filepath)))
 
 (defn write-file
+  "Save buffer to associated file"
   []
   (let [buf (editor/current-buffer)]
     (when-let [f (buf ::buffer/filename)]
