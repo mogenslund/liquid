@@ -1,6 +1,10 @@
 help.txt keybindings.txt                                              salza.dk
 
 
+                               Keybindings
+
+
+Keybindings are stored in major modes.
 
 ==============================================================================
 Modify keybindings
@@ -28,4 +32,11 @@ it.
       (editor/apply-to-buffer move10))
 
     (editor/add-key-bindings :help-mode :normal {"C-t" move10action})
+
+Editing the state directly, I think, should not be discouraged. Evaluate the 
+form below and press f5 a couple of times afterwards:
+
+    (swap! editor/state
+           assoc-in [::editor/modes :clojure-mode :normal "f5"]
+           #(editor/message (str (rand-int 100) " You pressed f5")))
 
