@@ -245,21 +245,22 @@
   ([] (highlight-buffer-row (current-buffer-id))))
 
 (defn new-buffer
-  [text {:keys [name] :as options}]
-  (let [id (util/counter-next)
-        o (if (options :rows)
-            options
-            (let [b (current-buffer) ;; TODO If there is no current-buffer, there will be a problem!
-                  w (b ::buffer/window)] 
-              (assoc options :top (w ::buffer/top)
-                             :left (w ::buffer/left)
-                             :rows (w ::buffer/rows)
-                             :cols (w ::buffer/cols)))) 
-        buf (reduce #(%2 %1) (assoc (buffer/buffer text o) ::id id ::idx id) (@state ::new-buffer-hooks))]
-    (swap! state update ::buffers assoc id buf) 
-    (highlight-buffer id)
-    (switch-to-buffer id)
-    (paint-buffer)))
+  ([text {:keys [name] :as options}]
+   (let [id (util/counter-next)
+         o (if (options :rows)
+             options
+             (let [b (current-buffer) ;; TODO If there is no current-buffer, there will be a problem!
+                   w (b ::buffer/window)] 
+               (assoc options :top (w ::buffer/top)
+                              :left (w ::buffer/left)
+                              :rows (w ::buffer/rows)
+                              :cols (w ::buffer/cols)))) 
+         buf (reduce #(%2 %1) (assoc (buffer/buffer text o) ::id id ::idx id) (@state ::new-buffer-hooks))]
+     (swap! state update ::buffers assoc id buf) 
+     (highlight-buffer id)
+     (switch-to-buffer id)
+     (paint-buffer)))
+  ([text] (new-buffer text {})))
 
 (defn open-file
   [path]
@@ -316,7 +317,6 @@
     (do (swap! state update ::repeat-counter (fn [t] (+ (* 10 t) (Integer/parseInt c))))
         nil)
     (let [mode ((current-buffer) ::buffer/mode)
-          major-mode ((current-buffer) ::buffer/major-mode)
           major-modes ((current-buffer) ::buffer/major-modes)
           tmp-k-selfinsert (and @tmp-keymap (@tmp-keymap :selfinsert)) 
           tmp-k (and @tmp-keymap
