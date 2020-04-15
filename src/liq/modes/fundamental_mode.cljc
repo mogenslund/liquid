@@ -35,6 +35,7 @@
                     (editor/invalidate-ui))
             "C- " #(((editor/get-mode :buffer-chooser-mode) :init))
             "C-b" :previous-regular-buffer
+            "C-f" :scroll-page
             "t" (fn [] (apply-to-buffer #(buffer/insert-string % "Just\nTesting")))
             "f2" editor/oldest-buffer
             "f3" #(non-repeat-fun buffer/debug-clear-undo)

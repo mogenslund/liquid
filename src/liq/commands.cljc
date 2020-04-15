@@ -333,6 +333,12 @@
    :open-file-at-point open-file-at-point
    :end-of-buffer #(non-repeat-fun buffer/end-of-buffer)
    :scroll-cursor-top (fn [] (non-repeat-fun #(assoc % ::buffer/tow {::buffer/row (-> % ::buffer/cursor ::buffer/row) ::buffer/col 1})))
+   :scroll-page (fn []
+                  (non-repeat-fun
+                    #(as-> %  _
+                           (assoc _ ::buffer/cursor (_ ::buffer/tow))
+                           (buffer/down _ (-> _ ::buffer/window ::buffer/rows))
+                           (assoc _ ::buffer/tow (_ ::buffer/cursor)))))
 
    :set-visual-mode #(non-repeat-fun buffer/set-visual-mode)
    :set-normal-mode #(non-repeat-fun buffer/set-normal-mode)
