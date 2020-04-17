@@ -1,0 +1,54 @@
+help.txt datastructures.txt                                           salza.dk
+
+
+                               Data Structures
+
+
+Overview of the datastructures used in Liquid.
+
+These are simplified examples designed to give an idea of what the keys and 
+the value types are in the different hash-maps.
+
+==============================================================================
+state
+
+  ::commands {:left ^:motion #(buffer/left %1 %2)}
+  ::buffers {}
+  ::modes {}
+  ::new-buffer-hooks []
+  ::settings {:auto-switch-to-output true}
+  ::exit-handler (fn [])
+  ::window nil
+  ::output-handler (fn [])
+
+==============================================================================
+buffer
+
+  ::name ""
+  ::filename ""
+  ::lines [[{::char \a} {::char \b}]
+           [{::char \c ::style :string} {::char \d}]]
+  ::lines-undo ()
+  ::lines-stack (list {::lines lines ::cursor {::row 1 ::col 1}})
+  ::line-ending "\n" 
+  ::hidden-lines {}
+  ::cursor {::row 1 ::col 1}
+  ::selection {::row 1 ::col 1}
+  ::window {::top 1 ::left 1 ::rows 20 ::cols 80}
+  ::mem-col 1
+  ::tow {::row 1 ::col 1}
+  ::mode :normal
+  ::encoding :utf-8
+  ::search-word ""
+  ::dirty false
+  ::major-modes [:clojure-mode]
+
+==============================================================================
+major-mode
+
+  :insert {}
+  :normal {}
+  :visual {}
+  :syntax {}
+
+
