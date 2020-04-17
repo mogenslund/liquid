@@ -30,6 +30,7 @@ commands.txt
 evaluation.txt
 spacemacs-mode.txt
 syntax-highlighting.txt
+datastructures.txt
 
 MODIFYING LIQUID:
 keybindings.txt
