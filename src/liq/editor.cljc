@@ -27,18 +27,26 @@
       w)))
 
 (defn set-setting
+  "Add a key value pair to settings"
   [keyw value]
   (swap! state assoc-in [::settings keyw] value))
 
 (defn get-setting
+  "Get value given key from settings"
   [keyw]
   ((@state ::settings) keyw))
 
 (defn set-output-handler
+  "Sets \"device\" (map with output functions) for displaying
+  buffers.
+  See :help output-handler for more details."
   [output-handler]
   (swap! state assoc ::output-handler output-handler))
 
 (defn set-exit-handler
+  "Exit handler is the function to be called, when exit is called.
+  This function usually depends on the environment Liquid is running
+  in. Java or NodeJS for example."
   [exit-handler]
   (swap! state assoc ::exit-handler exit-handler))
 

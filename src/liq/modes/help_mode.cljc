@@ -10,8 +10,12 @@
   [topic]
   (if-let [id (editor/get-buffer-id-by-name (str "*Help - " topic "*"))]
     (switch-to-buffer id)
-    (editor/new-buffer (slurp (if (re-find #"/" topic) topic (io/resource (str "help/" topic))))
-                       {:major-modes (list :help-mode :spacemacs-mode :clojure-mode :fundamental-mode) :name (str "*Help - " topic "*")})))
+    (when-let [path (if (re-find #"/" topic)
+                      topic
+                      (or (io/resource (str "help/" topic))
+                          (io/resource (str "help/" topic ".txt"))))]
+      (editor/new-buffer (slurp path)
+                         {:major-modes (list :help-mode :spacemacs-mode :clojure-mode :fundamental-mode) :name (str "*Help - " topic "*")}))))
  
 
 ; (slurp (io/resource (str "help/" topic)))

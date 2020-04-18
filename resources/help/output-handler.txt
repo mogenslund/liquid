@@ -1,0 +1,22 @@
+help.txt output-handler.txt                                           salza.dk
+
+
+                               Output Handler
+
+
+The state in editor has an entry ::output-handler. It is supposed to 
+reference a datastructure of the following form:
+
+    {:printer function: [buffer] -> nil
+     :invalidate function: [] -> nil
+     :dimensions function: [] -> {:rows int :cols int}
+
+The :printer value is a function able to "print" a buffer on the output 
+device (tty screen, JFrame, HTML, etc.)
+
+The :invalidate value is a function taking no parameters. It is called when 
+the editor wants to signal that a complete redraw of the screen should be 
+executed. 
+
+The :dimensions value is a function return a map with :rows and :cols. It 
+will usually be the output device who knows the dimensions of the print area.
