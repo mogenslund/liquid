@@ -20,6 +20,9 @@ state
   ::exit-handler (fn [])
   ::window nil
   ::output-handler (fn [])
+  ::repeat-counter
+  ::last-action
+  ::skip-number
 
 ==============================================================================
 buffer
@@ -42,6 +45,9 @@ buffer
   ::search-word ""
   ::dirty false
   ::major-modes [:clojure-mode]
+
+  ::editor/id
+  ::editor/idx
 
 ==============================================================================
 major-mode
