@@ -19,9 +19,9 @@
 
 Hi everyone
 
-I am experimenting with what is going to be Liquid 2.0. It will contain a rewrite of the inner machinery, based on experience and feedback from Liquid 1.0. Since I need to find out, what works and what does not, I decided to commit the highly experimental code in another project: [liq2](https://github.com/mogenslund/liq2). Feel free to give it a spin. 
+I am experimenting with what is going to be Liquid 2.0. It will contain a rewrite of the inner machinery, based on experience and feedback from Liquid 1.0. Since I need to find out what works and what does not, I decided to commit the highly experimental code in the [liq2](https://github.com/mogenslund/liquid/tree/liq2) branch. Feel free to give it a spin. 
 
-It now works well enough for me to know, it will replace Liquid 1.0 eventually. Since it is different in many ways, please let me know, if you use Liquid 1.0 now and have concerns! The experimental project uses namespace "liq2". When the transition is done, it will be renamed "liq". I will start the transition once Liquid 2.0 have matured enough.
+It now works well enough for me to know that it will replace Liquid 1.0 eventually. Since it is different in many ways, please let me know, if you use Liquid 1.0 now and have concerns! The experimental project uses namespace "liq2". When the transition is done, it will be renamed "liq". I will start the transition once Liquid 2.0 has matured enough.
 
 I have used the liq2 project as my primary editor for the past month. I have also used vim a lot to learn "the feel", to be able to incorporate that into Liquid 2.0. I like being able to switch between Liquid 2.0 and vim, without hazzle. 
 
