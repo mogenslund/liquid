@@ -99,9 +99,15 @@
 ;; Information
 ;; ===========
 
-(defn line-count [buf] (count (buf ::lines)))
+(defn line-count
+  "Number of lines in the buffer."
+  [buf]
+  (count (buf ::lines)))
 
-(defn col-count [buf row] (-> buf ::lines (get (dec row)) count))
+(defn col-count
+  "Number of columns on a given line in a buffer."
+  [buf row]
+  (-> buf ::lines (get (dec row)) count))
 
 (comment 
   (let [buf (buffer "abcd\nxyz")]
@@ -114,36 +120,50 @@
   (assoc buf ::mem-col ((buf ::cursor) ::col)))
 
 (defn point-compare
+  "Compares two point p1 and p2.
+  If p1 is before p2 -1 is returned.
+  If p1 is after p2 1 is returned.
+  If p1=p2 0 is returned."
   [p1 p2]
   (compare [(p1 ::row) (p1 ::col)]
            [(p2 ::row) (p2 ::col)]))
 
 (defn set-selection
+  "Set the selection point. If no point is given,
+  the current cursor position will be used."
   ([buf p] (assoc buf ::selection p))
   ([buf row col] (set-selection buf {::row row ::col col}))
   ([buf] (set-selection buf (buf ::cursor))))
 
 (defn get-selection
+  "Return the selection point.
+  One can also use
+  (buf ::buffer/selection)
+  directly."
   [buf]
   (buf ::selection))
 
 (defn remove-selection
+  "Set selection point to nil."
   [buf]
   (assoc buf ::selection nil))
 
 (defn set-visual-mode
+  "Set mode to :visual and set selection point."
   [buf]
   (-> buf
       (assoc ::mode :visual)
       set-selection))
 
 (defn set-normal-mode
+  "Set mode to :normal and set selection point to nil."
   [buf]
   (-> buf
       (assoc ::mode :normal)
       remove-selection))
   
 (defn set-insert-mode
+  "Set mode to :insert and set selection point to nil."
   [buf]
   (-> buf
       set-undo-point
@@ -161,12 +181,16 @@
           true buf)))
 
 (defn set-dirty
+  "Set the buffer as dirty.
+  Should be called when a change has been made which is
+  not saved yet."
   [buf val]
   (if (buf ::filename)
     (assoc buf ::dirty val)
     buf))
 
 (defn dirty?
+  "Return true if the buffer is changed since last save."
   [buf]
   (buf ::dirty))
 
@@ -237,15 +261,20 @@
   (line (buffer "abcde") 1 10))
 
 (defn word
+  "Get word at a given point point."
   ([buf row col]
    (loop [l (str/split (line buf row) #" ") idx 1]
      (let [w (first l)]
        (if (or (> (+ (count w) idx) col) (empty? l))
        w
        (recur (rest l) (+ idx (count w) 1))))))
+  ([buf p] (word buf (p ::row) (p ::col)))
   ([buf] (word buf (-> buf ::cursor ::row) (-> buf ::cursor ::col))))
 
 (defn text
+  "Get the text ind the buffer.
+  If a region or two points is specified the text will be the
+  contained text."
   ([buf]
    (str/join "\n" (map (fn [line] (str/join "" (map ::char line))) (buf ::lines))))
   ([buf p1 p2]
@@ -301,6 +330,7 @@
         (recur (previous-point buf p))))))
 
 (defn end-point
+  "The last point in the buffer"
   [buf]
   {::row (line-count buf) ::col (col-count buf (line-count buf))})
 
@@ -341,6 +371,8 @@
 ;; =========
 
 (defn right
+  "Move cursor forward.
+  If n is specifed forward n steps."
   ([buf n]
    (let [linevec (-> buf ::lines (get (dec (-> buf ::cursor ::row))))
          maxcol (+ (count linevec) (if (= (buf ::mode) :insert) 1 0))
@@ -352,12 +384,16 @@
    (right buf 1)))
 
 (defn left
+  "Move cursor backward.
+  If n is specifed backward n steps."
   ([buf n]
    (right buf (- n)))
   ([buf]
    (left buf 1)))
 
 (defn down
+  "Move cursor down.
+  If n is specified move down n steps."
   ([buf n]
    (let [;newrow (max 1 (min (count (buf ::lines)) (+ (-> buf ::cursor ::row) n hide-inc)))
          newrow (max 1 (min (count (buf ::lines)) (+ (next-visible-row buf) (dec n))))
@@ -369,6 +405,8 @@
    (down buf 1)))
 
 (defn up
+  "Move cursor up.
+  If n is specified move up n steps."
   ([buf n]
    (let [newrow (max 1 (min (count (buf ::lines)) (- (previous-visible-row buf) (dec n))))
          linevec (-> buf ::lines (get (dec newrow)))
@@ -379,18 +417,21 @@
    (up buf 1)))
 
 (defn end-of-line
+  "Move cursor to end of current line"
   [buf]
   (-> buf
       (assoc ::cursor {::row (-> buf ::cursor ::row) ::col (col-count buf (-> buf ::cursor ::row))}) 
       (assoc ::mem-col (col-count buf (-> buf ::cursor ::row)))))
 
 (defn beginning-of-line
+  "Move cursor to beginning of current line"
   [buf]
   (-> buf
       (assoc ::cursor {::row (-> buf ::cursor ::row) ::col 1}) 
       (assoc ::mem-col 1)))
 
 (defn beginning-of-buffer
+  "Move cursor to the beginning of the buffer"
   [buf]
   (-> buf
       (assoc ::cursor {::row 1 ::col 1}) 
@@ -398,6 +439,7 @@
 
 
 (defn end-of-buffer
+  "Move cursor to the end of the buffer"
   [buf]
   (-> buf
       (assoc ::cursor {::row (line-count buf) ::col (col-count buf (line-count buf))})
@@ -428,6 +470,7 @@
   ))
 
 (defn get-char
+  "Get the character symbol at a given position."
   ([buf row col]
    (-> buf
        ::lines
@@ -605,6 +648,7 @@
 (comment (pr-str (text (delete-region (buffer "aa\naa\naa") [{::row 1 ::col 2} {::row 2 ::col 1}]))))
 
 (defn shrink-region
+  "Narrow in the given region in both ends"
   [buf r]
   (when r
     (let [p1 (first r)
@@ -637,8 +681,11 @@
         text)))
 
 (defn delete-to-line-end
+  "Delete content form the cursor to the end of the line."
   [buf]
-  (left (delete-region buf [(buf ::cursor) {::row (-> buf ::cursor ::row) ::col (col-count buf (-> buf ::cursor ::row))}])))
+  (left (delete-region buf [(buf ::cursor)
+                            {::row (-> buf ::cursor ::row)
+                             ::col (col-count buf (-> buf ::cursor ::row))}])))
 
 (defn clear
   [buf]
@@ -836,6 +883,7 @@
 (comment (quote-region (-> (buffer "(\"asdf\")") right right)))
 
 (defn line-region
+  "Line at point as region."
   ([buf p]
    (when (<= (p ::row) (line-count buf))
      [(assoc p ::col 1) (assoc p ::col (col-count buf (p ::row)))]))
