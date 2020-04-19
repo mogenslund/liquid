@@ -18,7 +18,7 @@
       #(-> %
            buffer/clear
            (buffer/insert-string
-             (buffer/get-text (editor/get-buffer "*output*")))))))
+             (buffer/text (editor/get-buffer "*output*")))))))
 
 ;; clj -J-Dclojure.server.repl="{:port 5555 :accept clojure.core.server/repl}"
 (def socket (atom nil))

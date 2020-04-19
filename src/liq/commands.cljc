@@ -24,7 +24,7 @@
   []
   (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
   (let [buf (editor/current-buffer)
-        part (re-find #"[^:\(\)\[\]\{\}]+" (buffer/get-word buf))
+        part (re-find #"[^:\(\)\[\]\{\}]+" (buffer/word buf))
         buffer-file (or (buf ::buffer/filename) ((editor/get-buffer (editor/previous-regular-buffer-id)) ::buffer/filename))
         alternative-parent (if buffer-file (util/get-folder buffer-file) ".")
         filepath (util/resolve-path part alternative-parent)]
@@ -35,7 +35,7 @@
   []
   (let [buf (editor/current-buffer)]
     (when-let [f (buf ::buffer/filename)]
-      (util/write-file f (buffer/get-text buf)))
+      (util/write-file f (buffer/text buf)))
     (apply-to-buffer #(buffer/set-dirty % false))))
 
 (defn external-command
@@ -110,13 +110,13 @@
 
 (defn delete-line
   [buf]
-  (let [text (buffer/get-line buf)]
+  (let [text (buffer/line buf)]
     (util/set-clipboard-content text true)
     (buffer/delete-line buf)))
 
 (defn copy-line
   []
-  (let [text (buffer/get-line (editor/current-buffer))]
+  (let [text (buffer/line (editor/current-buffer))]
     (util/set-clipboard-content text true)))
 
 (defn delete
@@ -128,7 +128,7 @@
 (defn cut-region
   [buf r]
   (if r
-    (let [text (buffer/get-text buf r)]
+    (let [text (buffer/text buf r)]
       (util/set-clipboard-content text false)
       (buffer/delete-region buf r))
     buf))
@@ -136,7 +136,7 @@
 (defn yank-region
   [buf r]
   (if r
-    (let [text (buffer/get-text buf r)]
+    (let [text (buffer/text buf r)]
       (util/set-clipboard-content text false)
       (assoc buf ::buffer/cursor (first r)))
     buf))
@@ -149,7 +149,7 @@
 (defn typeahead-defs
   [buf]
   (let [headlines (filter #(re-find #"^\(def|^#" (second %))
-                          (map #(vector % (buffer/get-line buf %))
+                          (map #(vector % (buffer/line buf %))
                                (range 1 (inc (buffer/line-count buf)))))]
     (((editor/get-mode :typeahead-mode) :init) headlines 
                                                second
@@ -160,7 +160,7 @@
 
 (defn get-namespace
   [buf]
-  (let [content (buffer/get-line buf 1)]
+  (let [content (buffer/line buf 1)]
     (re-find #"(?<=\(ns )[-a-z0-9\\.]+" content))) ;)
 
 
@@ -362,14 +362,14 @@
    :bd! #(editor/force-kill-buffer)
    :t1 #(editor/highlight-buffer)
    :ts #(editor/message (buffer/sexp-at-point (editor/current-buffer)))
-   :t2 #(editor/message (buffer/get-word (editor/current-buffer)))
+   :t2 #(editor/message (buffer/word (editor/current-buffer)))
    :t3 #(((editor/get-mode :typeahead-mode) :init
              ["aaa" "bbb" "aabb" "ccc"]
              str
              (fn [res]
                (editor/previous-buffer)
                (editor/apply-to-buffer (fn [buf] (buffer/insert-string buf res))))))
-   :t4 #(editor/message (pr-str (buffer/get-line (editor/current-buffer) 1)))
+   :t4 #(editor/message (pr-str (buffer/line (editor/current-buffer) 1)))
    :t5 #(editor/message (pr-str (:liq.buffer/lines (editor/current-buffer))))
    :t6 #(((editor/get-mode :info-dialog-mode) :init) "This is the info dialog")
    :! (fn [& args] (external-command (str/join " " args)))

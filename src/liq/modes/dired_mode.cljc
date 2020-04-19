@@ -33,8 +33,8 @@
 (defn choose
   []
   (let [buf (editor/current-buffer)
-        parent (buffer/get-line buf 1)
-        f (buffer/get-line buf)
+        parent (buffer/line buf 1)
+        f (buffer/line buf)
         path (str parent "/" f)]
     (when (> (-> buf ::buffer/cursor ::buffer/row) 1)
       (if (util/folder? path)
@@ -48,8 +48,8 @@
 (defn new-file
   []
   (let [buf (editor/current-buffer)
-        parent (buffer/get-line buf 1)
-        f (if (= (-> buf ::buffer/cursor ::buffer/row) 1) "" (buffer/get-line buf))
+        parent (buffer/line buf 1)
+        f (if (= (-> buf ::buffer/cursor ::buffer/row) 1) "" (buffer/line buf))
         path (str parent "/" f)]
     (switch-to-buffer "*minibuffer*")
     (apply-to-buffer #(-> %

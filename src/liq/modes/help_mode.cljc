@@ -25,7 +25,7 @@
   []
   (let [buf (editor/current-buffer)
         parent (re-find #"/.*/" (buf ::buffer/name))
-        topic (str parent (re-find #"[^:\(\)\[\]\{\}]+" (buffer/get-word buf)))]
+        topic (str parent (re-find #"[^:\(\)\[\]\{\}]+" (buffer/word buf)))]
     (when (re-matches #".*\.txt" topic)
       (load-topic topic))))
 

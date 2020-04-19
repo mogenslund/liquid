@@ -4,9 +4,9 @@
 
 (deftest sub-buffer-test
   (testing "Sub buffer"
-    (is (= (-> (buffer "aaa\nbbb\nccc\nddd\neee") (sub-buffer 2 3) get-text)
+    (is (= (-> (buffer "aaa\nbbb\nccc\nddd\neee") (sub-buffer 2 3) text)
            "bbb\nccc"))
-    (is (= (-> (buffer "aaa\nbbb\nccc\nddd\neee") (sub-buffer 1 3) get-text)
+    (is (= (-> (buffer "aaa\nbbb\nccc\nddd\neee") (sub-buffer 1 3) text)
            "aaa\nbbb\nccc"))
     (is (= (-> (buffer "aaa\nbbb\nccc\nddd\neee") down down down right (sub-buffer 2 4) :liq.buffer/cursor :liq.buffer/row)
            3))
@@ -59,52 +59,52 @@
     (is (= (point-compare {:liq.buffer/row 2 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 2}) 1))
     (is (= (point-compare {:liq.buffer/row 1 :liq.buffer/col 2} {:liq.buffer/row 1 :liq.buffer/col 2}) 0))))
 
-(deftest get-line-test
+(deftest line-test
   (testing "Get line"
-    (is (= (-> (buffer "") get-line) ""))
-    (is (= (-> (buffer "aaa") (get-line 1)) "aaa"))
-    (is (= (-> (buffer "aaa") (get-line 2)) ""))
-    (is (= (-> (buffer "\naaa") (get-line 2)) "aaa"))))
+    (is (= (-> (buffer "") line) ""))
+    (is (= (-> (buffer "aaa") (line 1)) "aaa"))
+    (is (= (-> (buffer "aaa") (line 2)) ""))
+    (is (= (-> (buffer "\naaa") (line 2)) "aaa"))))
 
-(deftest get-text-test
+(deftest text-test
   (testing "Get text"
     (let [buf (buffer "abc\n\ndef")]
-      (is (= (get-text buf) "abc\n\ndef"))
-      (is (= (get-text buf {:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 10}) "abc"))
-      (is (= (get-text buf {:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 3}) "abc"))
-      (is (= (get-text buf {:liq.buffer/row 1 :liq.buffer/col 4} {:liq.buffer/row 2 :liq.buffer/col 1}) "\n"))
-      (is (= (get-text buf {:liq.buffer/row 1 :liq.buffer/col 4} {:liq.buffer/row 9 :liq.buffer/col 1}) "\n\ndef"))
-      (is (= (get-text buf {:liq.buffer/row 4 :liq.buffer/col 10} {:liq.buffer/row 4 :liq.buffer/col 20}) ""))
-      (is (= (get-text buf {:liq.buffer/row 5 :liq.buffer/col 1} {:liq.buffer/row 5 :liq.buffer/col 2}) ""))
-      (is (= (get-text buf {:liq.buffer/row 1 :liq.buffer/col 10} {:liq.buffer/row 1 :liq.buffer/col 1}) "abc")))))
+      (is (= (text buf) "abc\n\ndef"))
+      (is (= (text buf {:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 10}) "abc"))
+      (is (= (text buf {:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 3}) "abc"))
+      (is (= (text buf {:liq.buffer/row 1 :liq.buffer/col 4} {:liq.buffer/row 2 :liq.buffer/col 1}) "\n"))
+      (is (= (text buf {:liq.buffer/row 1 :liq.buffer/col 4} {:liq.buffer/row 9 :liq.buffer/col 1}) "\n\ndef"))
+      (is (= (text buf {:liq.buffer/row 4 :liq.buffer/col 10} {:liq.buffer/row 4 :liq.buffer/col 20}) ""))
+      (is (= (text buf {:liq.buffer/row 5 :liq.buffer/col 1} {:liq.buffer/row 5 :liq.buffer/col 2}) ""))
+      (is (= (text buf {:liq.buffer/row 1 :liq.buffer/col 10} {:liq.buffer/row 1 :liq.buffer/col 1}) "abc")))))
 
 (deftest delete-region-test
   (testing "Delete region"
-    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 3}]) get-text) ""))
-    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 4}]) get-text) ""))
-    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 4} {:liq.buffer/row 1 :liq.buffer/col 4}]) get-text) "abc"))
-    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 5}]) get-text) ""))
-    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 1}]) get-text) "bc"))
-    (is (= (-> (buffer "") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 1}]) get-text) ""))
-    (is (= (-> (buffer "a\n") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 2} {:liq.buffer/row 2 :liq.buffer/col 0}]) get-text) "a"))
-    (is (= (-> (buffer "\n") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 0} {:liq.buffer/row 2 :liq.buffer/col 0}]) get-text) ""))
-    (is (= (-> (buffer "a\n") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 2} {:liq.buffer/row 2 :liq.buffer/col 1}]) get-text) "a"))
-    (is (= (-> (buffer "aa\n") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 2 :liq.buffer/col 0}]) get-text) ""))
-    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 3}]) get-text) ""))))
+    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 3}]) text) ""))
+    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 4}]) text) ""))
+    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 4} {:liq.buffer/row 1 :liq.buffer/col 4}]) text) "abc"))
+    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 5}]) text) ""))
+    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 1}]) text) "bc"))
+    (is (= (-> (buffer "") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 1}]) text) ""))
+    (is (= (-> (buffer "a\n") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 2} {:liq.buffer/row 2 :liq.buffer/col 0}]) text) "a"))
+    (is (= (-> (buffer "\n") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 0} {:liq.buffer/row 2 :liq.buffer/col 0}]) text) ""))
+    (is (= (-> (buffer "a\n") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 2} {:liq.buffer/row 2 :liq.buffer/col 1}]) text) "a"))
+    (is (= (-> (buffer "aa\n") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 2 :liq.buffer/col 0}]) text) ""))
+    (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 3}]) text) ""))))
 
 (deftest split-buffer-test
   (testing "Split buffer"
-    (is (= (map get-text (split-buffer (buffer ""))) (list "" "")))
-    (is (= (map get-text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 1})) (list "" "aabb")))
-    (is (= (map get-text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 2})) (list "a" "abb")))
-    (is (= (map get-text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 3})) (list "aa" "bb")))
-    (is (= (map get-text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 4})) (list "aab" "b")))
-    (is (= (map get-text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 5})) (list "aabb" "")))
-    (is (= (map get-text (split-buffer (buffer "aa\nbb") {:liq.buffer/row 2 :liq.buffer/col 1})) (list "aa\n" "bb")))
-    (is (= (map get-text (split-buffer (buffer "aa\n") {:liq.buffer/row 2 :liq.buffer/col 1})) (list "aa\n" "")))
-    (is (= (map get-text (split-buffer (buffer "aa\n") {:liq.buffer/row 2 :liq.buffer/col 0})) (list "aa\n" "")))
-    (is (= (map get-text (split-buffer (buffer "\nbb") {:liq.buffer/row 1 :liq.buffer/col 1})) (list "" "\nbb")))
-    (is (= (map get-text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 3})) (list "aa" "bb")))))
+    (is (= (map text (split-buffer (buffer ""))) (list "" "")))
+    (is (= (map text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 1})) (list "" "aabb")))
+    (is (= (map text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 2})) (list "a" "abb")))
+    (is (= (map text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 3})) (list "aa" "bb")))
+    (is (= (map text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 4})) (list "aab" "b")))
+    (is (= (map text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 5})) (list "aabb" "")))
+    (is (= (map text (split-buffer (buffer "aa\nbb") {:liq.buffer/row 2 :liq.buffer/col 1})) (list "aa\n" "bb")))
+    (is (= (map text (split-buffer (buffer "aa\n") {:liq.buffer/row 2 :liq.buffer/col 1})) (list "aa\n" "")))
+    (is (= (map text (split-buffer (buffer "aa\n") {:liq.buffer/row 2 :liq.buffer/col 0})) (list "aa\n" "")))
+    (is (= (map text (split-buffer (buffer "\nbb") {:liq.buffer/row 1 :liq.buffer/col 1})) (list "" "\nbb")))
+    (is (= (map text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 3})) (list "aa" "bb")))))
 
 (defn random-string
   [len]
@@ -145,7 +145,7 @@
   (doseq [n (range 20)]
     (let [buf (generate (rand-int 500))]
       ;(testing "Point = count before"
-      ;  (is (= (get-point buf) (-> buf before get-text count))))
+      ;  (is (= (get-point buf) (-> buf before text count))))
       ;(testing "Linenumber = Total lines in before"
       ;  (is (= (get-linenumber buf) (total-lines (before sl)))))
       ;(testing "Totallines = total lines before and total lines after - 1"
@@ -163,6 +163,6 @@
   (doseq [n (range 100)]
     (let [b1 (random-buffer)
           b2 (random-buffer)]
-      (is (= (get-text (append-buffer b1 b2)) (str (get-text b1) (get-text b2))))
-      (is (= (get-text (append-buffer b1 (buffer ""))) (get-text b1)))
+      (is (= (text (append-buffer b1 b2)) (str (text b1) (text b2))))
+      (is (= (text (append-buffer b1 (buffer ""))) (text b1)))
       )))

@@ -60,13 +60,13 @@
         buf0 (buffer/sub-buffer buf r1 r2)
         buf1 (fun buf0)
         req {:mode "smart"
-             :text (buffer/get-text buf1)
+             :text (buffer/text buf1)
              :options {:cursorX (dec (-> buf1 ::buffer/cursor ::buffer/col))
                        :cursorLine (dec (-> buf1 ::buffer/cursor ::buffer/row))
                        :forceBalance true
                        :prevCursorX (dec (-> buf0 ::buffer/cursor ::buffer/col))
                        :prevCursorLine (dec (-> buf0 ::buffer/cursor ::buffer/row))
-                       :prevText (buffer/get-text buf0)}}
+                       :prevText (buffer/text buf0)}}
         res (call-parinfer-rust req)]
     (if (and (= (res :exit) 0)) 
       (let [out (json/read-str (res :out) :key-fn keyword)]

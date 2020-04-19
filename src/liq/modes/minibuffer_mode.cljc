@@ -18,7 +18,7 @@
 
 (defn execute
   []
-  (let [content (buffer/get-text (editor/current-buffer))
+  (let [content (buffer/text (editor/current-buffer))
         ;[command param] (str/split content #" " 2)
         ]
     (apply-to-buffer buffer/clear)

@@ -215,7 +215,7 @@
    (previous-visible-row buf (-> buf ::cursor ::row))))
 
 
-(defn get-line
+(defn line
   "Get line as string"
   ([buf row]
    (str/join (map ::char (get (buf ::lines) (dec row)))))
@@ -224,28 +224,28 @@
      (if (> col (count r))
        ""
        (str/join (map ::char (subvec r (dec col)))))))
-  ([buf] (get-line buf (-> buf ::cursor ::row))))
+  ([buf] (line buf (-> buf ::cursor ::row))))
 
-(comment (pr-str (get-line (buffer "aaa\nbbb\nccc") 2)))
+(comment (pr-str (line (buffer "aaa\nbbb\nccc") 2)))
 
 (comment
   (str/join (map ::char (get ((buffer "abcde") ::lines) 1)))
-  (get-line (buffer "abcde") 1)
-  (get-line (buffer "abcde") 1 2)
-  (type (get-line (buffer "abcde") 2 2))
-  (type (get-line (buffer "abcde") 10))
-  (get-line (buffer "abcde") 1 10))
+  (line (buffer "abcde") 1)
+  (line (buffer "abcde") 1 2)
+  (type (line (buffer "abcde") 2 2))
+  (type (line (buffer "abcde") 10))
+  (line (buffer "abcde") 1 10))
 
-(defn get-word
+(defn word
   ([buf row col]
-   (loop [l (str/split (get-line buf row) #" ") idx 1]
+   (loop [l (str/split (line buf row) #" ") idx 1]
      (let [w (first l)]
        (if (or (> (+ (count w) idx) col) (empty? l))
        w
        (recur (rest l) (+ idx (count w) 1))))))
-  ([buf] (get-word buf (-> buf ::cursor ::row) (-> buf ::cursor ::col))))
+  ([buf] (word buf (-> buf ::cursor ::row) (-> buf ::cursor ::col))))
 
-(defn get-text
+(defn text
   ([buf]
    (str/join "\n" (map (fn [line] (str/join "" (map ::char line))) (buf ::lines))))
   ([buf p1 p2]
@@ -261,13 +261,13 @@
                 (= (inc n) (q ::row)) (str/join "" (map ::char (subvec (lines n) 0 (min (q ::col) (count (lines n))))))
                 (>= n (q ::row)) nil
                 true (str/join "" (map ::char (lines n)))))))))
-  ([buf r] (get-text buf (first r) (second r))))
+  ([buf r] (text buf (first r) (second r))))
 
 (comment
-  (get-text (buffer "abcdefg\n1234567\nABCDEF" {}) {::row 1 ::col 1} {::row 2 ::col 3})
-  (get-text (buffer "abcdefg\n1234567\nABCDEF" {}) {::row 1 ::col 2} {::row 2 ::col 3})
-  (get-text (buffer "abcdefg\n1234567\nABCDEF" {}) {::row 2 ::col 2} {::row 2 ::col 3})
-  (get-text (buffer "abcdefg\n\nABCDEF\n\n" {}) {::row 1 ::col 2} {::row 6 ::col 1} )
+  (text (buffer "abcdefg\n1234567\nABCDEF" {}) {::row 1 ::col 1} {::row 2 ::col 3})
+  (text (buffer "abcdefg\n1234567\nABCDEF" {}) {::row 1 ::col 2} {::row 2 ::col 3})
+  (text (buffer "abcdefg\n1234567\nABCDEF" {}) {::row 2 ::col 2} {::row 2 ::col 3})
+  (text (buffer "abcdefg\n\nABCDEF\n\n" {}) {::row 1 ::col 2} {::row 6 ::col 1} )
 )
 
 (defn previous-point
@@ -324,7 +324,7 @@
 (defn get-selected-text
   [buf]
   (if-let [p (get-selection buf)]
-    (get-text buf (buf ::cursor) p)
+    (text buf (buf ::cursor) p)
     ""))
 
 (defn selected?
@@ -556,8 +556,8 @@
             (adjust-hidden-rows row -1)))))
   ([buf] (delete-line buf (-> buf ::cursor ::row))))
 
-(comment (pr-str (get-text (-> (buffer "aaa\nbbb\nccc") down right delete-line))))
-(comment (pr-str (get-text (-> (buffer "aaa\nbbb\nccc") down down delete-line))))
+(comment (pr-str (text (-> (buffer "aaa\nbbb\nccc") down right delete-line))))
+(comment (pr-str (text (-> (buffer "aaa\nbbb\nccc") down down delete-line))))
 
 (defn delete
   ([buf p1 p2]
@@ -584,13 +584,13 @@
      buf)))
 
 
-(comment (pr-str (get-text (delete (buffer "aa\naa\naa") {::row 1 ::col 2} {::row 2 ::col 2}))))
-(comment (pr-str (get-text (delete (buffer "aa\nbb\ncc") {::row 2 ::col 2} {::row 3 ::col 2}))))
-(comment (pr-str (get-text (delete (buffer "aa\nbbccdd\nee") {::row 2 ::col 3} {::row 2 ::col 4}))))
-(comment (pr-str (get-text (delete (buffer "aa\nbb\ncc") {::row 1 ::col 2} {::row 3 ::col 2}))))
-(comment (pr-str (get-text (delete (buffer "aa\n\nbb\ncc") {::row 1 ::col 1} {::row 2 ::col 1}))))
-(comment (pr-str (get-text (delete (buffer "aa\n\nbb\ncc") {::row 2 ::col 1} {::row 4 ::col 2}))))
-(comment (pr-str (get-text (delete (buffer "aaaaS\nK\nTbbbb\nbbbb") {::row 1 ::col 1} {::row 2 ::col 0}))))
+(comment (pr-str (text (delete (buffer "aa\naa\naa") {::row 1 ::col 2} {::row 2 ::col 2}))))
+(comment (pr-str (text (delete (buffer "aa\nbb\ncc") {::row 2 ::col 2} {::row 3 ::col 2}))))
+(comment (pr-str (text (delete (buffer "aa\nbbccdd\nee") {::row 2 ::col 3} {::row 2 ::col 4}))))
+(comment (pr-str (text (delete (buffer "aa\nbb\ncc") {::row 1 ::col 2} {::row 3 ::col 2}))))
+(comment (pr-str (text (delete (buffer "aa\n\nbb\ncc") {::row 1 ::col 1} {::row 2 ::col 1}))))
+(comment (pr-str (text (delete (buffer "aa\n\nbb\ncc") {::row 2 ::col 1} {::row 4 ::col 2}))))
+(comment (pr-str (text (delete (buffer "aaaaS\nK\nTbbbb\nbbbb") {::row 1 ::col 1} {::row 2 ::col 0}))))
 
 
 
@@ -601,8 +601,8 @@
     (delete buf (first r) (second r))
     buf))
 
-(comment (get-text (delete-region (buffer "aaaa") [{::row 1 ::col 2} {::row 1 ::col 4}])))
-(comment (pr-str (get-text (delete-region (buffer "aa\naa\naa") [{::row 1 ::col 2} {::row 2 ::col 1}]))))
+(comment (text (delete-region (buffer "aaaa") [{::row 1 ::col 2} {::row 1 ::col 4}])))
+(comment (pr-str (text (delete-region (buffer "aa\naa\naa") [{::row 1 ::col 2} {::row 2 ::col 1}]))))
 
 (defn shrink-region
   [buf r]
@@ -634,7 +634,7 @@
         (insert-char \l)
         right
         (insert-char \m)
-        get-text)))
+        text)))
 
 (defn delete-to-line-end
   [buf]
@@ -654,11 +654,11 @@
                (delete-region buf [(start-point buf) {::row (p ::row) ::col (max 0 (dec (p ::col)))}])]))
   ([buf] (split-buffer buf (buf ::cursor))))
 
-(comment (map get-text (split-buffer (buffer "aaaaSTbbbb\nbbbb") {::row 1 ::col 6})))
-(comment (map get-text (split-buffer (buffer "aaaaS\nK\nTbbbb\nbbbb") {::row 2 ::col 1})))
-(comment (map get-text (split-buffer (buffer "aa") {::row 1 ::col 1})))
-(comment (map get-text (split-buffer (buffer "aa") {::row 2 ::col 1})))
-(comment (map get-text (split-buffer (buffer "aa\n\nccc") {::row 2 ::col 1})))
+(comment (map text (split-buffer (buffer "aaaaSTbbbb\nbbbb") {::row 1 ::col 6})))
+(comment (map text (split-buffer (buffer "aaaaS\nK\nTbbbb\nbbbb") {::row 2 ::col 1})))
+(comment (map text (split-buffer (buffer "aa") {::row 1 ::col 1})))
+(comment (map text (split-buffer (buffer "aa") {::row 2 ::col 1})))
+(comment (map text (split-buffer (buffer "aa\n\nccc") {::row 2 ::col 1})))
 
 
 (defn append-buffer
@@ -668,11 +668,11 @@
       (update ::lines #(into [] (concat % (rest (buf1 ::lines)))))
       (set-dirty true)))
 
-(comment (pr-str (get-text (append-buffer (buffer "aaa\nbbb") (buffer "ccc\ndddd")))))
-(comment (pr-str (get-text (append-buffer (buffer "aaa\n") (buffer "bbb")))))
-(comment (pr-str (get-text (append-buffer (buffer "aaa") (buffer "bbb\n\n")))))
-(comment (pr-str (get-text (buffer "bbb\n\n"))))
-(comment (pr-str (get-text (append-buffer (buffer "aaa") (buffer "\nbbb")))))
+(comment (pr-str (text (append-buffer (buffer "aaa\nbbb") (buffer "ccc\ndddd")))))
+(comment (pr-str (text (append-buffer (buffer "aaa\n") (buffer "bbb")))))
+(comment (pr-str (text (append-buffer (buffer "aaa") (buffer "bbb\n\n")))))
+(comment (pr-str (text (buffer "bbb\n\n"))))
+(comment (pr-str (text (append-buffer (buffer "aaa") (buffer "\nbbb")))))
 
 (defn insert-buffer
   ([buf p buf0]
@@ -684,21 +684,21 @@
   ([buf buf0]
    (insert-buffer buf (buf ::cursor) buf0)))
 
-(comment (pr-str (get-text (insert-buffer (buffer "aaa\n\nbbb") (buffer "")))))
-(comment (-> (buffer "aaa") end-of-buffer (insert-buffer (buffer "bbb")) get-text))
-(comment (-> (buffer "aaa\n") end-of-buffer (insert-buffer (buffer "bbb")) get-text))
+(comment (pr-str (text (insert-buffer (buffer "aaa\n\nbbb") (buffer "")))))
+(comment (-> (buffer "aaa") end-of-buffer (insert-buffer (buffer "bbb")) text))
+(comment (-> (buffer "aaa\n") end-of-buffer (insert-buffer (buffer "bbb")) text))
 (comment (-> (buffer "aaa\n") :liq.buffer/cursor pr-str println))
 (comment (-> (buffer "aaa\n") end-of-buffer :liq.buffer/cursor pr-str println))
 (comment (-> (buffer "aaa\nb") end-of-buffer :liq.buffer/cursor pr-str println))
 (comment (-> (buffer "aaa\n") end-of-buffer ::cursor))
-(comment (-> (buffer "aaa\n") end-of-buffer (insert-buffer (buffer "bbb")) get-text))
-(comment (get-text (insert-buffer (buffer "aaaaabbbbb") {::row 1 ::col 6} (buffer "cccc"))))
-(comment (get-text (insert-buffer (buffer "aaaaa\n\nbbbbb") {::row 2 ::col 1} (buffer "cccc"))))
-(comment (get-text (insert-buffer (buffer "aaaaabbbbb") (buffer "cccc"))))
+(comment (-> (buffer "aaa\n") end-of-buffer (insert-buffer (buffer "bbb")) text))
+(comment (text (insert-buffer (buffer "aaaaabbbbb") {::row 1 ::col 6} (buffer "cccc"))))
+(comment (text (insert-buffer (buffer "aaaaa\n\nbbbbb") {::row 2 ::col 1} (buffer "cccc"))))
+(comment (text (insert-buffer (buffer "aaaaabbbbb") (buffer "cccc"))))
 (comment (get-row (insert-buffer (buffer "aaaaabbbbb") (buffer "cccc"))))
-(comment (pr-str (get-text (insert-buffer (buffer "") (buffer "")))))
-(comment (get-text (insert-buffer (buffer "") (buffer ""))))
-(comment (pr-str (get-text (insert-buffer (buffer "aaa") (buffer "bbb\n")))))
+(comment (pr-str (text (insert-buffer (buffer "") (buffer "")))))
+(comment (text (insert-buffer (buffer "") (buffer ""))))
+(comment (pr-str (text (insert-buffer (buffer "aaa") (buffer "bbb\n")))))
 
 (defn insert-string
   [buf text]
@@ -713,7 +713,7 @@
 
 (defn first-non-blank
   [buf]
-  (let [l (get-line buf)
+  (let [l (line buf)
         col (+ (or (count (re-find #"\s*" l)) 0) 1)]
     (-> buf
         (assoc-in [::cursor ::col] col))))
@@ -898,13 +898,13 @@
   ([buf w]
    (let [b (assoc buf ::search-word w)
          regex (re-pattern w)
-         l (get-line b)
+         l (line b)
          s (subs l (min (-> b ::cursor ::col) (count l)))
          res (str/split s regex 2)]
      (if (>= (count res) 2)
        (right b (inc (count (first res))))
        (loop [row (inc (-> b ::cursor ::row))]
-         (let [s (get-line b row)]
+         (let [s (line b row)]
            (cond (re-find regex s) (assoc b ::cursor {::row row ::col (inc (count (first (str/split s regex 2))))})
                  (>= row (line-count b)) b
                  true (recur (inc row))))))))
@@ -918,7 +918,7 @@
   ([buf p]
    (let [p0 (paren-match-before buf (if (= (get-char buf p) \)) (previous-point buf p) p) \()
          p1 (when p0 (paren-match-after buf (next-point buf p0) \)))]
-     (when p1 (get-text buf p0 p1))))
+     (when p1 (text buf p0 p1))))
   ([buf] (sexp-at-point buf (buf ::cursor))))
 
 (defn word-beginnings
@@ -1106,7 +1106,7 @@
   (let [buf (buffer "aaa bbb ccc")]
     (match-before buf {::row 1 ::col 8} #"a"))
 
-  (pr-str (get-line (buffer "") 2))
+  (pr-str (line (buffer "") 2))
   
   (let [buf (buffer "ab[[cd]\nx[asdf]yz]")]
     (paren-match-before buf {::row 1 ::col 3} \]))
@@ -1120,28 +1120,28 @@
   (let [buf (buffer "abcd\nxyz")]
     (-> buf
         (set-char 5 6 \k)
-        get-text)))
+        text)))
 
 
 (comment
   (let [buf (buffer "abcd\nxyz")]
     (-> buf
         right
-        get-text)))
+        text)))
 
 
 (comment
-  (-> (buffer "") set-insert-mode (get-line 1) pr-str)
-  (-> (buffer "") set-insert-mode (insert-char \a) set-normal-mode (get-line 1) pr-str)
+  (-> (buffer "") set-insert-mode (line 1) pr-str)
+  (-> (buffer "") set-insert-mode (insert-char \a) set-normal-mode (line 1) pr-str)
   (-> (buffer "") set-insert-mode (insert-char \a) set-normal-mode ::cursor)
   (-> (buffer "") set-insert-mode (insert-char \a) set-normal-mode left right ::cursor)
   (-> (buffer "") set-insert-mode (insert-char \a) set-normal-mode left ::cursor)
   (-> (buffer "abcd\nxyz") (right 3) down)
   (= (-> (buffer "abcd\nxyz") (right 3) down get-char) \z)
-  (-> (buffer "abcd\nxyz") (insert-char 4 5 \k) get-text)
-  (-> (buffer "abcd\nxyz") append-line get-text)
+  (-> (buffer "abcd\nxyz") (insert-char 4 5 \k) text)
+  (-> (buffer "abcd\nxyz") append-line text)
 
-  (get-text (buffer "abcd\nxyz"))
+  (text (buffer "abcd\nxyz"))
   (end-of-line (buffer ""))
   (beginning-of-buffer (buffer ""))
   (insert-char (buffer "") \a)

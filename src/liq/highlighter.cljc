@@ -15,7 +15,7 @@
 (defn highlight-row
   [buf hl row initial-context]
   (loop [b buf col 1 context initial-context]
-    (let [line (buffer/get-line b row col)
+    (let [line (buffer/line b row col)
           hit (first (sort-by :pos
                        (filter :pos
                          (for [[reg con] (-> hl context :matchers)]
@@ -33,7 +33,7 @@
 (defn highlight
   ([buf hl]
    (loop [b buf row 1 col 1 context :plain]
-     (let [line (buffer/get-line b row col)
+     (let [line (buffer/line b row col)
            hit (first (sort-by :pos
                         (filter :pos
                           (for [[reg con] (-> hl context :matchers)]

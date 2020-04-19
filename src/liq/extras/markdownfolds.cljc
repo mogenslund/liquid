@@ -6,7 +6,7 @@
 
 (defn get-headline-level
   ([buf row]
-   (let [line (buffer/get-line buf row)]
+   (let [line (buffer/line buf row)]
      (cond (re-find #"^ [✔☐➜✘] " line) 10  
            (re-find #"^.def?n" line) 10  
            true (count (re-find #"^[#]+(?= )" line)))))
