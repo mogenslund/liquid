@@ -39,6 +39,7 @@
 (defn insert-in-vector
   "Insert an element into a vector, at a given position.
   (insert-in-vector [:a :c :d] 1 :b) -> [:a :b :c :d])
+  If not 0 <= n <= length an exception will be thrown.
   Input: Vector, position, element
   Output: Vector
   Side effects: None"

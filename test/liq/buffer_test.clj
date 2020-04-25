@@ -2,6 +2,24 @@
   (:require [clojure.test :refer :all]
             [liq.buffer :refer :all]))
 
+(deftest insert-in-vector-test
+  (testing "Insert into vector"
+    (is (= (insert-in-vector [1 2 3] 0 9) [9 1 2 3]))
+    (is (= (insert-in-vector [1 2 3] 1 9) [1 9 2 3]))
+    (is (= (insert-in-vector [1 2 3] 3 9) [1 2 3 9]))))
+
+(deftest remove-from-vector-test
+  (testing "Remove from vector, single"
+    (is (= (remove-from-vector [1 2 3] 0) [1 2 3]))
+    (is (= (remove-from-vector [1 2 3] 1) [2 3]))
+    (is (= (remove-from-vector [1 2 3] 2) [1 3]))
+    (is (= (remove-from-vector [1 2 3] 3) [1 2])))
+  (testing "Remove from vector, multi"
+    (is (= (remove-from-vector [1 2 3 4] 2 3) [1 4]))
+    (is (= (remove-from-vector [1 2 3 4] 2 2) [1 3 4]))
+    (is (= (remove-from-vector [1 2 3 4] 1 4) []))))
+    
+
 (deftest sub-buffer-test
   (testing "Sub buffer"
     (is (= (-> (buffer "aaa\nbbb\nccc\nddd\neee") (sub-buffer 2 3) text)
@@ -125,7 +143,7 @@
 
 (defn random-textoperation
   [buf]
-  (let [r (rand-int 12)]
+  (let [r (rand-int 18)]
     (cond (= r 0) (right buf 1)
           (= r 1) (right buf (rand-int 20))
           (= r 2) (left buf 1)
@@ -135,7 +153,11 @@
           (= r 6) (end-of-line buf)
           (= r 7) (end-of-word buf)
           (= r 8) (beginning-of-buffer buf)
-          :else (insert-string buf (random-string (rand-int 100))))))
+          (= r 9) (set-visual-mode buf)
+          (= r 10) (set-normal-mode buf)
+          (= r 11) (set-insert-mode buf)
+          (= r 12) (delete buf)
+          :else (insert-string buf (random-string (rand-int 200))))))
 
 (defn generate
   [n]
