@@ -112,7 +112,9 @@
   [buf]
   (let [text (buffer/line buf)]
     (util/set-clipboard-content text true)
-    (buffer/delete-line buf)))
+    (-> buf
+        buffer/set-undo-point
+        buffer/delete-line)))
 
 (defn copy-line
   []

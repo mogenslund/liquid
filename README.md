@@ -8,12 +8,12 @@
 * <b>Translatable</b>  -  Tiny core, simple model, no tricks
 * <b>Comfortable keybindings</b>  -  Most used commands are close at hand
 
-<br><br><br><br><br>
+<br><br><br><br><br><br><br>
 
 ## Who is this for
 &lambda;iquid is absolutely not for everyone! It is for you if
 
- * You get a kick of doing everything in Clojure
+ * You get a kick out of doing everything in Clojure
  * You love to tinker with your editor
  * Terminals are the best
  * You love distraction-free power
@@ -38,8 +38,6 @@ For discussions, help, tips and support, use
 ????? todo Inline clj deps command
 
 #### Starter kit
-????? todo Update liquid-starter-kit
-
 A place to start is [Liquid Starter Kit](https://github.com/mogenslund/liquid-starter-kit)
 
 It sort of corresponds to a sample `.emacs` file. Some code you can extend to create your own version of the editor.
