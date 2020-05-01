@@ -35,7 +35,8 @@ For discussions, help, tips and support, use
 ### Download and execution
 
 #### Quick start
-????? todo Inline clj deps command
+    clj -Sdeps '{:deps {mogenslund/liquid {:mvn/version "2.0.0"}}}' -m liq.core
+
 
 #### Starter kit
 A place to start is [Liquid Starter Kit](https://github.com/mogenslund/liquid-starter-kit)
