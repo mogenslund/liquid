@@ -5,7 +5,8 @@
             [liq.util :as util]))
 
 (def ^:private state
-  (atom {::tostringfun nil
+  (atom {::bufferid nil
+         ::tostringfun nil
          ::callback nil
          ::items nil
          ::filtered nil
@@ -34,6 +35,7 @@
 
 (defn run
   [items tostringfun callback]
+  (swap! state assoc ::bufferid ((editor/current-buffer) ::editor/id))
   (if-let [id (editor/get-buffer-id-by-name "*typeahead*")]
     (switch-to-buffer id)
     (editor/new-buffer "" {:major-modes (list :typeahead-mode) :name "*typeahead*"}))
@@ -50,7 +52,8 @@
   (let [st @state
         index (max (- (-> (editor/current-buffer) ::buffer/cursor ::buffer/row) 2) 0)
         res (first (drop index (st ::filtered)))] 
-    (editor/previous-buffer)
+    (editor/switch-to-buffer (@state ::bufferid))
+    ;(editor/previous-buffer)
     ((st ::callback) res)))
 
 (defn handle-input
