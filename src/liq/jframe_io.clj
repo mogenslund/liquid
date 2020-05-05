@@ -245,12 +245,13 @@
                 bgcolor (cond cursor-match :cursor1
                               (buffer/selected? buf row col) :selection
                               true :plain)
-                n-trow (if (< cols tcol) (inc trow) trow)
-                n-tcol (if (< cols tcol) left (inc tcol))
-                n-row (cond (and (< cols tcol) (> col (buffer/col-count buf row))) (buffer/next-visible-row buf row)
+                last-col (+ cols left -1)
+                n-trow (if (< last-col tcol) (inc trow) trow)
+                n-tcol (if (< last-col tcol) left (inc tcol))
+                n-row (cond (and (< last-col tcol) (> col (buffer/col-count buf row))) (buffer/next-visible-row buf row)
                             true row)
-                n-col (cond (and (< cols tcol) (> col (buffer/col-count buf row))) 1
-                            true (inc col))]
+                n-col (cond (and (< last-col tcol) (> col (buffer/col-count buf row))) 1
+                           true (inc col))]
               (draw-char g (str c) trow tcol color bgcolor)
               ;(when (and (= col (buffer/col-count buf row)) (> (buffer/next-visible-row buf row) (+ row 1))) (tty-print "…"))
               (recur n-trow n-tcol n-row n-col new-cursor-row new-cursor-col)))

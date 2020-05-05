@@ -33,27 +33,60 @@
         buffer/beginning-of-buffer
         buffer/insert-at-line-end)))
 
+(defn calc-frame
+  [buf search]
+  (editor/get-window)
+  (let [wcols ((editor/get-window) ::buffer/cols)
+        wrows ((editor/get-window) ::buffer/rows)
+        crow (+ (-> buf ::buffer/window ::buffer/top)
+                (-> buf ::buffer/cursor ::buffer/row)
+                (- (-> buf ::buffer/tow ::buffer/row)))
+        ccol (+ (-> buf ::buffer/window ::buffer/left)
+                (-> buf ::buffer/cursor ::buffer/col)
+                -1)
+        left (max 1 (min (- ccol (count search)) (- wcols 40)))
+        top (if (> (- wrows crow) 10)
+              crow
+              (max 1 (- crow 10)))
+        cols 40
+        rows 10]
+    (editor/message (str {:top top :left left :rows rows :cols cols}))
+    {:top top :left left :rows rows :cols cols}))
+
 (defn run
-  [items tostringfun callback]
+  [items tostringfun callback & {:keys [search position]}] ; :position nil or :relative
   (swap! state assoc ::bufferid ((editor/current-buffer) ::editor/id))
   (if-let [id (editor/get-buffer-id-by-name "*typeahead*")]
-    (switch-to-buffer id)
+    (editor/kill-buffer id))
+  (if (= position :relative)
+    (let [f (calc-frame (editor/get-buffer (@state ::bufferid)) search)]
+      (editor/new-buffer "" {:major-modes (list :typeahead-mode)
+                             :name "*typeahead*"
+                             :top (f :top)
+                             :left (f :left)
+                             :rows (f :rows)
+                             :cols (f :cols)}))
     (editor/new-buffer "" {:major-modes (list :typeahead-mode) :name "*typeahead*"}))
   (swap! state assoc
     ::tostringfun tostringfun
     ::callback callback
     ::items items
-    ::search ""
+    ::search (or search "")
     ::filtered items)
   (apply-to-buffer update-view))
+
+(defn abort-typeahead
+  []
+  (editor/kill-buffer "*typeahead*")
+  (editor/switch-to-buffer (@state ::bufferid)))
+ 
 
 (defn execute
   []
   (let [st @state
         index (max (- (-> (editor/current-buffer) ::buffer/cursor ::buffer/row) 2) 0)
         res (first (drop index (st ::filtered)))] 
-    (editor/switch-to-buffer (@state ::bufferid))
-    ;(editor/previous-buffer)
+    (abort-typeahead)
     ((st ::callback) res)))
 
 (defn handle-input
@@ -73,8 +106,8 @@
 
 (def mode
   {:insert handle-input
-   :normal {"q" editor/previous-buffer
-            "esc" editor/previous-buffer
+   :normal {"q" abort-typeahead
+            "esc" abort-typeahead
             "\n" execute
             "i" #(apply-to-buffer buffer/set-insert-mode)
             "h" :left 

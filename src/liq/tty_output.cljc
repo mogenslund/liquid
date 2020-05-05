@@ -140,11 +140,12 @@
                new-cursor-col (if cursor-match tcol cursor-col)
                color (theme (cm ::buffer/style))
                bgcolor (if (buffer/selected? buf row col) "48;5;17" "49")
-               n-trow (if (< cols tcol) (inc trow) trow)
-               n-tcol (if (< cols tcol) left (inc tcol))
-               n-row (cond (and (< cols tcol) (> col (buffer/col-count buf row))) (buffer/next-visible-row buf row)
+               last-col (+ cols left -1)
+               n-trow (if (< last-col tcol) (inc trow) trow)
+               n-tcol (if (< last-col tcol) left (inc tcol))
+               n-row (cond (and (< last-col tcol) (> col (buffer/col-count buf row))) (buffer/next-visible-row buf row)
                            true row)
-               n-col (cond (and (< cols tcol) (> col (buffer/col-count buf row))) 1
+               n-col (cond (and (< last-col tcol) (> col (buffer/col-count buf row))) 1
                            true (inc col))]
               (draw-char c trow tcol color bgcolor)
              (recur n-trow n-tcol n-row n-col new-cursor-row new-cursor-col)))

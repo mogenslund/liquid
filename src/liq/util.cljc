@@ -21,6 +21,10 @@
   #?(:clj (System/currentTimeMillis)
      :cljs (.getTime (js/Date.))))
 
+(defn windows?
+  []
+  (boolean (re-find #"(?i)windows" (System/getProperty "os.name"))))
+
 (defn sleep
   ""
   [ms]

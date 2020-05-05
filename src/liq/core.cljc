@@ -85,7 +85,7 @@
   (editor/add-mode :info-dialog-mode info-dialog-mode/mode)
   ;(editor/add-mode :spacemacs-mode spacemacs-mode/mode)
   (spacemacs-mode/load-spacemacs-mode)
-  (cond (read-arg args "--jframe")
+  (cond (or (read-arg args "--jframe") (util/windows?))
         (do
           (editor/set-output-handler jframe-io/output-handler)
           (jframe-io/init editor/handle-input)

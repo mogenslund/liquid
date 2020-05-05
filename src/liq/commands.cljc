@@ -330,7 +330,8 @@
 
    :paste-clipboard paste-clipboard
    :paste-clipboard-here paste-clipboard-here
-   :beginning-of-buffer #(non-repeat-fun buffer/beginning-of-buffer)
+
+   :beginning-of-buffer ^:motion #(buffer/beginning-of-buffer %1 %2)
    :navigate-definitions #(typeahead-defs (editor/current-buffer))
    :open-file-at-point open-file-at-point
    :end-of-buffer #(non-repeat-fun buffer/end-of-buffer)

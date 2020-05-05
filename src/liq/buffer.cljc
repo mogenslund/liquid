@@ -433,10 +433,14 @@
 
 (defn beginning-of-buffer
   "Move cursor to the beginning of the buffer"
-  [buf]
-  (-> buf
-      (assoc ::cursor {::row 1 ::col 1}) 
-      (assoc ::mem-col 1)))
+  ([buf n]
+   (-> buf
+       (assoc ::cursor {::row (min (max 1 (min n (line-count buf)))) ::col 1}) 
+       (assoc ::mem-col 1)))
+  ([buf]
+   (-> buf
+       (assoc ::cursor {::row 1 ::col 1}) 
+       (assoc ::mem-col 1))))
 
 
 (defn end-of-buffer
