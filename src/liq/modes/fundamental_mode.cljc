@@ -23,13 +23,8 @@
             "up" :up 
             "right" :right 
             "C-x" {"C-e" :eval-sexp-at-point} 
-            "M-x" (fn [] ;(when (not= (@editor/state ::repeat-counter) 0) (swap! editor/state assoc ::repeat-counter 0))
-                      (switch-to-buffer "*minibuffer*")
-                      (non-repeat-fun #(-> % buffer/clear
-                                             (buffer/insert-char \M)
-                                             (buffer/insert-char \-)
-                                             (buffer/insert-char \x)
-                                             (buffer/insert-char \space))))}
+            "M-x" (fn [] (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
+                       (((editor/get-mode :minibuffer-mode) :init) ":"))}
    :normal {"esc" (fn []
                     (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
                     (editor/invalidate-ui))
@@ -130,12 +125,10 @@
                  "w" :change-to-end-of-word}
             "C" :change-eol
             "/" (fn [] (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
-                       (switch-to-buffer "*minibuffer*")
-                       (non-repeat-fun #(-> % buffer/clear (buffer/insert-char \/))))
+                    (((editor/get-mode :minibuffer-mode) :init) "/"))
             "f" {:selfinsert buffer/search} 
             ":" (fn [] (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
-                       (switch-to-buffer "*minibuffer*")
-                       (non-repeat-fun #(-> % buffer/clear (buffer/insert-char \:))))
+                       (((editor/get-mode :minibuffer-mode) :init) ":")) 
             "Q" editor/record-macro
             "q" editor/run-macro
             "J" :join-lines-space
