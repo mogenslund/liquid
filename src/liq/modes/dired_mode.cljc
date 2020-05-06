@@ -51,11 +51,7 @@
         parent (buffer/line buf 1)
         f (if (= (-> buf ::buffer/cursor ::buffer/row) 1) "" (buffer/line buf))
         path (str parent "/" f)]
-    (switch-to-buffer "*minibuffer*")
-    (apply-to-buffer #(-> %
-                          buffer/clear
-                          (buffer/insert-string (str ":e " path))
-                          buffer/insert-at-line-end))))
+    (((editor/get-mode :minibuffer-mode) :init) (str ":e " path))))
 
 (def mode
   {:insert {"esc" (fn [] (apply-to-buffer #(-> % (assoc ::buffer/mode :normal) buffer/left)))
@@ -81,10 +77,8 @@
             "g" {"g" #(editor/apply-to-buffer buffer/beginning-of-buffer)}
             "G" #(apply-to-buffer buffer/end-of-buffer)
             "%" new-file
-            "/" (fn [] (switch-to-buffer "*minibuffer*")
-                       (apply-to-buffer #(-> % buffer/clear (buffer/insert-char \/))))
-            ":" (fn [] (switch-to-buffer "*minibuffer*")
-                       (apply-to-buffer #(-> % buffer/clear (buffer/insert-char \:))))}
+            "/" #(((editor/get-mode :minibuffer-mode) :init) "/")
+            ":" #(((editor/get-mode :minibuffer-mode) :init) ":")}
     :visual {"esc" #(apply-to-buffer buffer/set-normal-mode)}
     :init run
     :syntax
