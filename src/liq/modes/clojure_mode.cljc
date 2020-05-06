@@ -1,9 +1,26 @@
 (ns liq.modes.clojure-mode
   (:require [clojure.string :as str]
+            [clojure.repl :as repl]
             [liq.modes.fundamental-mode :as fundamental-mode]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer]
             [liq.util :as util]))
+
+(defn get-namespace
+  [buf]
+  (re-find #"(?<=\x28ns )[-a-zA-Z.]+" (buffer/text buf)))
+
+(defn get-functions
+  "List of alias replaced functions available from namespace"
+  [buf]
+  (let [n (or (get-namespace buf) "user")
+        funs (map str (repl/apropos ""))
+        al (ns-aliases (symbol n))]
+    (map #(str/replace % "clojure.core/" "")
+      (reduce (fn [l [short full]]
+                  (map #(str/replace % (re-pattern (str "^" full "/")) (str short "/")) l))       
+              funs
+              al))))
 
 (def match
   {:keyword-begin #"(?<=(\s|\(|\[|\{)|^):[\w\#\.\-\_\:\+\=\>\<\/\!\?\*]+(?=(\s|\)|\]|\}|\,|$))"

@@ -6,6 +6,7 @@
             [liq.modes.help-mode :as help-mode]
             [liq.modes.dired-mode :as dired-mode]
             [liq.modes.typeahead-mode :as typeahead-mode]
+            [liq.tools.word-completion :as word-completion]
             [liq.modes.clojure-mode :as clojure-mode]
             [liq.modes.spacemacs-mode :as spacemacs-mode]
             [liq.modes.parinfer-mode :as parinfer-mode]
@@ -69,7 +70,6 @@
   (swap! editor/state assoc-in [:liq.editor/commands :poff]
     (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes (fn [l] (remove (fn [elem] (= elem :parinfer-mode)) l)))))))
 
-
 ;; clj -m liq.experiments.core
 (defn -main
   [& args]
@@ -85,6 +85,7 @@
   (editor/add-mode :info-dialog-mode info-dialog-mode/mode)
   ;(editor/add-mode :spacemacs-mode spacemacs-mode/mode)
   (spacemacs-mode/load-spacemacs-mode)
+  (swap! editor/state assoc-in [::editor/modes :fundamental-mode :insert "\t"] word-completion/word-typeahead)
   (cond (or (read-arg args "--jframe") (util/windows?))
         (do
           (editor/set-output-handler jframe-io/output-handler)
