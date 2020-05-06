@@ -1,6 +1,7 @@
 (ns liq.modes.clojure-mode
   (:require [clojure.string :as str]
             [clojure.repl :as repl]
+            [clojure.java.io :as io]
             [liq.modes.fundamental-mode :as fundamental-mode]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer]
@@ -22,6 +23,21 @@
               funs
               al))))
 
+(defn goto-definition
+  [buf]
+  (let [fun (re-find #"\w.*\w" (-> buf buffer/left buffer/word))
+        cpaths (seq (.getURLs (java.lang.ClassLoader/getSystemClassLoader)))]
+    (when fun
+      (try
+        (let [info (load-string (str "(meta #'" fun ")"))
+              path (first (filter #(.exists %) (map #(io/file % (info :file)) cpaths)))]
+          (when path
+            (editor/open-file (str path))
+            (editor/apply-to-buffer #(-> %
+                                         (buffer/beginning-of-buffer (or (info :line) 1))
+                                         (assoc ::buffer/tow {::buffer/row (or (info :line) 1) ::buffer/col 1})))))
+        (catch Exception e (str "caught exception: " (.getMessage e)))))))
+
 (def match
   {:keyword-begin #"(?<=(\s|\(|\[|\{)|^):[\w\#\.\-\_\:\+\=\>\<\/\!\?\*]+(?=(\s|\)|\]|\}|\,|$))"
    :keyword-end #".|$"
@@ -40,7 +56,8 @@
    :definition-end #"."})
 
 (def mode
-   {:syntax
+   {:normal {"g" (assoc ((fundamental-mode/mode :normal) "g") "D" #(goto-definition (editor/current-buffer)))}
+    :syntax
      {:plain ; Context
        {:style :plain1 ; style
         :matchers {(match :string-begin) :string
