@@ -267,8 +267,8 @@
    (loop [l (str/split (line buf row) #" ") idx 1]
      (let [w (first l)]
        (if (or (> (+ (count w) idx) col) (empty? l))
-       w
-       (recur (rest l) (+ idx (count w) 1))))))
+         (or w "")
+         (recur (rest l) (+ idx (count w) 1))))))
   ([buf p] (word buf (p ::row) (p ::col)))
   ([buf] (word buf (-> buf ::cursor ::row) (-> buf ::cursor ::col))))
 

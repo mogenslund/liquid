@@ -96,6 +96,12 @@
       (is (= (text buf {:liq.buffer/row 5 :liq.buffer/col 1} {:liq.buffer/row 5 :liq.buffer/col 2}) ""))
       (is (= (text buf {:liq.buffer/row 1 :liq.buffer/col 10} {:liq.buffer/row 1 :liq.buffer/col 1}) "abc")))))
 
+(deftest word-test
+  (testing "Get current word"
+    (is (= (word (-> (buffer "aaa bbb ccc") (right 4))) "bbb"))
+    (is (= (word (buffer "")) ""))))
+  
+
 (deftest delete-region-test
   (testing "Delete region"
     (is (= (-> (buffer "abc") (delete-region [{:liq.buffer/row 1 :liq.buffer/col 1} {:liq.buffer/row 1 :liq.buffer/col 3}]) text) ""))
