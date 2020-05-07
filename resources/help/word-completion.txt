@@ -1,0 +1,35 @@
+help.txt word-completion.txt                                          salza.dk
+
+                             Word completion
+
+
+Word provides a typeahead list of suggestions based on the word under the
+cursor. The suggestion buffer works like a regular buffer except insert mode
+works as a filter.
+
+The suggestions are based on functions from required namespaces and optionally
+from a word list.
+
+==============================================================================
+Usage
+
+Type something, then press TAB. A buffer is created below the cursor. Continue
+typeahead. When the target suggestion is displayed press ESC to enter normal
+mode. Now use j and k to move the cursor between the suggestions. Press ENTER
+to choose.
+
+Press ESC a couple of times to cancel.
+
+==============================================================================
+Specifying wordlist
+
+A wordlist can be specified by setting the setting :word-list-path.
+
+On Linux systems there are usually a wordlist on the path:  
+
+    /usr/share/dict/words
+
+To use is add the following to your .liq file:
+
+    (editor/set-setting :word-list-path "/usr/share/dict/words")
+
