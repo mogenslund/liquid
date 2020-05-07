@@ -56,54 +56,60 @@
    :definition-end #"."})
 
 (def mode
-   {:normal {"g" (assoc ((fundamental-mode/mode :normal) "g") "D" #(goto-definition (editor/current-buffer)))}
-    :syntax
-     {:plain ; Context
-       {:style :plain1 ; style
-        :matchers {(match :string-begin) :string
-                   (match :keyword-begin) :keyword
-                   (match :comment-begin) :comment
-                   (match :green-begin) :green
-                   (match :yellow-begin) :yellow
-                   (match :red-begin) :red
-                   (match :bold-begin) :bold
-                   (match :special-begin) :special}}
-      :string
+  {:normal {"g" (assoc ((fundamental-mode/mode :normal) "g") "D" #(goto-definition (editor/current-buffer)))}
+   :syntax
+    {:plain ; Context
+      {:style :plain1 ; style
+       :matchers {(match :string-begin) :string
+                  (match :keyword-begin) :keyword
+                  (match :comment-begin) :comment
+                  (match :green-begin) :green
+                  (match :yellow-begin) :yellow
+                  (match :red-begin) :red
+                  (match :bold-begin) :bold
+                  (match :special-begin) :special
+                  #"[-a-zA-Z0-9]+\.txt" :topic
+                  #"---.*---" :topic
+                  #"===.*===" :topic}}
+     :string
        {:style :string
         :matchers {(match :string-escape) :string
                    (match :string-end) :string-end}}
-      :string-end
+     :string-end
        {:style :string
         :matchers {#".|$|^" :plain}}
 
-      :comment
+     :comment
        {:style :comment
         :matchers {(match :comment-end) :plain}}
 
-      :keyword
+     :keyword
        {:style :keyword
         :matchers {(match :keyword-end) :plain}}
       
-      :special
+     :special
        {:style :special
         :matchers {(match :definition-begin) :definition}}
 
-      :green
+     :green
        {:style :green
         :matchers {#".|$|^" :plain}}
 
-      :yellow
+     :yellow
        {:style :yellow
         :matchers {#".|$|^" :plain}}
 
-      :red
+     :red
        {:style :red
         :matchers {#".|$|^" :plain}}
 
-      :bold
+     :bold
        {:style :green
         :matchers {(match :bold-end) :plain}}
 
-      :definition
+     :definition
        {:style :definition
-        :matchers {(match :definition-end) :plain}}}})
+        :matchers {(match :definition-end) :plain}}
+
+     :topic {:style :definition
+             :matchers {#".|$" :plain}}}})

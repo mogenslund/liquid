@@ -60,28 +60,4 @@
             "J" #(fn [])
             "\n" load-topic-at-point
             "C-]" load-topic-at-point}
-    :init run
-    :syntax
-      (-> clojure-mode/mode
-          :syntax
-          (assoc-in [:plain :matchers #"[-a-zA-Z0-9]+\.txt"] :topic)
-          (assoc-in [:plain :matchers #"---.*---"] :topic)
-          (assoc-in [:plain :matchers #"===.*==="] :topic)
-          (assoc :topic {:style :definition
-                         :matchers {#".|$" :plain}}))})
-     ;{:plain ; Context
-     ;  {:style :plain ; style
-     ;   :matchers {#"[-a-zA-Z0-9]+\.txt" :topic
-     ;              #"---.*---" :topic
-     ;              #"===.*===" :topic}}
-     ; :topic
-     ;  {:style :definition
-     ;   :matchers {#".|$" :plain}}}})
-
-
-
-
-
-
-
-
+    :init run})
