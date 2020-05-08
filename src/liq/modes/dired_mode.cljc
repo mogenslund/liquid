@@ -4,6 +4,9 @@
             [liq.buffer :as buffer]
             [liq.util :as util]))
 
+(def ^:private state
+  (atom {::bufferid nil}))
+
 (defn load-content
   [buf folder]
   (-> buf
@@ -19,6 +22,7 @@
 
 (defn run
   ([path]
+   (swap! state assoc ::bufferid ((editor/current-buffer) ::editor/id))
    (let [f (or path ((editor/current-buffer) ::buffer/filename) ".")
          folder (util/absolute (util/get-folder f))
          id (editor/get-buffer-id-by-name "*dired*")]
@@ -53,11 +57,18 @@
         path (str parent "/" f)]
     (((editor/get-mode :minibuffer-mode) :init) (str ":e " path))))
 
+(defn abort-dired
+  []
+  (editor/kill-buffer "*dired*")
+  (editor/switch-to-buffer (@state ::bufferid)))
+ 
+
 (def mode
   {:insert {"esc" (fn [] (apply-to-buffer #(-> % (assoc ::buffer/mode :normal) buffer/left)))
             "\n" choose}
-   :normal {"q" editor/previous-buffer
-            "esc" editor/previous-buffer
+   :normal {"q" abort-dired 
+            "esc" abort-dired
+            "backspace" (fn [] (apply-to-buffer #(-> % buffer/beginning-of-buffer buffer/down)) (choose))
             "\n" choose
             "h" :left 
             "j" :down
@@ -74,7 +85,8 @@
             "n" #(apply-to-buffer buffer/search)
             "0" #(apply-to-buffer buffer/beginning-of-line)
             "$" #(apply-to-buffer buffer/end-of-line)
-            "g" {"g" #(editor/apply-to-buffer buffer/beginning-of-buffer)}
+            "g" {"g" #(editor/apply-to-buffer buffer/beginning-of-buffer)
+                 "l" :navigate-lines}
             "G" #(apply-to-buffer buffer/end-of-buffer)
             "%" new-file
             "/" #(((editor/get-mode :minibuffer-mode) :init) "/")

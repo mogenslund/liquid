@@ -130,6 +130,11 @@
     (is (= (map text (split-buffer (buffer "\nbb") {:liq.buffer/row 1 :liq.buffer/col 1})) (list "" "\nbb")))
     (is (= (map text (split-buffer (buffer "aabb") {:liq.buffer/row 1 :liq.buffer/col 3})) (list "aa" "bb")))))
 
+(deftest end-of-word-test
+  (testing "End-of-word"
+    (is (= (-> (buffer "aaa bbb ccc") (right 100) end-of-word :liq.buffer/cursor) {:liq.buffer/row 1 :liq.buffer/col 11}))
+    (is (= (-> (buffer "\n") down end-of-word :liq.buffer/cursor) {:liq.buffer/row 2 :liq.buffer/col 1}))))
+
 (defn random-string
   [len]
   (let [chars ["a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "æ" "A" "B" "-" " " "\n" "\r" "$" "\t" "-" ":"]]
@@ -170,8 +175,8 @@
   (nth (iterate random-textoperation (buffer "")) n))
 
 (deftest properties-test
-  (doseq [n (range 20)]
-    (let [buf (generate (rand-int 500))]
+  (doseq [n (range 50)]
+    (let [buf (generate (rand-int 200))]
       ;(testing "Point = count before"
       ;  (is (= (get-point buf) (-> buf before text count))))
       ;(testing "Linenumber = Total lines in before"
@@ -182,7 +187,7 @@
       ;            (total-lines (after buf))
       ;            -1))))
       (testing "Insert string -> delete (count string) is invariant"
-        (let [len (rand-int 100)
+        (let [len (rand-int 20)
               text (random-string len)]
           (is (= (buf (-> buf (insert-string text) (delete-char len)))))))
     )))

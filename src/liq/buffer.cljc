@@ -488,6 +488,7 @@
    (get-char buf (-> buf ::cursor ::row) (-> buf ::cursor ::col))))
 
 
+(comment (-> (buffer "\n") down get-char))
 (comment
   
   (get-char (buffer "abcd\nxyz"))
@@ -632,6 +633,7 @@
      buf)))
 
 
+(comment (pr-str (text (delete (buffer "") {::row 1 ::col 2} {::row 1 ::col 2}))))
 (comment (pr-str (text (delete (buffer "aa\naa\naa") {::row 1 ::col 2} {::row 2 ::col 2}))))
 (comment (pr-str (text (delete (buffer "aa\nbb\ncc") {::row 2 ::col 2} {::row 3 ::col 2}))))
 (comment (pr-str (text (delete (buffer "aa\nbbccdd\nee") {::row 2 ::col 3} {::row 2 ::col 4}))))
@@ -1004,13 +1006,25 @@
            cols (col-count b (p ::row))
            c (str (get-char b))
            is-word (re-matches #"\w" c)]
-       (cond (and (= rows 1) (= cols 0)) b
+
+        ;  If p1 is after p2 1 is returned.
+       (cond (>= (point-compare p (end-point b)) 0) b
+             (and (= rows 1) (= cols 0)) b
              (= p {::row rows ::col cols}) b 
              (and is-word (= (p ::col) cols)) b
              (= (p ::col) cols) (recur (next-point b))
              (and is-word (re-matches #"\W" (str (get-char (right b))))) b
              true (recur (right b))))))
   ([buf n] (nth (iterate end-of-word buf) n)))
+
+(comment (-> (buffer "aaa bbb ccc") (right 100) end-of-word ::cursor))
+(comment (-> (buffer "") (right 100) end-of-word ::cursor))
+(comment (-> (buffer "\n") (right 100) (down 100) ::cursor))
+(comment (-> (buffer "\n") (right 100) (down 100) end-of-word ::cursor))
+(comment (-> (buffer "\n") (down 1) end-of-word ::cursor))
+(comment (-> (buffer "\n\n") (down 1) end-of-word ::cursor))
+(comment (-> (buffer "\n") end-point))
+(comment (-> (buffer "\n") down ::cursor))
 
 (defn end-of-word-region
   ([buf]
@@ -1027,7 +1041,8 @@
            cols (col-count b (p ::row))
            c (str (get-char b))
            is-word (re-matches #"\S" c)]
-       (cond (= p {::row rows ::col cols}) b 
+       (cond (>= (point-compare p (end-point b)) 0) b
+             (= p {::row rows ::col cols}) b 
              (and is-word (= (p ::col) cols)) b
              (= (p ::col) cols) (recur (next-point b))
              (and is-word (re-matches #"\s" (str (get-char (right b))))) b
@@ -1068,7 +1083,8 @@
            cols (col-count b (p ::row))
            c (str (get-char b))
            is-word (re-matches #"\w" c)]
-       (cond (= p {::row rows ::col cols}) b 
+       (cond (>= (point-compare p (end-point b)) 0) b
+             (= p {::row rows ::col cols}) b 
              (and is-word (= (p ::col) 1)) b
              (and is-word (re-matches #"\W" (str (get-char (left b))))) b
              true (recur (next-point b))))))
@@ -1082,7 +1098,8 @@
            cols (col-count b (p ::row))
            c (str (get-char b))
            is-word (re-matches #"\S" c)]
-       (cond (= p {::row rows ::col cols}) b 
+       (cond (>= (point-compare p (end-point b)) 0) b
+             (= p {::row rows ::col cols}) b 
              (and is-word (= (p ::col) 1)) b
              (and is-word (re-matches #"\s" (str (get-char (left b))))) b
              true (recur (next-point b))))))
