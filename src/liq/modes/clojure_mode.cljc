@@ -38,6 +38,15 @@
                                          (assoc ::buffer/tow {::buffer/row (or (info :line) 1) ::buffer/col 1})))))
         (catch Exception e (str "caught exception: " (.getMessage e)))))))
 
+(defn goto-definition-local
+  [buf]
+  (let [fun (re-find #"\w.*\w" (-> buf buffer/left buffer/word))
+        hit #(-> %
+                 buffer/beginning-of-buffer
+                 (buffer/search (str "\\x28defn? " fun)))]
+    (when (and fun (> (-> (hit buf) ::buffer/cursor ::buffer/row) 1))
+      (editor/apply-to-buffer hit))))
+
 (def match
   {:keyword-begin #"(?<=(\s|\(|\[|\{)|^):[\w\#\.\-\_\:\+\=\>\<\/\!\?\*]+(?=(\s|\)|\]|\}|\,|$))"
    :keyword-end #".|$"
@@ -56,7 +65,9 @@
    :definition-end #"."})
 
 (def mode
-  {:normal {"g" (assoc ((fundamental-mode/mode :normal) "g") "D" #(goto-definition (editor/current-buffer)))}
+  {:normal {"g" (assoc ((fundamental-mode/mode :normal) "g")
+                       "D" #(goto-definition (editor/current-buffer))
+                       "d" #(goto-definition-local (editor/current-buffer)))}
    :syntax
     {:plain ; Context
       {:style :plain1 ; style

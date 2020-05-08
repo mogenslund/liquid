@@ -83,6 +83,7 @@
             "P" :paste-clipboard-here
             "g" {"g" :beginning-of-buffer
                  "i" :navigate-definitions
+                 "l" :navigate-lines
                  "f" :open-file-at-point
                  "J" :join-lines}
             "G" :end-of-buffer

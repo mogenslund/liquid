@@ -87,7 +87,8 @@
         index (max (- (-> (editor/current-buffer) ::buffer/cursor ::buffer/row) 2) 0)
         res (first (drop index (st ::filtered)))] 
     (abort-typeahead)
-    ((st ::callback) res)))
+    (when res
+      ((st ::callback) res))))
 
 (defn handle-input
   [c]

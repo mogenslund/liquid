@@ -12,7 +12,7 @@
   (when (and (nil? @word-list) (editor/get-setting :word-list-path))
     (reset! word-list (str/split-lines (slurp (editor/get-setting :word-list-path)))))
   (let [buf (editor/current-buffer)
-        w (or (re-find #"\w.*\w" (-> buf buffer/left buffer/word)) "")
+        w (or (re-find #"\w.*[\w/-_\\.]" (-> buf buffer/left buffer/word)) "")
         functionlist (clojure-mode/get-functions buf)]
     (((editor/get-mode :typeahead-mode) :init)
      (filter #(re-find (re-pattern (str "^" w)) %) (concat functionlist @word-list))

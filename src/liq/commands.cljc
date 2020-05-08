@@ -160,6 +160,17 @@
                                                                        (assoc ::buffer/cursor {::buffer/row (first res) ::buffer/col 1})
                                                                        (assoc ::buffer/tow {::buffer/row (first res) ::buffer/col 1})))))))
 
+(defn typeahead-lines
+  [buf]
+  (let [lines (map #(vector % (buffer/line buf %))
+                   (range 1 (inc (buffer/line-count buf))))]
+    (((editor/get-mode :typeahead-mode) :init) lines 
+                                               second
+                                               (fn [res]
+                                                 (apply-to-buffer #(-> %
+                                                                       (assoc ::buffer/cursor {::buffer/row (first res) ::buffer/col 1})
+                                                                       (assoc ::buffer/tow {::buffer/row (first res) ::buffer/col 1})))))))
+
 (defn get-namespace
   [buf]
   (let [content (buffer/line buf 1)]
@@ -333,6 +344,7 @@
 
    :beginning-of-buffer ^:motion #(buffer/beginning-of-buffer %1 %2)
    :navigate-definitions #(typeahead-defs (editor/current-buffer))
+   :navigate-lines #(typeahead-lines (editor/current-buffer))
    :open-file-at-point open-file-at-point
    :end-of-buffer #(non-repeat-fun buffer/end-of-buffer)
    :scroll-cursor-top (fn [] (non-repeat-fun #(assoc % ::buffer/tow {::buffer/row (-> % ::buffer/cursor ::buffer/row) ::buffer/col 1})))
