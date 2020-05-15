@@ -5,7 +5,8 @@
             [liq.modes.fundamental-mode :as fundamental-mode]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer]
-            [liq.util :as util]))
+            [liq.util :as util])
+  (:import [java.net URLClassLoader]))
 
 (defn get-namespace
   [buf]
@@ -23,20 +24,47 @@
               funs
               al))))
 
+(defn property-classpath
+  []
+  (.split (System/getProperty "java.class.path") (System/getProperty "path.separator")))
+
+(defn classloaders-classpath
+  []
+  (->> (.getContextClassLoader (Thread/currentThread)) 
+       (iterate #(.getParent ^ClassLoader %))
+       (take-while identity)
+       (filter #(instance? URLClassLoader %))
+       (mapcat #(.getURLs ^URLClassLoader %))))
+
+(defn classpaths
+  []
+  (distinct (concat (property-classpath) (classloaders-classpath))))
+
+(defn file-of-var
+  [a-var]
+  (when-some [path (some-> a-var meta :file)]
+    (first (sequence (comp (map #(io/file % path)) (filter #(.exists %))) (classpaths)))))
+
+(let [this-ns *ns*]
+  (defn var-at-point
+    [buf]
+    (some->> (re-find #"\w.*\w" (-> buf buffer/left buffer/word)) symbol (ns-resolve this-ns))))
+
+(defn goto-var
+  [file var]
+  (editor/open-file (str file))
+  (editor/apply-to-buffer #(let [line (or (-> var meta :line) 1)]
+                             (-> %
+                                 (buffer/beginning-of-buffer line)
+                                 (assoc ::buffer/tow {::buffer/row line ::buffer/col 1})))))
+
 (defn goto-definition
   [buf]
-  (let [fun (re-find #"\w.*\w" (-> buf buffer/left buffer/word))
-        cpaths (seq (.getURLs (java.lang.ClassLoader/getSystemClassLoader)))]
-    (when fun
-      (try
-        (let [info (load-string (str "(meta #'" fun ")"))
-              path (first (filter #(.exists %) (map #(io/file % (info :file)) cpaths)))]
-          (when path
-            (editor/open-file (str path))
-            (editor/apply-to-buffer #(-> %
-                                         (buffer/beginning-of-buffer (or (info :line) 1))
-                                         (assoc ::buffer/tow {::buffer/row (or (info :line) 1) ::buffer/col 1})))))
-        (catch Exception e (str "caught exception: " (.getMessage e)))))))
+  (try
+    (when-some [var (var-at-point buf)]
+      (when-some [file (file-of-var var)]
+        (goto-var file var)))
+    (catch Exception e (str e))))
 
 (defn goto-definition-local
   [buf]
