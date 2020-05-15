@@ -1,0 +1,75 @@
+help.txt how-it-works.txt                                             salza.dk
+
+
+                            How it works
+
+
+This article describes how the editor works. How the internal mechanics work. 
+
+The outline of the article will follow the internal flow from key press to
+characters written on the display. 
+
+The flow is:
+
+      Keypress  ->  Handle input  ->  Execute action  ->  Paint buffer
+
+==============================================================================
+Keypress
+
+In the editor, there is a function liq.editor/handle-input which takes a  
+keypress as a string, like "a", "A" or "C-a" and "C-M-a" and modifies the  
+editor data accordingly. This function works as a standardized interface for  
+different kind of input mechanisms. The function is given as input for the 
+input handlers, like liq.tty-input and liq.jframe-io. These input handlers 
+read keypresses, transforms them and sends the result to the editor.
+
+The reason the handle-input function is given as input to the input handler, 
+is to completely separate input handling and the editor. Both ends can then be
+tested independently!
+
+In the tty-input case the main function liq.core/-main calls
+liq.tty-input/input-handler with liq.editor/handle-input as argument.
+The liq.tty-input/input-handler starts a loop, waiting for inputs. Each input
+is transformed to the "a", "C-a" like format and send to
+liq.editor/handle-input.
+
+==============================================================================
+Handle input
+
+Through the liq.editor/handle-input function the editor receives the  
+keypresses as strings in shapes like "a", "A", "C-a" etc. 
+
+The main purpose of the handle-input function is to decide what action should
+be executed. How the editor should be transformed.
+
+The function checks different maps in order to check if one of the keys is 
+matching the keypress. If so the corresponding value determines the action. 
+
+The major-modes list on the current buffer contains some of these maps. 
+Sometimes the value is a map itself. In that case the map is used as part of 
+resolving the next keypress. This way keymaps can be nested to provide 
+combinations like "c c p".
+
+==============================================================================
+Execute action
+
+Many actions use the liq.editor/apply-to-buffer function. This function takes
+another function that takes a buffer and returns a buffer. Many actions like
+up, down, left, right etc. are defined by buffer -> buffer functions.
+
+The buffer -> buffer functions are pure and easy to test.
+
+==============================================================================
+Paint buffers
+
+Using the function liq.editor/set-output-handler an output handler can be set
+for displaying buffers and providing information about the dimensions of the
+output device.
+
+The output handler is "injected" into the editor, again to separate concerns
+and make testing easier.
+
+When an action has been executed the liq.editor/paint-buffer calls the output
+handler function with the current buffer as input.
+
+See output-handler.txt for more details.

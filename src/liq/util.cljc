@@ -51,7 +51,7 @@
 
 (defn resolve-home
   [path]
-  (str/replace path #"^~" (str/replace (System/getProperty "user.home") "\\" "\\\\")))
+  (.getCanonicalPath (io/file (str/replace path #"^~" (str/replace (System/getProperty "user.home") "\\" "\\\\")))))
 
 (defn resolve-path
   [part alternative-parent]

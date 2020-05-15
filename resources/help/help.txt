@@ -43,3 +43,4 @@ typeahead-mode.txt
 jack-in.txt
 cool-stuff.txt
 word-completion.txt
+how-it-works.txt

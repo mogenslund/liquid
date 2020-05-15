@@ -11,3 +11,8 @@ typeahead will filter the headlines and def/defns. If the target is the
 topmost entry type ENTER. Otherwise type ESC to enter normal mode. Then 
 navigate to the target using hjkl or arrow keys and press ENTER on the 
 target, to do the navigation.
+
+==============================================================================
+Games
+
+ * Snake, type :snake<ENTER> to start.

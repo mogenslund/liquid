@@ -111,44 +111,44 @@
                   #"---.*---" :topic
                   #"===.*===" :topic}}
      :string
-       {:style :string
-        :matchers {(match :string-escape) :string
-                   (match :string-end) :string-end}}
+      {:style :string
+       :matchers {(match :string-escape) :string
+                  (match :string-end) :string-end}}
      :string-end
-       {:style :string
-        :matchers {#".|$|^" :plain}}
+      {:style :string
+       :matchers {#".|$|^" :plain}}
 
      :comment
-       {:style :comment
-        :matchers {(match :comment-end) :plain}}
+      {:style :comment
+       :matchers {(match :comment-end) :plain}}
 
      :keyword
-       {:style :keyword
-        :matchers {(match :keyword-end) :plain}}
+      {:style :keyword
+       :matchers {(match :keyword-end) :plain}}
       
      :special
-       {:style :special
-        :matchers {(match :definition-begin) :definition}}
+      {:style :special
+       :matchers {(match :definition-begin) :definition}}
 
      :green
-       {:style :green
-        :matchers {#".|$|^" :plain}}
+      {:style :green
+       :matchers {#".|$|^" :plain}}
 
      :yellow
-       {:style :yellow
-        :matchers {#".|$|^" :plain}}
+      {:style :yellow
+       :matchers {#".|$|^" :plain}}
 
      :red
-       {:style :red
-        :matchers {#".|$|^" :plain}}
+      {:style :red
+       :matchers {#".|$|^" :plain}}
 
      :bold
-       {:style :green
-        :matchers {(match :bold-end) :plain}}
+      {:style :green
+       :matchers {(match :bold-end) :plain}}
 
      :definition
-       {:style :definition
-        :matchers {(match :definition-end) :plain}}
+      {:style :definition
+       :matchers {(match :definition-end) :plain}}
 
      :topic {:style :definition
              :matchers {#".|$" :plain}}}})
