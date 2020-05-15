@@ -38,7 +38,7 @@
 
 (defn classpaths
   []
-  (apply into [] (property-classpath) (classloaders-classpath)))
+  (distinct (concat (property-classpath) (classloaders-classpath))))
 
 (defn file-of-var
   [a-var]
