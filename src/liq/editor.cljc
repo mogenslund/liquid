@@ -297,10 +297,14 @@
 
 (def tmp-keymap (atom nil))
 
+(defn deep-merge
+  [m1 m2]
+  (merge-with #(if (and (map? %1) (map? %2)) (deep-merge %1 %2) %1) m1 m2))
+
 (defn merge-mode-maps
   [major-modes mode]
   (apply merge-with
-          #(if (and (map? %1) (map? %2)) (merge %1 %2) %1)
+          #(if (and (map? %1) (map? %2)) (deep-merge %1 %2) %1)
           (map #((get-mode %) mode) major-modes)))
 
 (defn get-mode-fun

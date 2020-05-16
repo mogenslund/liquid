@@ -8,6 +8,7 @@
             [liq.modes.typeahead-mode :as typeahead-mode]
             [liq.tools.word-completion :as word-completion]
             [liq.modes.clojure-mode :as clojure-mode]
+            [liq.modes.javascript-mode :as javascript-mode]
             [liq.modes.spacemacs-mode :as spacemacs-mode]
             [liq.modes.parinfer-mode :as parinfer-mode]
             [liq.modes.info-dialog-mode :as info-dialog-mode]
@@ -83,6 +84,7 @@
   (editor/add-mode :clojure-mode clojure-mode/mode)
   (editor/add-mode :parinfer-mode parinfer-mode/mode)
   (editor/add-mode :info-dialog-mode info-dialog-mode/mode)
+  (javascript-mode/load-mode)
   ;(editor/add-mode :spacemacs-mode spacemacs-mode/mode)
   (spacemacs-mode/load-spacemacs-mode)
   (swap! editor/state assoc-in [::editor/modes :fundamental-mode :insert "\t"] word-completion/word-typeahead)
