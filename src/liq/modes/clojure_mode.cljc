@@ -2,7 +2,6 @@
   (:require [clojure.string :as str]
             [clojure.repl :as repl]
             [clojure.java.io :as io]
-            [liq.modes.fundamental-mode :as fundamental-mode]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer]
             [liq.util :as util])
@@ -93,9 +92,8 @@
    :definition-end #"."})
 
 (def mode
-  {:normal {"g" (assoc ((fundamental-mode/mode :normal) "g")
-                       "D" #(goto-definition (editor/current-buffer))
-                       "d" #(goto-definition-local (editor/current-buffer)))}
+  {:normal {"g" {"D" #(goto-definition (editor/current-buffer))
+                 "d" #(goto-definition-local (editor/current-buffer))}}
    :syntax
     {:plain ; Context
       {:style :plain1 ; style

@@ -3,8 +3,7 @@
             [clojure.java.io :as io]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer]
-            [liq.util :as util]
-            [liq.modes.clojure-mode :as clojure-mode]))
+            [liq.util :as util]))
 
 (defn load-topic
   [topic]

@@ -109,7 +109,8 @@
                                (buffer/set-char buf (first c)))}
             "c" {"p" {"p" :eval-sexp-at-point
                       "r" :raw-eval-sexp-at-point
-                      "f" :evaluate-file-raw}
+                      "f" :eval-buffer
+                      "F" :evaluate-file-raw}
                  "i" {"w" :change-inner-word
                       "(" :change-inner-paren
                       "[" :change-inner-bracket

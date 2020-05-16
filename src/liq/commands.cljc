@@ -187,11 +187,32 @@
         (str "(do (ns " namespace ") (in-ns '" namespace ") " sexp ")"))
       (catch Exception e (println (util/pretty-exception e))))))
 
-(defn sanitice-output
+(defn sanitize-output
   [x]
   (cond (string? x) x
         (and (map? x) (x ::editor/buffers)) "<editor/state>"
         true (pr-str x)))
+
+(defn eval-buffer
+  [buf]
+  #?(:clj
+      (do
+        (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
+        (let [text (buffer/text buf)]
+          (binding [*print-length* 200]
+            (editor/message "" :view true); ( :view true :timer 1500)
+            (future
+              (with-redefs [println (fn [& args] (editor/message (str/join " " args) :append true))]
+                (try
+                  (println (sanitize-output (load-string text)))
+                  (catch Exception e (println (util/pretty-exception e)))))))))
+     :cljs (do
+             (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
+             (let [code (buffer/text buf)]
+               (binding [cljs.js/*eval-fn* cljs.js/js-eval]
+                 (eval-str (cljs.js/empty-state) code "bla"
+                           {:eval cljs/js-eval :context :statements}
+                           #(editor/message (str %) :view true)))))))
 
 (defn eval-sexp-at-point
   [buf]
@@ -207,12 +228,12 @@
             (future
               (with-redefs [println (fn [& args] (editor/message (str/join " " args) :append true))]
                 (try
-                  (println (sanitice-output
-                    (load-string
-                      (str
-                        "(do (ns " namespace ") (in-ns '"
-                        namespace
-                        ") " sexp "\n)"))))
+                  (println (sanitize-output
+                             (load-string
+                               (str
+                                 "(do (ns " namespace ") (in-ns '"
+                                 namespace
+                                 ") " sexp "\n)"))))
                   (catch Exception e (println (util/pretty-exception e)))))))))
      :cljs (do
              (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
@@ -222,6 +243,7 @@
                  (eval-str (cljs.js/empty-state) sexp "bla"
                            {:eval cljs/js-eval :context :statements}
                            #(editor/message (str %) :view true)))))))
+
 
 (defn raw-eval-sexp-at-point
   [buf]
@@ -338,6 +360,7 @@
    :eval-sexp-at-point #(eval-sexp-at-point (editor/current-buffer))
    :raw-eval-sexp-at-point #(raw-eval-sexp-at-point (editor/current-buffer))
    :evaluate-file-raw evaluate-file-raw
+   :eval-buffer #(eval-buffer (editor/current-buffer))
 
    :paste-clipboard paste-clipboard
    :paste-clipboard-here paste-clipboard-here

@@ -297,9 +297,15 @@
 
 (def tmp-keymap (atom nil))
 
+(defn merge-mode-maps
+  [major-modes mode]
+  (apply merge-with
+          #(if (and (map? %1) (map? %2)) (merge %1 %2) %1)
+          (map #((get-mode %) mode) major-modes)))
+
 (defn get-mode-fun
   [major-modes mode c]
-  (first (filter identity (map #(get (-> % get-mode mode) c) major-modes))))
+  ((merge-mode-maps major-modes mode) c))
 
 (defn handle-keyword-action
   [k]
