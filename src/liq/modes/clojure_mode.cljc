@@ -11,6 +11,12 @@
   [buf]
   (re-find #"(?<=\x28ns )[-a-zA-Z.]+" (buffer/text buf)))
 
+(defn maybe-shorten
+  [s full short]
+  (if (str/starts-with? s (str full "/"))
+    (str short "/" (subs s (inc (count full))))
+    s))
+
 (defn get-functions
   "List of alias replaced functions available from namespace"
   [buf]
@@ -18,8 +24,7 @@
         funs (map str (repl/apropos ""))
         al (ns-aliases (symbol n))]
     (map #(str/replace % "clojure.core/" "")
-      (reduce (fn [l [short full]]
-                  (map #(str/replace % (re-pattern (str "^" full "/")) (str short "/")) l))       
+      (reduce (fn [l [short full]] (map #(maybe-shorten % (str full) short) l))
               funs
               al))))
 
