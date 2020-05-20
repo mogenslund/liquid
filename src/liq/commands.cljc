@@ -180,7 +180,7 @@
 (defn raw-eval-sexp-at-point
   [buf]
   (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
-  (let [sexp (if (= (buf ::buffer/mode) :visuel) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
+  (let [sexp (if (= (buf ::buffer/mode) :visual) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
         namespace (or (get-namespace buf) "user")]
     (try
       (load-string
@@ -219,7 +219,7 @@
   #?(:clj
       (do
         (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
-        (let [sexp (if (= (buf ::buffer/mode) :visuel) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
+        (let [sexp (if (= (buf ::buffer/mode) :visual) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
               namespace (or (get-namespace buf) "user")]
           (create-ns (symbol namespace))
           (binding [*print-length* 200
@@ -237,7 +237,7 @@
                   (catch Exception e (println (util/pretty-exception e)))))))))
      :cljs (do
              (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
-             (let [sexp (if (= (buf ::buffer/mode) :visuel) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
+             (let [sexp (if (= (buf ::buffer/mode) :visual) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
                    namespace (or (get-namespace buf) "user")]
                (binding [cljs.js/*eval-fn* cljs.js/js-eval]
                  (eval-str (cljs.js/empty-state) sexp "bla"
@@ -248,7 +248,7 @@
 (defn raw-eval-sexp-at-point
   [buf]
   (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
-  (let [sexp (if (= (buf ::buffer/mode) :visuel) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
+  (let [sexp (if (= (buf ::buffer/mode) :visual) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
         namespace (or (get-namespace buf) "user")]
     (try
       (load-string
