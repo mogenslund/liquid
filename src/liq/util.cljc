@@ -111,6 +111,7 @@
 
 (defn write-file
   [path content]
+  (io/make-parents path)
   (spit path content))
 
 (defn eval-safe
