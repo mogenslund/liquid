@@ -599,7 +599,7 @@
              ::mem-col 1)
      (let [b1 (update buf ::lines #(remove-from-vector % row))
            newrow (min (line-count b1) row)
-           newcol (min (col-count b1 newrow) (-> buf ::cursor ::col))]
+           newcol (max (min (col-count b1 newrow) (-> buf ::cursor ::col)) 1)]
         (-> b1
             (assoc ::cursor {::row newrow ::col newcol})
             (adjust-hidden-rows row -1)))))

@@ -75,3 +75,23 @@
       (editor/paint-buffer)
       ;(clojure.pprint/pprint (editor/current-buffer))
       (is (= @output "# d")))))
+
+(deftest dd-with-empty-line
+  (testing "Pressing d d i ENTER on line n-1 while line n is empty"
+    (let [output (atom "")
+          printer (fn [b] (reset! output (text b)))
+          dimensions (fn [] {:rows 20 :cols 40})
+          invalidate (fn [])]
+      (reset-editor)
+      (editor/set-output-handler
+        {:printer printer
+         :invalidate invalidate
+         :dimensions dimensions})
+      (editor/new-buffer "aa\nbb\n")
+      (editor/handle-input "j")
+      (editor/handle-input "d")
+      (editor/handle-input "d")
+      (editor/handle-input "i")
+      (editor/handle-input "\n")
+      (editor/paint-buffer)
+      (is (= @output "aa\n\n")))))
