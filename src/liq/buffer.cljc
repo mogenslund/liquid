@@ -167,6 +167,7 @@
   "Set mode to :insert and set selection point to nil."
   [buf]
   (-> buf
+      (update-in [::cursor ::col] (partial max 1))
       set-undo-point
       (assoc ::mode :insert)
       remove-selection))
