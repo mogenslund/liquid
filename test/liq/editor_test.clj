@@ -112,4 +112,4 @@
       (editor/handle-input "i")
       (editor/handle-input "\n")
       (editor/paint-buffer)
-      (is (= @output "aa\n\n")))))
+      (is (= @output "aa\nbb\n\n")))))
