@@ -95,3 +95,21 @@
       (editor/handle-input "\n")
       (editor/paint-buffer)
       (is (= @output "aa\n\n")))))
+
+(deftest G-with-empty-line
+  (testing "Pressing G i ENTER on line n-1 while line n is empty"
+    (let [output (atom "")
+          printer (fn [b] (reset! output (text b)))
+          dimensions (fn [] {:rows 20 :cols 40})
+          invalidate (fn [])]
+      (reset-editor)
+      (editor/set-output-handler
+        {:printer printer
+         :invalidate invalidate
+         :dimensions dimensions})
+      (editor/new-buffer "aa\nbb\n")
+      (editor/handle-input "G")
+      (editor/handle-input "i")
+      (editor/handle-input "\n")
+      (editor/paint-buffer)
+      (is (= @output "aa\nbb\n\n")))))

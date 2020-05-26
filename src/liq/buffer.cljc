@@ -447,8 +447,8 @@
   "Move cursor to the end of the buffer"
   [buf]
   (-> buf
-      (assoc ::cursor {::row (line-count buf) ::col (col-count buf (line-count buf))})
-      (assoc ::mem-col (col-count buf (line-count buf)))))
+      (assoc ::cursor {::row (line-count buf) ::col (max (col-count buf (line-count buf)) 1)})
+      (assoc ::mem-col (max (col-count buf (line-count buf)) 1))))
 
 ;; Modifications
 ;; =============
