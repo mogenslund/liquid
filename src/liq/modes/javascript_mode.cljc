@@ -16,7 +16,7 @@
    :string1-begin #"(?<!\\\\)(')"
    :string1-escape #"(\\')"
    :string1-end "'"
-   :comment-begin #"//"
+   :comment-begin #"(?<!\\\\)//.*$|^#+ .*$"
    :comment-end #"$"
    :special-begin #"(var|function )"
    :green-begin "✔"

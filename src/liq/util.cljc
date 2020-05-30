@@ -45,17 +45,20 @@
 
 (defn get-folder
   [filepath]
-  (if (folder? filepath)
-    filepath
-    (str (.getParent (io/file filepath)))))
+  (cond (re-matches #"https?:.*" filepath) (re-find #"https?:.*/" filepath)
+        (folder? filepath) filepath
+        true (str (.getParent (io/file filepath)))))
 
 (defn resolve-home
   [path]
-  (.getCanonicalPath (io/file (str/replace path #"^~" (str/replace (System/getProperty "user.home") "\\" "\\\\")))))
+  (cond (re-matches #"https?:.*" path) path
+        true (.getCanonicalPath (io/file (str/replace path #"^~" (str/replace (System/getProperty "user.home") "\\" "\\\\"))))))
 
 (defn resolve-path
   [part alternative-parent]
-  (cond (.isAbsolute (io/file part)) (.getCanonicalPath (io/file part))
+  (cond (re-matches #"https?:.*" part) part
+        (re-matches #"https?:.*" alternative-parent) (str alternative-parent part)
+        (.isAbsolute (io/file part)) (.getCanonicalPath (io/file part))
         (re-find #"^~" part) (str (.getCanonicalPath (io/file (str/replace part #"^~" (System/getProperty "user.home")))))
         true (str (.getCanonicalPath (io/file alternative-parent part)))))
 
@@ -104,10 +107,10 @@
 
 (defn read-file
   [path]
-  #?(:clj (when (.exists (io/file path))
-            (slurp path))
-     :cljs (do) ;(slurp path)
-     ))
+  #?(:clj (cond (re-matches #"https?:.*" path) (slurp path)
+                (.exists (io/file path)) (slurp path))
+     :cljs (do))) ;(slurp path)
+     
 
 (defn write-file
   [path content]
