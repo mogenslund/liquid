@@ -20,16 +20,6 @@
   (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
   (editor/apply-to-buffer fun))
 
-(defn open-file-at-point
-  []
-  (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
-  (let [buf (editor/current-buffer)
-        part (re-find #"[^:\(\)\[\]\{\}]+" (buffer/word buf))
-        buffer-file (or (buf ::buffer/filename) ((editor/get-buffer (editor/previous-regular-buffer-id)) ::buffer/filename))
-        alternative-parent (if buffer-file (util/get-folder buffer-file) ".")
-        filepath (util/resolve-path part alternative-parent)]
-    (editor/open-file filepath)))
-
 (defn write-file
   "Save buffer to associated file"
   []
@@ -55,6 +45,16 @@
     (cond (or (= t ".") (not t)) (((editor/get-mode :dired-mode) :init))
           (util/folder? t) (((editor/get-mode :dired-mode) :init) t)
           true (editor/open-file t))))
+
+(defn open-file-at-point
+  []
+  (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
+  (let [buf (editor/current-buffer)
+        part (re-find #"[^:\(\)\[\]\{\}]+" (buffer/word buf))
+        buffer-file (or (buf ::buffer/filename) ((editor/get-buffer (editor/previous-regular-buffer-id)) ::buffer/filename))
+        alternative-parent (if buffer-file (util/get-folder buffer-file) ".")
+        filepath (util/resolve-path part alternative-parent)]
+    (e-cmd filepath)))
 
 (defn copy-selection-to-clipboard
   [buf]
@@ -411,6 +411,9 @@
    :t5 #(editor/message (pr-str (:liq.buffer/lines (editor/current-buffer))))
    :t6 #(((editor/get-mode :info-dialog-mode) :init) "This is the info dialog")
    :! (fn [& args] (external-command (str/join " " args)))
+   :git (fn [& args] (external-command (str "git " (str/join " " args))))
+   :grep (fn [& args] (external-command (str "grep " (str/join " " args))))
+   :node (fn [& args] (external-command (str "node " (str/join " " args))))
    :e e-cmd
    :Ex (fn [] (e-cmd "."))
    :edit e-cmd})

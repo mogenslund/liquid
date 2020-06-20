@@ -56,7 +56,8 @@
 
 (defn resolve-path
   [part alternative-parent]
-  (cond (re-matches #"https?:.*" part) part
+  (cond (nil? part) "."
+        (re-matches #"https?:.*" part) part
         (re-matches #"https?:.*" alternative-parent) (str alternative-parent part)
         (.isAbsolute (io/file part)) (.getCanonicalPath (io/file part))
         (re-find #"^~" part) (str (.getCanonicalPath (io/file (str/replace part #"^~" (System/getProperty "user.home")))))
