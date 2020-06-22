@@ -1,0 +1,59 @@
+help.txt lynx-integration.txt                                         salza.dk
+
+
+                           Lynx Integration
+
+
+Lynx is a command line browser for linux. If it is installed it can be used 
+together with Liquid by adding the code below to .liq.
+
+The code defines a keybinding gw (read goto web). If gw is typed while the 
+cursor is on a link, Lynx will be used to display the content of the page in 
+Liquid.
+
+If gw is typed while inside brackets with a number, like "[99]", Liquid will 
+look for a matching link reference starting with 99: <link> and grap the link 
+from there. This is how Lynx displays links.
+
+==============================================================================
+Code to be added to .liq
+
+(ns user
+  (:require [liq.editor :as editor]
+            [liq.buffer :as buffer]
+            [clojure.java.shell :as shell]))
+
+
+(def regex-url
+  (re-pattern
+    (str "https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\."
+         "[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&//=]*)")))
+
+(def regex-ref #"(?<=\[)\d+(?=\])")
+
+(defn jump-link
+  "If this function is called while the cursor is on a hyper link
+  a new buffer with the target of the link will be displayed using
+  Lynx (Which has to be installed).
+  If the cursor is inside brackets with a number. The number will
+  be looked up at the bottom of the buffer to get a link."
+  []
+  (let [buf (editor/current-buffer)
+        u (buffer/thing-at-point buf regex-url)
+        n (buffer/thing-at-point buf regex-ref)
+        w (buffer/word buf)]
+    (cond u (editor/new-buffer ((shell/sh "lynx" u "--dump") :out) {:name w})
+          n (let [text (buffer/text buf)
+                  hit (second (re-find (re-pattern (str " +" n "\\. (.+)"))
+                                       text))]
+              (when hit
+                (editor/new-buffer
+                  ((shell/sh "lynx" hit "--dump") :out)
+                  {:name hit}))))))
+
+(swap! editor/state assoc-in
+       [::editor/commands :jump-link] jump-link)
+
+(swap! editor/state assoc-in
+       [::editor/modes :fundamental-mode :normal "g" "w"] :jump-link)
+

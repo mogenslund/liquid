@@ -44,3 +44,4 @@ jack-in.txt
 cool-stuff.txt
 word-completion.txt
 how-it-works.txt
+lynx-integration.txt
