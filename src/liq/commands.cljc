@@ -413,6 +413,9 @@
    :! (fn [& args] (external-command (str/join " " args)))
    :git (fn [& args] (external-command (str "git " (str/join " " args))))
    :grep (fn [& args] (external-command (str "grep " (str/join " " args))))
+   :man (fn [& args] (external-command (str "man " (str/join " " args))))
+   :tree (fn [& args] (external-command (str "tree " (str/join " " args))))
+   :locate (fn [& args] (external-command (str "locate " (str/join " " args))))
    :node (fn [& args] (external-command (str "node " (str/join " " args))))
    :e e-cmd
    :Ex (fn [] (e-cmd "."))

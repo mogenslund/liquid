@@ -1165,6 +1165,21 @@
 ;                        (and (= keyw :string) (= c "\"")) :
 ;  buf))
 
+(defn match-at-pos
+  "Match regular expression at position 0 based.
+  Returns substring or nil"
+  [s pos re]
+  (first (filter #(let [i (str/index-of s %)]
+                    (<= i pos (+ i (count %) -1))) (re-seq re s))))
+
+(defn thing-at-point
+  "Return regex match around point.
+  If no match nil is returned"
+  [buf re]
+  (match-at-pos (line buf) (- (-> buf ::cursor ::col) 1) re))
+  
+
+
 (comment
 
   (let [buf (buffer "ab[[cd]\nx[asdf]yz]")]
@@ -1198,6 +1213,10 @@
     (-> buf
         right
         text)))
+
+(comment (thing-at-point (-> (buffer "abc12c") (right 1)) #"\d+"))
+(comment (thing-at-point (-> (buffer "abc12c") (right 2)) #"\d+"))
+(comment (thing-at-point (-> (buffer "abc12c") (right 3)) #"\d+"))
 
 
 (comment
