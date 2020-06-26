@@ -1,0 +1,80 @@
+help.txt project-specific-modifications.txt                           salza.dk
+
+
+                        Project specific modifications
+
+
+The idea around project specific modifications is to have a file with 
+functions, actions and keybindings that are useful in a specific context, 
+like within a project.
+
+The file or the content of the file should then just be evaluated when 
+working on that project enhancing Liquid with project specific functionality. 
+
+==============================================================================
+Typeaheads
+
+The code here will generate a list of functions within paredit-bundle.js and
+assign CTRL+o in insert mode to do a typeahead insert of one of the functions
+in the list.
+
+Of cause any list can be used and any keybinding.
+
+(ns user
+  (:require [liq.util :as util]
+            [liq.editor :as editor]
+            [liq.buffer :as buffer]))
+
+(def content
+  (re-seq
+    #"(?<=function.)[-_a-zA-Z]+"
+    (slurp (util/resolve-home "~/proj/paredit.js/paredit-bundle.js"))))
+
+
+
+(swap! editor/state assoc-in 
+  [::editor/modes :fundamental-mode :insert "C-o"]
+  (fn []
+     (((editor/get-mode :typeahead-mode) :init)
+      content
+      str
+      (fn [s]
+        (editor/apply-to-buffer
+          (fn [buf] (-> buf
+                        (buffer/insert-string (str s ""))
+                        (buffer/set-insert-mode)
+                        (buffer/right (count s)))))))))
+
+==============================================================================
+File navigation typeahead
+
+The code in this section will create a list of clj and js files in the /tmp
+folder.
+
+The "-" key will be assiged to a typeahead of this list where the file 
+choosen will be opened.
+
+By changing the folder to the root of a project, all the files in the project
+can be opened just by pressing "-" (or whatever keybinding is used) and
+choosing the file using typeahead.
+
+(ns user
+  (:require [clojure.java.io :as io]
+            [liq.util :as util]
+            [liq.editor :as editor]
+            [liq.buffer :as buffer]))
+
+
+(defn filesbelow
+  [path]
+  (filter #(re-find #"\.(clj|js)" %)
+          (filter util/file?
+                  (map #(.getAbsolutePath %)
+                       (file-seq (io/file (util/resolve-home path)))))))
+
+(swap! editor/state assoc-in 
+  [::editor/modes :fundamental-mode :normal "-"]
+  #(((editor/get-mode :typeahead-mode) :init)
+    (filesbelow "/tmp")
+    str editor/open-file))
+

@@ -41,8 +41,9 @@
             "up" :up 
             "right" :right
             "0" #(apply-to-buffer buffer/beginning-of-line)
-            "$" #(apply-to-buffer buffer/end-of-line)
-            "g" {"g" #(editor/apply-to-buffer buffer/beginning-of-buffer)}
+            "$" :end-of-line
+            "g" {"g" :beginning-of-buffer
+                 "l" :navigate-lines}
             "G" #(apply-to-buffer buffer/end-of-buffer)
             "/" (fn [] (switch-to-buffer "*minibuffer*")
                        (apply-to-buffer #(-> % buffer/clear (buffer/insert-char \/))))
