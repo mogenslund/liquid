@@ -30,13 +30,13 @@
 
 (defn external-command
   [text]
-   #?(:clj (let [f (or ((editor/current-buffer) ::buffer/filename) ".")
-                 folder (util/absolute (util/get-folder f))
-                 text1 (str/replace text #"%" f)]
-             (editor/message (str "Running command: " text1 "\n") :view true)
-             (future
-               (doseq [output (s/cmdseq folder "/bin/sh" "-c" text1)]
-                 (editor/message output :append true)))))
+  #?(:clj (let [f (or ((editor/current-buffer) ::buffer/filename) ".")
+                folder (util/absolute (util/get-folder f))
+                text1 (str/replace text #"%" f)]
+            (editor/message (str "Running command: " text1 "\n") :view true)
+            (future
+              (doseq [output (s/cmdseq folder "/bin/sh" "-c" text1)]
+                (editor/message output :append true)))))
    #?(:cljs (do)))
 
 (defn e-cmd
@@ -50,7 +50,9 @@
   []
   (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
   (let [buf (editor/current-buffer)
-        part (re-find #"[^:\(\)\[\]\{\}]+" (buffer/word buf))
+        w (buffer/word buf)
+        project-part (when-let [p (re-find #"^:\+(?:\w+|-)+$" w)] (str (subs p 2) ".md"))
+        part (or project-part (re-find #"[^:\(\)\[\]\{\}]+" w))
         buffer-file (or (buf ::buffer/filename) ((editor/get-buffer (editor/previous-regular-buffer-id)) ::buffer/filename))
         alternative-parent (if buffer-file (util/get-folder buffer-file) ".")
         filepath (util/resolve-path part alternative-parent)]
@@ -262,8 +264,8 @@
   If no filepath is supplied the path connected
   to the current buffer will be used."
   ([filepath]
-    (try (editor/message (load-file filepath))
-      (catch Exception e (editor/message (util/pretty-exception e)))))
+   (try (editor/message (load-file filepath))
+     (catch Exception e (editor/message (util/pretty-exception e)))))
   ([] (when-let [filepath ((editor/current-buffer) ::buffer/filename)] (evaluate-file-raw filepath))))
 
 (defn run-command
@@ -275,149 +277,155 @@
       (apply fun args)))) 
 
 
-(def commands
-  {:left ^:motion #(buffer/left %1 %2)
-   :down ^:motion #(buffer/down %1 %2)
-   :up ^:motion #(buffer/up %1 %2)
-   :right ^:motion #(buffer/right %1 %2)
-   :first-non-blank #(non-repeat-fun buffer/first-non-blank)
-   :0 #(non-repeat-fun buffer/beginning-of-line)
-   :move-matching-paren #(non-repeat-fun buffer/move-matching-paren)
-   :word-forward ^:motion #(buffer/word-forward %1 %2)
-   :word-forward-ws ^:motion #(buffer/word-forward-ws %1 %2)
-   :beginning-of-word ^:motion #(buffer/beginning-of-word %1 %2)
-   :end-of-word ^:motion #(buffer/end-of-word %1 %2)
-   :end-of-word-ws ^:motion #(buffer/end-of-word-ws %1 %2)
-   :end-of-line ^:motion (fn [buf n] (buffer/end-of-line buf))
-  ;:delete-char (fn [& args] (repeat-fun buffer/delete-char args))
-   :delete-char (fn [& args] (repeat-fun #(do (util/set-clipboard-content (str (buffer/get-char %1)) false) (buffer/delete-char %1 %2)) args))
-   :copy-selection-to-clipboard #(apply-to-buffer copy-selection-to-clipboard)
-   :copy-line copy-line
-   :yank-filename yank-filename
-   :yank-inner-word (fn [] (non-repeat-fun #(->> % buffer/word-region (yank-region %))))
-   :yank-inner-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (yank-region %))))
-   :yank-inner-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (shrink-region %) (yank-region %))))
-   :yank-inner-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (shrink-region %) (yank-region %))))
-   :yank-inner-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (shrink-region %) (yank-region %))))
-   :yank-outer-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (yank-region %))))
-   :yank-outer-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (yank-region %))))
-   :yank-outer-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (yank-region %))))
-   :yank-outer-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (yank-region %))))
+(defn load-commands
+  []
+  (swap! editor/state update ::editor/commands merge 
+    {:left ^:motion #(buffer/left %1 %2)
+     :down ^:motion #(buffer/down %1 %2)
+     :up ^:motion #(buffer/up %1 %2)
+     :right ^:motion #(buffer/right %1 %2)
+     :first-non-blank #(non-repeat-fun buffer/first-non-blank)
+     :0 #(non-repeat-fun buffer/beginning-of-line)
+     :move-matching-paren #(non-repeat-fun buffer/move-matching-paren)
+     :word-forward ^:motion #(buffer/word-forward %1 %2)
+     :word-forward-ws ^:motion #(buffer/word-forward-ws %1 %2)
+     :beginning-of-word ^:motion #(buffer/beginning-of-word %1 %2)
+     :end-of-word ^:motion #(buffer/end-of-word %1 %2)
+     :end-of-word-ws ^:motion #(buffer/end-of-word-ws %1 %2)
+     :end-of-line ^:motion (fn [buf n] (buffer/end-of-line buf))
+    ;:delete-char (fn [& args] (repeat-fun buffer/delete-char args))
+     :delete-char (fn [& args] (repeat-fun #(do (util/set-clipboard-content (str (buffer/get-char %1)) false) (buffer/delete-char %1 %2)) args))
+     :copy-selection-to-clipboard #(apply-to-buffer copy-selection-to-clipboard)
+     :copy-line copy-line
+     :yank-filename yank-filename
+     :yank-inner-word (fn [] (non-repeat-fun #(->> % buffer/word-region (yank-region %))))
+     :yank-inner-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (yank-region %))))
+     :yank-inner-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (shrink-region %) (yank-region %))))
+     :yank-inner-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (shrink-region %) (yank-region %))))
+     :yank-inner-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (shrink-region %) (yank-region %))))
+     :yank-outer-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (yank-region %))))
+     :yank-outer-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (yank-region %))))
+     :yank-outer-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (yank-region %))))
+     :yank-outer-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (yank-region %))))
 
-   :delete #(apply-to-buffer delete)
-   :delete-line #(non-repeat-fun delete-line)
-   :delete-inner-word (fn [] (non-repeat-fun #(->> % buffer/word-region (cut-region %))))
-   :delete-inner-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (cut-region %))))
-   :delete-inner-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (shrink-region %) (cut-region %))))
-   :delete-inner-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (shrink-region %) (cut-region %))))
-   :delete-inner-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (shrink-region %) (cut-region %))))
-   :delete-outer-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region  (cut-region %))))
-   :delete-outer-bracket  (fn [] (non-repeat-fun #(->> % buffer/bracket-region  (cut-region %))))
-   :delete-outer-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region  (cut-region %))))
-   :delete-outer-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region  (cut-region %))))
-   :delete-to-word (fn [& args] (repeat-fun #(cut-region %1
-                                              [(%1 ::buffer/cursor)
-                                               ((buffer/left (buffer/word-forward %1 %2)) ::buffer/cursor)]) args))
-   :delete-to-end-of-word (fn [& args] (repeat-fun #(cut-region %1 (buffer/end-of-word-region %1 %2)) args))
-   :delete-to-end-of-word-ws (fn [& args] (repeat-fun #(cut-region %1 (buffer/end-of-word-ws-region %1 %2)) args))
+     :delete #(apply-to-buffer delete)
+     :delete-line #(non-repeat-fun delete-line)
+     :delete-inner-word (fn [] (non-repeat-fun #(->> % buffer/word-region (cut-region %))))
+     :delete-inner-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (cut-region %))))
+     :delete-inner-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (shrink-region %) (cut-region %))))
+     :delete-inner-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (shrink-region %) (cut-region %))))
+     :delete-inner-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (shrink-region %) (cut-region %))))
+     :delete-outer-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region  (cut-region %))))
+     :delete-outer-bracket  (fn [] (non-repeat-fun #(->> % buffer/bracket-region  (cut-region %))))
+     :delete-outer-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region  (cut-region %))))
+     :delete-outer-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region  (cut-region %))))
+     :delete-to-word (fn [& args] (repeat-fun #(cut-region %1
+                                                [(%1 ::buffer/cursor)
+                                                 ((buffer/left (buffer/word-forward %1 %2)) ::buffer/cursor)]) args))
+     :delete-to-end-of-word (fn [& args] (repeat-fun #(cut-region %1 (buffer/end-of-word-region %1 %2)) args))
+     :delete-to-end-of-word-ws (fn [& args] (repeat-fun #(cut-region %1 (buffer/end-of-word-ws-region %1 %2)) args))
 
-   :change (fn [] (non-repeat-fun #(->> % delete set-insert-mode)))
-   :change-inner-word (fn [] (non-repeat-fun #(->> % buffer/word-region (cut-region %) set-insert-mode)))
-   :change-inner-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (cut-region %) set-insert-mode)))
-   :change-inner-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (shrink-region %) (cut-region %) set-insert-mode)))
-   :change-inner-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (shrink-region %) (cut-region %) set-insert-mode)))
-   :change-inner-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (shrink-region %) (cut-region %) set-insert-mode)))
-   :change-outer-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (cut-region %) set-insert-mode)))
-   :change-outer-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (cut-region %) set-insert-mode)))
-   :change-outer-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (cut-region %) set-insert-mode)))
-   :change-outer-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (cut-region %) set-insert-mode)))
-   :change-line (fn [] (non-repeat-fun #(->> % buffer/line-region (cut-region %) set-insert-mode)))
-   :change-eol (fn [] (non-repeat-fun #(->> % buffer/eol-region (cut-region %) set-insert-mode)))
-   :change-to-end-of-word (fn [& args] (repeat-fun #(set-insert-mode (cut-region %1 (buffer/end-of-word-region %1 %2))) args))
-   :change-to-end-of-word-ws (fn [& args] (repeat-fun #(set-insert-mode (cut-region %1 (buffer/end-of-word-ws-region %1 %2))) args))
+     :change (fn [] (non-repeat-fun #(->> % delete set-insert-mode)))
+     :change-inner-word (fn [] (non-repeat-fun #(->> % buffer/word-region (cut-region %) set-insert-mode)))
+     :change-inner-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (cut-region %) set-insert-mode)))
+     :change-inner-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (shrink-region %) (cut-region %) set-insert-mode)))
+     :change-inner-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (shrink-region %) (cut-region %) set-insert-mode)))
+     :change-inner-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (shrink-region %) (cut-region %) set-insert-mode)))
+     :change-outer-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (cut-region %) set-insert-mode)))
+     :change-outer-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (cut-region %) set-insert-mode)))
+     :change-outer-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (cut-region %) set-insert-mode)))
+     :change-outer-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (cut-region %) set-insert-mode)))
+     :change-line (fn [] (non-repeat-fun #(->> % buffer/line-region (cut-region %) set-insert-mode)))
+     :change-eol (fn [] (non-repeat-fun #(->> % buffer/eol-region (cut-region %) set-insert-mode)))
+     :change-to-end-of-word (fn [& args] (repeat-fun #(set-insert-mode (cut-region %1 (buffer/end-of-word-region %1 %2))) args))
+     :change-to-end-of-word-ws (fn [& args] (repeat-fun #(set-insert-mode (cut-region %1 (buffer/end-of-word-ws-region %1 %2))) args))
 
-   :select-inner-word (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/word-region %))))
-   :select-inner-paren (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/paren-region %)))))
-   :select-inner-bracket (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/bracket-region %)))))
-   :select-inner-brace (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/brace-region %)))))
-   :select-inner-quote (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/quote-region %)))))
-   :select-outer-paren (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/paren-region %))))
-   :select-outer-bracket (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/bracket-region %))))
-   :select-outer-brace (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/brace-region %))))
-   :select-outer-quote (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/quote-region %))))
-   :select-line (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/line-region %))))
+     :select-inner-word (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/word-region %))))
+     :select-inner-paren (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/paren-region %)))))
+     :select-inner-bracket (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/bracket-region %)))))
+     :select-inner-brace (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/brace-region %)))))
+     :select-inner-quote (fn [] (non-repeat-fun #(buffer/expand-selection % (shrink-region % (buffer/quote-region %)))))
+     :select-outer-paren (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/paren-region %))))
+     :select-outer-bracket (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/bracket-region %))))
+     :select-outer-brace (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/brace-region %))))
+     :select-outer-quote (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/quote-region %))))
+     :select-line (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/line-region %))))
 
-   :insert-at-line-end #(non-repeat-fun buffer/insert-at-line-end)
-   :insert-at-beginning-of-line #(non-repeat-fun buffer/insert-at-beginning-of-line)
-   :delete-to-line-end #(non-repeat-fun buffer/delete-to-line-end)
+     :insert-at-line-end #(non-repeat-fun buffer/insert-at-line-end)
+     :insert-at-beginning-of-line #(non-repeat-fun buffer/insert-at-beginning-of-line)
+     :delete-to-line-end #(non-repeat-fun buffer/delete-to-line-end)
 
-   :append-line #(non-repeat-fun buffer/append-line)
-   :append-line-above #(non-repeat-fun (fn [buf] (-> buf buffer/beginning-of-line (buffer/insert-char \newline) buffer/up)))
-   :join-lines #(non-repeat-fun buffer/join-lines)
-   :join-lines-space #(non-repeat-fun buffer/join-lines-space)
+     :append-line #(non-repeat-fun buffer/append-line)
+     :append-line-above #(non-repeat-fun (fn [buf] (-> buf buffer/beginning-of-line (buffer/insert-char \newline) buffer/up)))
+     :join-lines #(non-repeat-fun buffer/join-lines)
+     :join-lines-space #(non-repeat-fun buffer/join-lines-space)
 
-   :eval #(eval-sexp-at-point (editor/current-buffer))
-   :eval-sexp-at-point #(eval-sexp-at-point (editor/current-buffer))
-   :raw-eval-sexp-at-point #(raw-eval-sexp-at-point (editor/current-buffer))
-   :evaluate-file-raw evaluate-file-raw
-   :eval-buffer #(eval-buffer (editor/current-buffer))
+     :eval #(eval-sexp-at-point (editor/current-buffer))
+     :eval-sexp-at-point #(eval-sexp-at-point (editor/current-buffer))
+     :raw-eval-sexp-at-point #(raw-eval-sexp-at-point (editor/current-buffer))
+     :evaluate-file-raw evaluate-file-raw
+     :eval-buffer #(eval-buffer (editor/current-buffer))
 
-   :paste-clipboard paste-clipboard
-   :paste-clipboard-here paste-clipboard-here
+     :paste-clipboard paste-clipboard
+     :paste-clipboard-here paste-clipboard-here
 
-   :beginning-of-buffer ^:motion #(buffer/beginning-of-buffer %1 %2)
-   :navigate-definitions #(typeahead-defs (editor/current-buffer))
-   :navigate-lines #(typeahead-lines (editor/current-buffer))
-   :open-file-at-point open-file-at-point
-   :end-of-buffer #(non-repeat-fun buffer/end-of-buffer)
-   :scroll-cursor-top (fn [] (non-repeat-fun #(assoc % ::buffer/tow {::buffer/row (-> % ::buffer/cursor ::buffer/row) ::buffer/col 1})))
-   :scroll-page (fn []
-                  (non-repeat-fun
-                    #(as-> %  _
-                           (assoc _ ::buffer/cursor (_ ::buffer/tow))
-                           (buffer/down _ (-> _ ::buffer/window ::buffer/rows))
-                           (assoc _ ::buffer/tow (_ ::buffer/cursor)))))
+     :beginning-of-buffer ^:motion #(buffer/beginning-of-buffer %1 %2)
+     :navigate-definitions #(typeahead-defs (editor/current-buffer))
+     :navigate-lines #(typeahead-lines (editor/current-buffer))
+     :open-file-at-point open-file-at-point
+     :end-of-buffer #(non-repeat-fun buffer/end-of-buffer)
+     :scroll-cursor-top (fn [] (non-repeat-fun #(assoc % ::buffer/tow {::buffer/row (-> % ::buffer/cursor ::buffer/row) ::buffer/col 1})))
+     :scroll-page (fn []
+                    (non-repeat-fun
+                      #(as-> %  _
+                             (assoc _ ::buffer/cursor (_ ::buffer/tow))
+                             (buffer/down _ (-> _ ::buffer/window ::buffer/rows))
+                             (assoc _ ::buffer/tow (_ ::buffer/cursor)))))
 
-   :set-visual-mode #(non-repeat-fun buffer/set-visual-mode)
-   :set-normal-mode #(non-repeat-fun buffer/set-normal-mode)
-   :set-insert-mode #(non-repeat-fun buffer/set-insert-mode)
-   :insert-after-point (fn [] (non-repeat-fun #(-> % buffer/set-insert-mode buffer/right)))
-   :search  #(non-repeat-fun buffer/search)
-   :undo #(non-repeat-fun buffer/undo)
-   :q #(editor/exit-program)
-   :q! #(editor/force-exit-program)
-   :bnext #(editor/oldest-buffer)
-   :bn #(editor/oldest-buffer)
-   :new #(editor/new-buffer "" {})
-   :buffers #(((editor/get-mode :buffer-chooser-mode) :init))
-   :ls #(((editor/get-mode :buffer-chooser-mode) :init))
-   :previous-regular-buffer editor/previous-regular-buffer
-   :help (fn [& args] (apply ((editor/get-mode :help-mode) :init) args))
-   :w #(write-file)
-   :wq #(do (write-file) (editor/exit-program))
-   :t #(editor/open-file "/home/sosdamgx/proj/liquid/src/dk/salza/liq/slider.clj")
-   :bd #(editor/kill-buffer)
-   :bd! #(editor/force-kill-buffer)
-   :t1 #(editor/highlight-buffer)
-   :ts #(editor/message (buffer/sexp-at-point (editor/current-buffer)))
-   :t2 #(editor/message (buffer/word (editor/current-buffer)))
-   :t3 #(((editor/get-mode :typeahead-mode) :init
-             ["aaa" "bbb" "aabb" "ccc"]
-             str
-             (fn [res]
-               (editor/previous-buffer)
-               (editor/apply-to-buffer (fn [buf] (buffer/insert-string buf res))))))
-   :t4 #(editor/message (pr-str (buffer/line (editor/current-buffer) 1)))
-   :t5 #(editor/message (pr-str (:liq.buffer/lines (editor/current-buffer))))
-   :t6 #(((editor/get-mode :info-dialog-mode) :init) "This is the info dialog")
-   :! (fn [& args] (external-command (str/join " " args)))
-   :git (fn [& args] (external-command (str "git " (str/join " " args))))
-   :grep (fn [& args] (external-command (str "grep " (str/join " " args))))
-   :man (fn [& args] (external-command (str "man " (str/join " " args))))
-   :tree (fn [& args] (external-command (str "tree " (str/join " " args))))
-   :locate (fn [& args] (external-command (str "locate " (str/join " " args))))
-   :node (fn [& args] (external-command (str "node " (str/join " " args))))
-   :e e-cmd
-   :Ex (fn [] (e-cmd "."))
-   :edit e-cmd})
+     :set-visual-mode #(non-repeat-fun buffer/set-visual-mode)
+     :set-normal-mode #(non-repeat-fun buffer/set-normal-mode)
+     :set-insert-mode #(non-repeat-fun buffer/set-insert-mode)
+     :insert-after-point (fn [] (non-repeat-fun #(-> % buffer/set-insert-mode buffer/right)))
+     :search  #(non-repeat-fun buffer/search)
+     :undo #(non-repeat-fun buffer/undo)
+     :q #(editor/exit-program)
+     :q! #(editor/force-exit-program)
+     :bnext #(editor/oldest-buffer)
+     :bn #(editor/oldest-buffer)
+     :new #(editor/new-buffer "" {})
+     :buffers #(((editor/get-mode :buffer-chooser-mode) :init))
+     :buffer-major-modes #(editor/message (str ((editor/current-buffer) ::buffer/major-modes)))
+     :settings #(editor/message (@editor/state ::editor/settings))
+     :ls #(((editor/get-mode :buffer-chooser-mode) :init))
+     :previous-regular-buffer editor/previous-regular-buffer
+     :help (fn [& args] (apply ((editor/get-mode :help-mode) :init) args))
+     :w #(write-file)
+     :wq #(do (write-file) (editor/exit-program))
+     :t #(editor/open-file "/home/sosdamgx/proj/liquid/src/dk/salza/liq/slider.clj")
+     :bd #(editor/kill-buffer)
+     :bd! #(editor/force-kill-buffer)
+     :t1 #(editor/highlight-buffer)
+     :ts #(editor/message (buffer/sexp-at-point (editor/current-buffer)))
+     :t2 #(editor/message (buffer/word (editor/current-buffer)))
+     :t3 #(((editor/get-mode :typeahead-mode) :init
+               ["aaa" "bbb" "aabb" "ccc"]
+               str
+               (fn [res]
+                 (editor/previous-buffer)
+                 (editor/apply-to-buffer (fn [buf] (buffer/insert-string buf res))))))
+     :t4 #(editor/message (pr-str (buffer/line (editor/current-buffer) 1)))
+     :t5 #(editor/message (pr-str (:liq.buffer/lines (editor/current-buffer))))
+     :t6 #(((editor/get-mode :info-dialog-mode) :init) "This is the info dialog")
+     :! (fn [& args] (external-command (str/join " " args)))
+     :git (fn [& args] (external-command (str "git " (str/join " " args))))
+     :grep (fn [& args] (external-command (str "grep " (str/join " " args))))
+     :man (fn [& args] (external-command (str "man " (str/join " " args))))
+     :tree (fn [& args] (external-command (str "tree " (str/join " " args))))
+     :locate (fn [& args] (external-command (str "locate " (str/join " " args))))
+     :node (fn [& args] (external-command (str "node " (if (empty? args) "%" (str/join " " args)))))
+     :python (fn [& args] (external-command (str "python " (if (empty? args) "%" (str/join " " args)))))
+     :bb (fn [& args] (external-command (str "bb " (if (empty? args) "%" (str/join " " args)))))
+     :e e-cmd
+     :Ex (fn [] (e-cmd "."))
+     :edit e-cmd}))
  

@@ -74,7 +74,7 @@
 ;; clj -m liq.experiments.core
 (defn -main
   [& args]
-  (swap! editor/state update ::editor/commands merge commands/commands)
+  (commands/load-commands)
   (editor/add-mode :fundamental-mode fundamental-mode/mode)
   (editor/add-mode :minibuffer-mode minibuffer-mode/mode)
   (editor/add-mode :buffer-chooser-mode buffer-chooser-mode/mode)
