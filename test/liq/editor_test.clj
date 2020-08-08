@@ -13,7 +13,7 @@
   []
   (let [rows 10
         cols 80]
-    (swap! editor/state update ::editor/commands merge commands/commands)
+    (commands/load-commands)
     (editor/add-mode :fundamental-mode fundamental-mode/mode)
     (editor/add-mode :clojure-mode clojure-mode/mode)
     (editor/new-buffer "" {:name "*status-line*" :top rows :left 1 :rows 1 :cols cols
