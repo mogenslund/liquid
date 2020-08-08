@@ -58,9 +58,15 @@
   [keyw]
   (or ((@state ::modes) keyw) {}))
 
+;; (add-key-bindings :fundamental-mode :normal {"-" #(message (rand-int 100))})
 (defn add-key-bindings
   [major-mode mode keybindings]
   (swap! state update-in [::modes major-mode mode] #(merge-with merge % keybindings))) 
+
+;; (set-command :mycommand #(message (rand-int 100)))
+(defn set-command
+  [keyw fun]
+  (swap! state assoc-in [::commands keyw] fun))
 
 (defn get-buffer-id-by-idx
   [idx]
