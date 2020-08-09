@@ -22,6 +22,10 @@ Modify commands
       []
       (editor/apply-to-buffer move10))
 
+    (editor/set-command :move10 move10action)
+
+or
+
     (swap! editor/state assoc-in [:liq.editor/commands :move10] move10action)
 
 Now type :move10 in normal mode. Then ENTER. The cursor will move 10 times to 

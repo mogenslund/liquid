@@ -58,10 +58,15 @@
   [keyw]
   (or ((@state ::modes) keyw) {}))
 
+(defn- deep-merge
+  [m1 m2]
+  (merge-with #(if (and (map? %1) (map? %2)) (deep-merge %1 %2) %1) m1 m2))
+
 ;; (add-key-bindings :fundamental-mode :normal {"-" #(message (rand-int 100))})
 (defn add-key-bindings
   [major-mode mode keybindings]
-  (swap! state update-in [::modes major-mode mode] #(merge-with merge % keybindings))) 
+  ;(swap! state update-in [::modes major-mode mode] #(merge-with merge % keybindings)) 
+  (swap! state update-in [::modes major-mode mode] #(deep-merge keybindings %))) 
 
 ;; (set-command :mycommand #(message (rand-int 100)))
 (defn set-command
@@ -303,12 +308,9 @@
 
 (def tmp-keymap (atom nil))
 
-(defn deep-merge
-  [m1 m2]
-  (merge-with #(if (and (map? %1) (map? %2)) (deep-merge %1 %2) %1) m1 m2))
-
 (defn merge-mode-maps
   [major-modes mode]
+  ;(apply deep-merge (reverse (map #((get-mode %) mode) major-modes)))
   (apply merge-with
           #(if (and (map? %1) (map? %2)) (deep-merge %1 %2) %1)
           (map #((get-mode %) mode) major-modes)))
