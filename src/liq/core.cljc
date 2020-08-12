@@ -130,6 +130,15 @@
 #?(:cljs (set! cljs.core/*main-cli-fn* -main))
 #?(:cljs (defn init [] (-main "--browser")))
 
+(ns user
+  (:require [clojure.java.shell :as shell]
+            [clojure.java.io :as io]
+            [clojure.data.json :as json]
+            [liq.extras.mindmap :refer [mindmap]]
+            [liq.util :as util]
+            [liq.buffer :as buffer]
+            [liq.editor :as editor]))
+
 ;#?(:cljs
 ;(do
 ;(defn ^:export init
