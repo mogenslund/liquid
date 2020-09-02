@@ -22,6 +22,8 @@
             "down" :down 
             "up" :up 
             "right" :right 
+            "pgdn" :page-down
+            "pgup" :page-up
             "C-x" {"C-e" :eval-sexp-at-point} 
             "M-x" (fn [] (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
                        (((editor/get-mode :minibuffer-mode) :init) ":"))}
@@ -30,7 +32,8 @@
                     (editor/invalidate-ui))
             "C- " #(((editor/get-mode :buffer-chooser-mode) :init))
             "C-b" :previous-regular-buffer
-            "C-f" :scroll-page
+            "C-f" :page-down
+            "C-o" :output-snapshot
             "t" (fn [] (apply-to-buffer #(buffer/insert-string % "Just\nTesting")))
             "f2" editor/oldest-buffer
             "f3" #(non-repeat-fun buffer/debug-clear-undo)
@@ -57,6 +60,8 @@
             "down" :down 
             "up" :up 
             "right" :right 
+            "pgdn" :page-down
+            "pgup" :page-up
             "w" :word-forward
             "W" :word-forward-ws
             "b" :beginning-of-word

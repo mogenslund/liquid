@@ -9,16 +9,18 @@
 
 (defn load-content
   [buf folder]
-  (-> buf
-      buffer/clear
-      (buffer/insert-string
-        (str
-          (util/resolve-path folder ".") "\n../\n./\n"
-          (str/join "\n" (sort (map #(str (util/filename %) "/") (util/get-folders folder))))
-          "\n"
-          (str/join "\n" (sort (map #(str (util/filename %)) (util/get-files folder))))))
-      buffer/beginning-of-buffer
-      buffer/down))
+  (let [path (util/resolve-path folder ".")
+        content (str
+                  path "\n../\n./\n"
+                  (str/join "\n" (sort (map #(str (util/filename %) "/") (util/get-folders folder))))
+                  "\n"
+                  (str/join "\n" (sort (map #(str (util/filename %)) (util/get-files folder)))))]
+    (-> buf
+        buffer/clear
+        (buffer/insert-string content)
+        (assoc ::folder path) 
+        buffer/beginning-of-buffer
+        buffer/down)))
 
 (defn run
   ([path]
@@ -70,6 +72,8 @@
             "esc" abort-dired
             "backspace" (fn [] (apply-to-buffer #(-> % buffer/beginning-of-buffer buffer/down)) (choose))
             "\n" choose
+            "C-o" :output-snapshot
+            "C- " #(((editor/get-mode :buffer-chooser-mode) :init))
             "h" :left 
             "j" :down
             "k" :up

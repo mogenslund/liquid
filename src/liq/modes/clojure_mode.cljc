@@ -87,7 +87,7 @@
    :string-end "\""
    :comment-begin #"(?<!\\\\);.*$|^#+ .*$"
    :comment-end #"$"
-   :special-begin #"(?<=\()(ns |def(n|n-|test|record|protocol|macro)? )"
+   :special-begin #"(?<=\()(ns |def(n|n-|test|record|protocol|macro|type)? )"
    :green-begin "✔"
    :red-begin "✘"
    :yellow-begin "➜"

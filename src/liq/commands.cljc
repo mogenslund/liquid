@@ -30,8 +30,9 @@
 
 (defn external-command
   [text]
-  #?(:clj (let [f (or ((editor/current-buffer) ::buffer/filename) ".")
-                folder (util/absolute (util/get-folder f))
+  #?(:clj (let [f (or ((editor/current-buffer) ::buffer/filename "."))
+                folder (or ((editor/current-buffer) :liq.modes.dired-mode/folder)
+                           (util/absolute (util/get-folder f)))
                 text1 (str/replace text #"%" f)]
             (editor/message (str "Running command: " text1 "\n") :view true)
             (future
@@ -53,8 +54,11 @@
         w (buffer/word buf)
         project-part (when-let [p (re-find #"^:\+(?:\w+|-)+$" w)] (str (subs p 2) ".md"))
         part (or project-part (re-find #"[^:\(\)\[\]\{\}]+" w))
-        buffer-file (or (buf ::buffer/filename) ((editor/get-buffer (editor/previous-regular-buffer-id)) ::buffer/filename))
-        alternative-parent (if buffer-file (util/get-folder buffer-file) ".")
+        buffer-file (or (buf ::buffer/filename)
+                        ((editor/get-buffer (editor/previous-regular-buffer-id)) ::buffer/filename))
+        alternative-parent (if buffer-file
+                             (util/get-folder buffer-file)
+                             (or ((editor/get-buffer (editor/previous-regular-buffer-id)) :liq.modes.dired-mode/folder) "."))
         filepath (util/resolve-path part alternative-parent)]
     (e-cmd filepath)))
 
@@ -276,6 +280,17 @@
     (when-let [fun (-> @editor/state ::editor/commands keyw)]
       (apply fun args)))) 
 
+(defn output-snapshot
+  [] 
+  (let [id (editor/get-buffer-id-by-name "output-snapshot")]
+    (if id
+      (editor/switch-to-buffer id)
+      (editor/new-buffer "" {:name "output-snapshot"}))
+    (editor/apply-to-buffer
+      #(-> %
+           buffer/clear
+           (buffer/insert-string
+             (buffer/text (editor/get-buffer "*output*")))))))
 
 (defn load-commands
   []
@@ -374,13 +389,10 @@
      :navigate-lines #(typeahead-lines (editor/current-buffer))
      :open-file-at-point open-file-at-point
      :end-of-buffer #(non-repeat-fun buffer/end-of-buffer)
-     :scroll-cursor-top (fn [] (non-repeat-fun #(assoc % ::buffer/tow {::buffer/row (-> % ::buffer/cursor ::buffer/row) ::buffer/col 1})))
-     :scroll-page (fn []
-                    (non-repeat-fun
-                      #(as-> %  _
-                             (assoc _ ::buffer/cursor (_ ::buffer/tow))
-                             (buffer/down _ (-> _ ::buffer/window ::buffer/rows))
-                             (assoc _ ::buffer/tow (_ ::buffer/cursor)))))
+     :scroll-cursor-top (fn [] (non-repeat-fun buffer/scroll-cursor-top))
+     :scroll-page (fn [] (non-repeat-fun buffer/page-down))
+     :page-down (fn [] (non-repeat-fun buffer/page-down))
+     :page-up (fn [] (non-repeat-fun buffer/page-up))
 
      :set-visual-mode #(non-repeat-fun buffer/set-visual-mode)
      :set-normal-mode #(non-repeat-fun buffer/set-normal-mode)
@@ -416,6 +428,7 @@
      :t4 #(editor/message (pr-str (buffer/line (editor/current-buffer) 1)))
      :t5 #(editor/message (pr-str (:liq.buffer/lines (editor/current-buffer))))
      :t6 #(((editor/get-mode :info-dialog-mode) :init) "This is the info dialog")
+     :output-snapshot output-snapshot 
      :! (fn [& args] (external-command (str/join " " args)))
      :git (fn [& args] (external-command (str "git " (str/join " " args))))
      :grep (fn [& args] (external-command (str "grep " (str/join " " args))))

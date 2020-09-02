@@ -1105,7 +1105,6 @@
              true (recur (next-point b))))))
   ([buf n] (nth (iterate word-forward-ws buf) n)))
 
-
 (defn calculate-wrapped-row-dist
   [buf cols row1 row2]
   ;; todo subtract number of hidden lines between row1 and row2
@@ -1113,6 +1112,48 @@
              %1
              (+ %1 1 (quot (dec (col-count buf %2)) cols)))
           0 (range row1 row2))) 
+
+(defn beginning-of-window
+  [buf]
+  (assoc buf ::cursor (buf ::tow)))
+
+(defn end-of-window
+  [buf]
+  (let [row1 (-> buf ::tow ::row)
+        rows (-> buf ::window ::rows)
+        cols (-> buf ::window ::cols)]
+    (loop [row2 (-> buf ::cursor ::row)]
+      (if (> (calculate-wrapped-row-dist buf cols row1 row2) rows) 
+        (beginning-of-line (down buf (- row2 (-> buf ::cursor ::row) 2)))
+        (recur (inc row2))))))
+
+(defn scroll-cursor-top
+  [buf]
+  (assoc buf ::tow {::row (-> buf ::cursor ::row) ::col 1}))
+
+(defn scroll-cursor-bottom
+  [buf]
+  (let [row1 (-> buf ::cursor ::row)
+        rows (-> buf ::window ::rows)
+        cols (-> buf ::window ::cols)]
+    (loop [row2 (-> buf ::tow ::row)]
+      (if (or (> (calculate-wrapped-row-dist buf cols row2 row1) rows) (= row2 1))
+        (assoc-in buf [::tow ::row] row2)
+        (recur (dec row2))))))
+
+(defn page-down
+  [buf]
+  (-> buf
+      end-of-window
+      down
+      scroll-cursor-top )) 
+
+(defn page-up
+  [buf]
+  (-> buf
+      beginning-of-window
+      up
+      scroll-cursor-bottom ))
 
 (defn recalculate-tow
   "This is a first draft, which does not handle edge

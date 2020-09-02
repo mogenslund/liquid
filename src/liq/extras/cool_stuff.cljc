@@ -8,18 +8,6 @@
                     BufferedReader InputStreamReader]
            [java.nio.charset Charset]))
 
-(defn output-snapshot
-  [] 
-  (let [id (editor/get-buffer-id-by-name "output-snapshot")]
-    (if id
-      (editor/switch-to-buffer id)
-      (editor/new-buffer "" {:name "output-snapshot"}))
-    (editor/apply-to-buffer
-      #(-> %
-           buffer/clear
-           (buffer/insert-string
-             (buffer/text (editor/get-buffer "*output*")))))))
-
 ;; clj -J-Dclojure.server.repl="{:port 5555 :accept clojure.core.server/repl}"
 (def socket (atom nil))
 
@@ -81,8 +69,7 @@
   (swap! editor/state assoc-in [::editor/commands :jack-out] jack-out) 
   (swap! editor/state assoc-in [::editor/commands :output-split] output-split) 
   (editor/add-key-bindings :clojure-mode :normal
-    {"C-o" output-snapshot
-     "f5" #(send-sexp-at-point-to-repl (editor/current-buffer))
+    {"f5" #(send-sexp-at-point-to-repl (editor/current-buffer))
      "f6" jack-out})
   (editor/add-key-bindings :clojure-mode :visual
     {"f5" #(send-sexp-at-point-to-repl (editor/current-buffer))}))
