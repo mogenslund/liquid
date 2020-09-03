@@ -58,6 +58,11 @@
   [keyw]
   (or ((@state ::modes) keyw) {}))
 
+(defn add-new-buffer-hook
+  "Add function: buffer -> buffer to new-buffer-hook"
+  [fun]
+  (swap! state update ::new-buffer-hooks conj (buffer/ensure-buffer-fun fun)))
+
 (defn- deep-merge
   [m1 m2]
   (merge-with #(if (and (map? %1) (map? %2)) (deep-merge %1 %2) %1) m1 m2))
@@ -154,7 +159,7 @@
   "Apply function to buffer"
   ([idname fun]
    (if (number? idname)
-     (swap! state update-in [::buffers idname] fun)
+     (swap! state update-in [::buffers idname] (buffer/ensure-buffer-fun fun))
      (apply-to-buffer (get-buffer-id-by-name idname) fun)))
   ([fun] (apply-to-buffer (current-buffer-id) fun)))
 

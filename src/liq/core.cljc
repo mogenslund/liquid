@@ -10,6 +10,7 @@
             [liq.modes.clojure-mode :as clojure-mode]
             [liq.modes.javascript-mode :as javascript-mode]
             [liq.modes.spacemacs-mode :as spacemacs-mode]
+            [liq.modes.notepad-mode :as notepad-mode]
             [liq.modes.parinfer-mode :as parinfer-mode]
             [liq.modes.info-dialog-mode :as info-dialog-mode]
             #?(:clj [liq.extras.cool-stuff :as cool-stuff])
@@ -106,6 +107,7 @@
           (input/init)
           (editor/set-exit-handler input/exit-handler)
           (input/input-handler editor/handle-input)))
+  (when (read-arg args "--notepad") (notepad-mode/load-notepad-mode))
   (let [w (editor/get-window)
         rows (w ::buffer/rows)
         cols (w ::buffer/cols w)]

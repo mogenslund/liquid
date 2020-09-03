@@ -29,6 +29,7 @@ major-modes.txt
 commands.txt
 evaluation.txt
 spacemacs-mode.txt
+notepad-mode.txt
 syntax-highlighting.txt
 datastructures.txt
 output-handler.txt

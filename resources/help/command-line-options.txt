@@ -16,3 +16,6 @@ Options
     --init=<path>  Where <path> is the path to a file. Use this to load a clj
                    file on startup. If there is a .liq file it will not be
                    loaded if this parameter is set.
+
+    --notepad      Start with notepad-mode enabled: In insert mode behavior is
+                   notepad.

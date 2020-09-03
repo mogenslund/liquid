@@ -30,7 +30,7 @@ new-buffer-hooks.
       (:require [liq.editor :as editor]
                 [liq.buffer :as buffer]))
 
-    (swap! editor/state update ::editor/new-buffer-hooks conj
+    (editor/add-new-buffer-hook
       (fn [buf]
         (if (and (buf ::buffer/filename)
                  (re-matches #".*.(cljc?)" (buf ::buffer/filename)))

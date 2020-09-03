@@ -36,6 +36,19 @@
       ::major-modes (or major-modes (list :spacemacs-mode :clojure-mode :fundamental-mode))}))
   ([text] (buffer text {})))
 
+(defn buffer?
+  "If buf is a buffer it is returned, otherwise nil.
+  Useful to capture inconsistent buffers."
+  [buf]
+  (when (and (map? buf) (contains? buf ::lines)) buf))
+
+(defn ensure-buffer-fun
+  "Make a function that will always return a buffer
+  given a buffer. If not a buffer, then identity is
+  returned"
+  [fun]
+  (fn [buf] (or (buffer? (fun buf)) buf)))
+
 (defn insert-in-vector
   "Insert an element into a vector, at a given position.
   (insert-in-vector [:a :c :d] 1 :b) -> [:a :b :c :d])
@@ -1218,7 +1231,7 @@
   If no match nil is returned"
   [buf re]
   (match-at-pos (line buf) (- (-> buf ::cursor ::col) 1) re))
-  
+
 
 
 (comment
