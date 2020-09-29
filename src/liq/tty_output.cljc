@@ -1,36 +1,13 @@
 (ns liq.tty-output
   (:require [liq.buffer :as buffer]
             #?(:clj [clojure.java.io :as io])
+            #?(:clj [clojure.java.shell :as shell])
               ; :cljs [lumo.io :as io]
               
             [clojure.string :as str]))
 
 (def ^:private last-buffer (atom nil))
 (def esc "\033[")
-
-(defn cmd
-  "Execute a native command.
-  Adding :timeout 60 or similar as last command will
-  add a timeout to the process."
-  [& args]
-  (let [builder (doto (ProcessBuilder. args)
-                  (.redirectErrorStream true))
-        process (.start builder)
-        lineprocessor (future (doseq [line (line-seq (io/reader (.getInputStream process)))]
-                                (println line)))
-        monitor (future (.waitFor process))
-        starttime (quot (System/currentTimeMillis) 1000)]
-    (try
-      (while (and (not (future-done? monitor))
-                  (< (- (quot (System/currentTimeMillis) 1000) starttime)))
-        (Thread/sleep 1000))
-      (catch Exception e
-        (do (.destroy process)
-            (println "Exception" (.getMessage e))
-            (future-cancel monitor))))
-    (when (not (future-done? monitor))
-      (println "TimeoutException or Interrupted")
-      (.destroy process))))
 
 (defn- tty-print
   [& args]
@@ -44,25 +21,26 @@
 
 (defn rows
   []
-  #?(:clj (loop [shellinfo (with-out-str (cmd "/bin/sh" "-c" "stty size </dev/tty")) n 0]
-            (if (or (re-find #"^\d+" shellinfo) (> n 10)) 
+  #?(:clj (loop [shellinfo ((shell/sh "/bin/sh" "-c" "stty size </dev/tty") :out) n 0]
+            (if (or (re-find #"^\d+" shellinfo) (> n 10))
               (Integer/parseInt (re-find #"^\d+" shellinfo))
               (do
                 (tty-println n)
                 (Thread/sleep 100)
-                (recur (with-out-str (cmd "/bin/sh" "-c" "stty size </dev/tty")) (inc n)))))
-     :cljs (aget (js/process.stdout.getWindowSize) 1))) 
+                (recur ((shell/sh "/bin/sh" "-c" "stty size </dev/tty") :out) (inc n)))))
+     :cljs (aget (js/process.stdout.getWindowSize) 0))) 
 
 (defn cols
   []
-  #?(:clj (loop [shellinfo (with-out-str (cmd "/bin/sh" "-c" "stty size </dev/tty")) n 0]
+  #?(:clj (loop [shellinfo ((shell/sh "/bin/sh" "-c" "stty size </dev/tty") :out) n 0]
             (if (or (re-find #"\d+$" shellinfo) (> n 10)) 
              (dec (Integer/parseInt (re-find #"\d+$" shellinfo)))
              (do
                (tty-println n)
                (Thread/sleep 100)
-               (recur (with-out-str (cmd "/bin/sh" "-c" "stty size </dev/tty")) (inc n)))))
+               (recur ((shell/sh "/bin/sh" "-c" "stty size </dev/tty") :out) (inc n)))))
      :cljs (aget (js/process.stdout.getWindowSize) 0))) 
+
 
 (defn get-dimensions
   []

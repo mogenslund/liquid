@@ -1,0 +1,49 @@
+help.txt snippets.txt                                                 salza.dk
+
+
+                                 Snippets
+
+
+Copy, modify and evaluate the snippets below to change the behavior of Liquid.
+
+==============================================================================
+Requires
+
+Evaluate the ns below to have all the requires for the snippets in this 
+document:
+
+    (ns user
+      (:require [clojure.string :as str]
+                [liq.editor :as editor]
+                [liq.buffer :as buffer]))
+
+==============================================================================
+Modify keybindings
+
+    (editor/add-key-bindings :fundamental-mode :normal
+      {"-" {"r" #(editor/message (rand-int 100))}})
+
+Evaluate the snippet. Now pressing "-" and then "r" will print a random number
+in the output area.
+
+==============================================================================
+Add actions
+   
+    (editor/set-command :showtime #(editor/message (java.util.Date.)))
+
+Evaluate the snippet. Now time is shown when typing ":showtime".
+
+==============================================================================
+Buffer actions
+
+    (editor/set-command
+      :my-buffer-action
+      #(editor/apply-to-buffer (fn [buf] (buffer/insert-string buf "----"))))
+
+Type command ":my-buffer-action" and "----" will be inserted into the editor.
+
+==============================================================================
+Show UIs
+
+    (javax.swing.JOptionPane/showMessageDialog nil "Hello")
+

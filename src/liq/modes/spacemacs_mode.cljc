@@ -33,9 +33,10 @@
   (add-mapping [" " "f" "s"] :w)
   (add-description [" " "q"] "q Quit")
   (add-mapping [" " "q" "q"] :q)
-  (add-description [" " "b"] "TAB Alternate buffer      b Bufferchooser    k Kill buffer ")
+  (add-description [" " "b"] "TAB Alternate buffer      b Bufferchooser    k Kill buffer\nr Repaint buffers")
   (add-mapping [" " "b" "\t"] :previous-regular-buffer)
   (add-mapping [" " "b" "b"] #(((editor/get-mode :buffer-chooser-mode) :init)))
+  (add-mapping [" " "b" "r"] #(editor/paint-all-buffers))
   (add-mapping [" " "b" "k"] :bd))
  
  

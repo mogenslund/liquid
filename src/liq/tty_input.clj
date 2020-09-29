@@ -1,6 +1,7 @@
 (ns liq.tty-input
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
+            [clojure.java.shell :as shell]
             [liq.util :as util]
             [liq.tty-shared :as shared]))
 
@@ -17,34 +18,9 @@
   [& args]
   (.println sysout (str/join "" args)))
 
-(defn cmd
-  "Execute a native command.
-  Adding :timeout 60 or similar as last command will
-  add a timeout to the process."
-  [& args]
-  (let [builder (doto (ProcessBuilder. args)
-                  (.redirectErrorStream true))
-        process (.start builder)
-        lineprocessor (future (doseq [line (line-seq (io/reader (.getInputStream process)))]
-                                (println line)))
-        monitor (future (.waitFor process))
-        starttime (quot (System/currentTimeMillis) 1000)]
-    (try
-      (while (and (not (future-done? monitor))
-                  (< (- (quot (System/currentTimeMillis) 1000) starttime)))
-        (Thread/sleep 1000))
-      (catch Exception e
-        (do (.destroy process)
-            (println "Exception" (.getMessage e))
-            (future-cancel monitor))))
-    (when (not (future-done? monitor))
-      (println "TimeoutException or Interrupted")
-      (.destroy process))))
-
-
 (defn set-raw-mode
   []
-  (cmd "/bin/sh" "-c" "stty -echo raw </dev/tty")
+  (shell/sh "/bin/sh" "-c" "stty -echo raw </dev/tty")
   (tty-print esc "0;37m" esc "2J")
   (tty-print esc "?7l")  ; disable line wrap
   (tty-print esc "5000;5000H" esc "s")
@@ -53,16 +29,16 @@
 (defn set-line-mode
   []
   ;(tty-print esc "0;37m" esc "2J")
-  (cmd "/bin/sh" "-c" "stty -echo cooked </dev/tty")
-  (cmd "/bin/sh" "-c" "stty -echo sane </dev/tty")
+  (shell/sh "/bin/sh" "-c" "stty -echo cooked </dev/tty")
+  (shell/sh "/bin/sh" "-c" "stty -echo sane </dev/tty")
   (tty-print esc "0;0H" esc "s"))
 
 (defn exit-handler
   []
   (tty-print "\033[0;37m\033[2J")
   (tty-print "\033[?25h")
-  (cmd "/bin/sh" "-c" "stty -echo cooked </dev/tty")
-  (cmd "/bin/sh" "-c" "stty -echo sane </dev/tty")
+  (shell/sh "/bin/sh" "-c" "stty -echo cooked </dev/tty")
+  (shell/sh "/bin/sh" "-c" "stty -echo sane </dev/tty")
   (tty-print "\n")
   (System/exit 0))
 

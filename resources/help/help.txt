@@ -33,6 +33,7 @@ notepad-mode.txt
 syntax-highlighting.txt
 datastructures.txt
 output-handler.txt
+snippets.txt
 
 MODIFYING LIQUID:
 keybindings.txt

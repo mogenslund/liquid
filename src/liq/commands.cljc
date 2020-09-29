@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer :refer [delete-region shrink-region set-insert-mode]]
+            [clojure.pprint :as pprint]
             #?(:clj [liq.tools.shell :as s])
             #?(:cljs [cljs.js :refer [eval eval-str empty-state]])
             [liq.util :as util]))
@@ -407,6 +408,8 @@
      :new #(editor/new-buffer "" {})
      :buffers #(((editor/get-mode :buffer-chooser-mode) :init))
      :buffer-major-modes #(editor/message (str ((editor/current-buffer) ::buffer/major-modes)))
+     :buffer-info #(editor/message (with-out-str (pprint/pprint (buffer/info (editor/current-buffer)))))
+     :paint-all-buffers #(editor/paint-all-buffers)
      :settings #(editor/message (@editor/state ::editor/settings))
      :ls #(((editor/get-mode :buffer-chooser-mode) :init))
      :previous-regular-buffer editor/previous-regular-buffer

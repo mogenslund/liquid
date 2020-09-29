@@ -216,6 +216,15 @@
        ((-> @state ::output-handler :printer) (assoc (highlight-paren buf) :status-line (get-buffer "*status-line*"))))))
   ([] (paint-buffer (current-buffer-id))))
 
+(defn paint-all-buffers
+  []
+  (doseq [buf (sort-by ::idx (vals (@state ::buffers)))]
+    (paint-buffer (buf ::id))))
+       
+
+(comment (map ::buffer/name (sort-by ::idx (vals (@state ::buffers)))))
+(comment (paint-buffer "*delimeter*"))
+
 (defn invalidate-ui
   []
   (when-let [f (-> @state ::output-handler :invalidate)]

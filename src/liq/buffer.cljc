@@ -1232,7 +1232,23 @@
   [buf re]
   (match-at-pos (line buf) (- (-> buf ::cursor ::col) 1) re))
 
-
+(defn info
+  "Return map with interesting info about the
+  buffer."
+  [buf]
+  {:name (buf ::name)
+   :filename (buf ::filename)
+   :line-count (count (buf ::lines))
+   :cursor-row (-> buf ::cursor ::row)
+   :cursor-col (-> buf ::cursor ::col)
+   :window-top (-> buf ::window ::top)
+   :window-left (-> buf ::window ::left)
+   :window-rows (-> buf ::window ::rows)
+   :window-cols (-> buf ::window ::cols)
+   :tow-row (-> buf ::tow ::row)
+   :tow-col (-> buf ::tow ::col)
+   :mode (buf ::mode)
+   :major-modes (buf ::major-modes)})
 
 (comment
 

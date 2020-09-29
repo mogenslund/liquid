@@ -136,6 +136,7 @@
   (:require [clojure.java.shell :as shell]
             [clojure.java.io :as io]
             [clojure.data.json :as json]
+            [clojure.pprint :as pprint]
             [liq.extras.mindmap :refer [mindmap]]
             [liq.util :as util]
             [liq.buffer :as buffer]
