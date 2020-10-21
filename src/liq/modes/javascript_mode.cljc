@@ -22,8 +22,6 @@
    :green-begin "✔"
    :red-begin "✘"
    :yellow-begin "➜"
-   :bold-begin #"(?<=\*)\w+"
-   :bold-end #"\*"
    :definition-begin #"[\w\#\.\-\_\:\+\=\>\<\/\!\?\*]+"
    :definition-end #"."})
 
@@ -43,7 +41,6 @@
                   (match :green-begin) :green
                   (match :yellow-begin) :yellow
                   (match :red-begin) :red
-                  (match :bold-begin) :bold
                   (match :special-begin) :special
                   #"[-a-zA-Z0-9]+\.txt" :topic
                   #"---.*---" :topic
@@ -87,10 +84,6 @@
      :red
       {:style :red
        :matchers {#".|$|^" :plain}}
-
-     :bold
-      {:style :green
-       :matchers {(match :bold-end) :plain}}
 
      :definition
       {:style :definition
