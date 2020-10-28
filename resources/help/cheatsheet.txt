@@ -164,7 +164,7 @@ Examples
 ==============================================================================
 .liq example
 
-Save a file in ~/.liq2 to load the content on startup.
+Save a file in ~/.liq to load the content on startup.
 
 The example below will create an outputbuffer at the buttom of the window to 
 make evaluation and result flow more smooth.

@@ -1,6 +1,6 @@
-(ns liq2.tty-input
+(ns liq.tty-input
   (:require [clojure.string :as str]
-            [liq2.tty-shared :as shared]))
+            [liq.tty-shared :as shared]))
 
 (def esc "\033[")
 

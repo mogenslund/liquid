@@ -9,7 +9,8 @@
                   ::buffers {}
                   ::modes {}
                   ::new-buffer-hooks []
-                  ::settings {:auto-switch-to-output true}
+                  ::settings {:auto-switch-to-output true
+                              :default-tabwidth 8}
                   ::exit-handler nil
                   ::window nil
                   ::output-handler nil}))
@@ -288,7 +289,9 @@
                               :left (w ::buffer/left)
                               :rows (w ::buffer/rows)
                               :cols (w ::buffer/cols)))) 
-         buf (reduce #(%2 %1) (assoc (buffer/buffer text o) ::id id ::idx id) (@state ::new-buffer-hooks))]
+         buf (reduce #(%2 %1)
+                     (assoc (buffer/buffer text o) ::id id ::idx id ::buffer/tabwidth (get-setting :default-tabwidth))
+                     (@state ::new-buffer-hooks))]
      (swap! state update ::buffers assoc id buf) 
      (highlight-buffer id)
      (switch-to-buffer id)

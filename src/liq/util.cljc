@@ -3,6 +3,7 @@
             #?(:clj [clojure.java.io :as io]
               ; :cljs [lumo.io :as io :refer [slurp spit]]
               )
+            #?(:bb [clojure.java.io :as io])
             #?(:cljs [cljs.js :refer [eval eval-str empty-state]])))
 
 (def counter (atom 0))

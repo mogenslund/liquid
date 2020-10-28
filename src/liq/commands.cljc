@@ -302,6 +302,7 @@
      :right ^:motion #(buffer/right %1 %2)
      :first-non-blank #(non-repeat-fun buffer/first-non-blank)
      :0 #(non-repeat-fun buffer/beginning-of-line)
+     :beginning-of-line #(non-repeat-fun buffer/beginning-of-line)
      :move-matching-paren #(non-repeat-fun buffer/move-matching-paren)
      :word-forward ^:motion #(buffer/word-forward %1 %2)
      :word-forward-ws ^:motion #(buffer/word-forward-ws %1 %2)

@@ -24,6 +24,9 @@
             "right" :right 
             "pgdn" :page-down
             "pgup" :page-up
+            "home" :beginning-of-line
+            "end" :end-of-line
+            "delete" :delete-char
             "C-x" {"C-e" :eval-sexp-at-point} 
             "M-x" (fn [] (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
                        (((editor/get-mode :minibuffer-mode) :init) ":"))}
@@ -62,6 +65,9 @@
             "right" :right 
             "pgdn" :page-down
             "pgup" :page-up
+            "home" :beginning-of-line
+            "end" :end-of-line
+            "delete" :delete-char
             "w" :word-forward
             "W" :word-forward-ws
             "b" :beginning-of-word

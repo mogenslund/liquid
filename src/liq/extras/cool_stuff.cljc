@@ -12,20 +12,21 @@
 (def socket (atom nil))
 
 (defn jack-in
-  [port]
-  (let [s (try (Socket. "localhost" (util/int-value port)) (catch Exception e nil))]
-    (when s
-      (reset! socket {:socket s
-                      :in (BufferedInputStream. (.getInputStream s))
-                      :out (BufferedOutputStream. (.getOutputStream s))
-                      :reader (BufferedReader. (InputStreamReader. (BufferedInputStream. (.getInputStream s))))})
-      (future
-        (loop []
-          (when @socket
-            (let [l (.readLine (@socket :reader))]
-              (when l
-                (editor/message l)
-                (recur)))))))))
+  ([port]
+   (let [s (try (Socket. "localhost" (util/int-value port)) (catch Exception e nil))]
+     (when s
+       (reset! socket {:socket s
+                       :in (BufferedInputStream. (.getInputStream s))
+                       :out (BufferedOutputStream. (.getOutputStream s))
+                       :reader (BufferedReader. (InputStreamReader. (BufferedInputStream. (.getInputStream s))))})
+       (future
+         (loop []
+           (when @socket
+             (let [l (.readLine (@socket :reader))]
+               (when l
+                 (editor/message l)
+                 (recur)))))))))
+  ([] (jack-in "5555")))
 
 (defn jack-out
   []
@@ -65,7 +66,7 @@
 
 (defn load-cool-stuff
   []
-  (swap! editor/state assoc-in [::editor/commands :jack-in] jack-in) 
+  (swap! editor/state assoc-in [::editor/commands :jack-in] jack-in)
   (swap! editor/state assoc-in [::editor/commands :jack-out] jack-out) 
   (swap! editor/state assoc-in [::editor/commands :output-split] output-split) 
   (editor/add-key-bindings :clojure-mode :normal

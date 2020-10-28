@@ -80,6 +80,7 @@
 (defn print-buffer
   [buf]
   (let [cache-id (buffer-footprint buf)
+        tw (or (buf ::buffer/tabwidth) 8)
         w (buf ::buffer/window)
         top (w ::buffer/top)   ; Window top margin
         left (w ::buffer/left) ; Window left margin
@@ -103,12 +104,13 @@
      (if (< trow (+ rows top))
        (do
        ;; Check if row has changed...
-         (let [cursor-match (or (and (= row crow) (= col ccol))
+         (let [cm (or (-> buf ::buffer/lines (get (dec row)) (get (dec col))) {}) ; Char map like {::buffer/char \x ::buffer/style :string} 
+               c-width (if (= (cm ::buffer/char) \tab) (- tw (mod (- tcol left) tw)) 1) ; Width of the char
+               cursor-match (or (and (= row crow) (= col ccol))
                                 (and (= row crow) (not cursor-col) (> col ccol))
                                 (and (not cursor-row) (> row crow)))
-               cm (or (-> buf ::buffer/lines (get (dec row)) (get (dec col))) {}) ; Char map like {::buffer/char \x ::buffer/style :string} 
                c (cond (and cursor-match (buf :status-line)) "█" 
-                       (= (cm ::buffer/char) \tab) (char 172)
+                       (= (cm ::buffer/char) \tab) (str/join (repeat c-width " "))
                        (= (cm ::buffer/char) \return) (char 633)
                        (cm ::buffer/char) (cm ::buffer/char)
                        (and (= col (inc (buffer/col-count buf row))) (> (buffer/next-visible-row buf row) (+ row 1))) "…"
@@ -120,15 +122,16 @@
                bgcolor (if (buffer/selected? buf row col) "48;5;17" "49")
                last-col (+ cols left -1)
                n-trow (if (< last-col tcol) (inc trow) trow)
-               n-tcol (if (< last-col tcol) left (inc tcol))
+               ;n-tcol (if (< last-col tcol) left (inc tcol))
+               n-tcol (if (< last-col tcol) left (+ tcol c-width))
                n-row (cond (and (< last-col tcol) (> col (buffer/col-count buf row))) (buffer/next-visible-row buf row)
                            true row)
                n-col (cond (and (< last-col tcol) (> col (buffer/col-count buf row))) 1
                            true (inc col))]
-              (draw-char c trow tcol color bgcolor)
-             (recur n-trow n-tcol n-row n-col new-cursor-row new-cursor-col)))
+           (draw-char c trow tcol color bgcolor)
+           (recur n-trow n-tcol n-row n-col new-cursor-row new-cursor-col)))
        (when (buf :status-line)
-         (tty-print esc cursor-row ";" cursor-col "H" esc "s" (or (buffer/get-char buf) \space))
+         (tty-print esc cursor-row ";" cursor-col "H" esc "s" (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space))
          (tty-print esc "?25h" esc cursor-row ";" cursor-col "H" esc "s")
          (reset! last-buffer cache-id))))))
 
