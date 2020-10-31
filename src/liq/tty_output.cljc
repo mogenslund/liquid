@@ -62,11 +62,15 @@
    nil "0"})
 
 (def char-cache (atom {}))
+(def countdown-cache (atom 0))
 (defn- draw-char
   [ch row col color bgcolor]
   (let [k (str row "-" col)
         footprint (str ch row col color bgcolor)]
     (when (not= (@char-cache k) footprint)
+      (reset! countdown-cache 9))
+    (when (> @countdown-cache 0)
+      (swap! countdown-cache dec)
       (tty-print esc color "m")
       (tty-print esc bgcolor "m")
       (tty-print esc row ";" col "H" esc "s" ch)
@@ -92,7 +96,7 @@
    (when (= cache-id @last-buffer)
      (tty-print "█")) ; To make it look like the cursor is still there while drawing.
    (tty-print esc "?25l") ; Hide cursor
-   (when-let [statusline (buf :status-line)]
+   (when-let [statusline (and (not= (buf ::buffer/name) "*minibuffer*") (buf :status-line))]
      (print-buffer statusline))
   ;; Looping over the rows and cols in buffer window in the terminal
    (loop [trow top  ; Terminal row
