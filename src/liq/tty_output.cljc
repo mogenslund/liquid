@@ -104,7 +104,8 @@
           row (tow ::buffer/row)
           col (tow ::buffer/col)
           cursor-row nil
-          cursor-col nil]
+          cursor-col nil
+          ccolor "0"]
      (if (< trow (+ rows top))
        (do
        ;; Check if row has changed...
@@ -133,9 +134,10 @@
                n-col (cond (and (< last-col tcol) (> col (buffer/col-count buf row))) 1
                            true (inc col))]
            (draw-char c trow tcol color bgcolor)
-           (recur n-trow n-tcol n-row n-col new-cursor-row new-cursor-col)))
+           (recur n-trow n-tcol n-row n-col new-cursor-row new-cursor-col (if cursor-match color ccolor))))
        (when (buf :status-line)
-         (tty-print esc cursor-row ";" cursor-col "H" esc "s" (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space))
+         (tty-print esc ccolor "m" esc cursor-row ";" cursor-col "H" esc "s" (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space))
+         ;(draw-char (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space) cursor-row cursor-col ccolor "49")
          (tty-print esc "?25h" esc cursor-row ";" cursor-col "H" esc "s")
          (reset! last-buffer cache-id))))))
 
