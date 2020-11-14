@@ -1,0 +1,53 @@
+help.txt orchart-integration.txt                                      salza.dk
+
+
+                          Orchart Integration
+
+
+The plugin liquid-orchard is for enhanced goto definition functionality.
+
+The plugin is located here
+
+    https://github.com/mogenslund/liquid-orchard
+
+Wrappring the library
+
+    https://github.com/clojure-emacs/orchard
+
+which is designed to provide common functionality for Clojure development.
+
+The plugin is not included in core liquid to keep the core free from external
+dependencies.
+
+The current version of the plugin will replace the built-in goto-definition
+function with keybinding g D.
+
+Since orchard is capable of much more, the plugin will probably grow over time
+levaraging even more functionlity.
+
+Using the plugin together with liquid is done in two steps:
+
+ 1. Add the liquid-orchard to class path
+ 2. Load the plugin to modify the editor to use the functionality
+
+==============================================================================
+Add liquid-orchard to classpath
+
+One way to do that is starting liquid using
+
+    clojure -Sdeps \
+      '{:deps {liquid-orchard 
+                {:git/url "https://github.com/mogenslund/liquid-orchard" 
+                 :sha "d4e74abea5fd64d8043ef6e7a85d15ddae9b6a0d"}}}' \
+      -m liq.core
+
+==============================================================================
+Code to be added to .liq
+
+    (ns user 
+      (:require [liquid-orchard.core :as liqo]))
+
+    (liqo/load-liquid-orchard)
+
+Of cause it can be added in many other ways. Only thing needed is the
+classpath to be in place and the load-liquid-orchard function to be executed.

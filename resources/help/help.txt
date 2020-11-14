@@ -47,6 +47,7 @@ cool-stuff.txt
 word-completion.txt
 how-it-works.txt
 lynx-integration.txt
+orchard-integration.txt
 
 TIPS & TRICKS
 project-specific-modifications.txt
