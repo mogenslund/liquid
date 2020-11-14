@@ -38,7 +38,7 @@ One way to do that is starting liquid using
     clojure -Sdeps \
       '{:deps {liquid-orchard 
                 {:git/url "https://github.com/mogenslund/liquid-orchard" 
-                 :sha "d4e74abea5fd64d8043ef6e7a85d15ddae9b6a0d"}}}' \
+                 :sha "eace7a5b23eac0ed1d74b8a1f598a289ff5d9f37"}}}' \
       -m liq.core
 
 ==============================================================================
