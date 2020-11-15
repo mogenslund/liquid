@@ -142,17 +142,21 @@
   []
   (let [buf (current-buffer)
         bufb (first
-               (filter #(> (-> % ::buffer/window ::buffer/top) (-> buf ::buffer/window ::buffer/top))
+               (filter #(and (> (-> % ::buffer/window ::buffer/top) (-> buf ::buffer/window ::buffer/top))
+                             (not= (% ::buffer/name) "*minibuffer*")
+                             (not= (% ::buffer/name) "*status-line*"))
                        (all-buffers)))]
-    (when (and bufb (not= (bufb ::buffer/name) "*minibuffer*"))  (switch-to-buffer (bufb ::id)))))
+    (when bufb (switch-to-buffer (bufb ::id)))))
 
 (defn window-above
   []
   (let [buf (current-buffer)
         bufb (first
-               (filter #(< (-> % ::buffer/window ::buffer/top) (-> buf ::buffer/window ::buffer/top))
+               (filter #(and (< (-> % ::buffer/window ::buffer/top) (-> buf ::buffer/window ::buffer/top))
+                             (not= (% ::buffer/name) "*minibuffer*")
+                             (not= (% ::buffer/name) "*status-line*"))
                        (all-buffers)))]
-    (when (and bufb (not= (bufb ::buffer/name) "*minibuffer*"))  (switch-to-buffer (bufb ::id)))))
+    (when bufb (switch-to-buffer (bufb ::id)))))
  
 
 (defn previous-buffer
