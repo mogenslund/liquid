@@ -415,6 +415,8 @@
      :settings #(editor/message (@editor/state ::editor/settings))
      :window-smaller #(editor/window-resize-vertical -1)
      :window-larger #(editor/window-resize-vertical 1)
+     :window-below editor/window-below
+     :window-above editor/window-above
      :ls #(((editor/get-mode :buffer-chooser-mode) :init))
      :previous-regular-buffer editor/previous-regular-buffer
      :help (fn [& args] (apply ((editor/get-mode :help-mode) :init) args))
