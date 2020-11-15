@@ -32,7 +32,7 @@
                        (((editor/get-mode :minibuffer-mode) :init) ":"))}
    :normal {"esc" (fn []
                     (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
-                    (editor/invalidate-ui))
+                    (editor/paint-all-buffer-groups))
             "C- " #(((editor/get-mode :buffer-chooser-mode) :init))
             "C-b" :previous-regular-buffer
             "C-f" :page-down
@@ -147,7 +147,9 @@
             "J" :join-lines-space
             "V" :select-line
             "o" :append-line
-            "O" :append-line-above}
+            "O" :append-line-above
+            "C-w" {"-" :window-smaller
+                   "+" :window-larger}}
     :visual {"esc" :set-normal-mode 
              "i" {"w" :select-inner-word
                   "(" :select-inner-paren
