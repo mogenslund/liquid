@@ -123,11 +123,13 @@
   (let [g (-> (current-buffer) ::buffer/window ::buffer/group)]
     (swap! state update ::buffers
       (fn [m] (into {}
-                (for [[k v] m]
-                  [k (if (= (-> v ::buffer/window ::buffer/group) g)
-                       (update-in v [::buffer/window ::buffer/rows] #(+ % amount))
-                       v)]))))))
-    
+                (for [[k buf] m]
+                  [k (if (= (-> buf ::buffer/window ::buffer/group) g)
+                       (-> buf
+                         (update-in [::buffer/window ::buffer/rows] #(+ % amount))
+                         (update-in [::buffer/window ::buffer/top] #(+ % (if (= % 1) 0 (- amount)))))
+                       buf)]))))))
+   
 (defn switch-to-buffer
   [idname]
   (if (number? idname)
@@ -135,6 +137,23 @@
       (swap! state assoc-in [::buffers idname ::idx] (util/counter-next))
       idname)
     (switch-to-buffer (get-buffer-id-by-name idname)))) 
+
+(defn window-below
+  []
+  (let [buf (current-buffer)
+        bufb (first
+               (filter #(> (-> % ::buffer/window ::buffer/top) (-> buf ::buffer/window ::buffer/top))
+                       (all-buffers)))]
+    (when (and bufb (not= (bufb ::buffer/name) "*minibuffer*"))  (switch-to-buffer (bufb ::id)))))
+
+(defn window-above
+  []
+  (let [buf (current-buffer)
+        bufb (first
+               (filter #(< (-> % ::buffer/window ::buffer/top) (-> buf ::buffer/window ::buffer/top))
+                       (all-buffers)))]
+    (when (and bufb (not= (bufb ::buffer/name) "*minibuffer*"))  (switch-to-buffer (bufb ::id)))))
+ 
 
 (defn previous-buffer
   "n = 1 means previous"

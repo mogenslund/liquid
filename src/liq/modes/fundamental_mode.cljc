@@ -149,7 +149,9 @@
             "o" :append-line
             "O" :append-line-above
             "C-w" {"-" :window-smaller
-                   "+" :window-larger}}
+                   "+" :window-larger
+                   "j" :window-below
+                   "k" :window-above}}
     :visual {"esc" :set-normal-mode 
              "i" {"w" :select-inner-word
                   "(" :select-inner-paren
