@@ -15,7 +15,7 @@
   Input: Various fields
   Output: Buffer
   Side effects: None" 
-  ([text {:keys [name filename top left rows cols major-mode major-modes mode] :as options}]
+  ([text {:keys [name filename top left rows cols major-mode major-modes mode bottom-border group] :as options}]
    (let [lines (mapv (fn [l] (mapv #(hash-map ::char %) l)) (str/split text #"\r?\n" -1))]
      {::name (or name "")
       ::filename filename
@@ -26,7 +26,8 @@
       ::hidden-lines {}
       ::cursor {::row 1 ::col 1}
       ::selection nil
-      ::window {::top (or top 1) ::left (or left 1) ::rows (or rows 1) ::cols (or cols 80)}
+      ::window {::top (or top 1) ::left (or left 1)
+                ::rows (or rows 1) ::cols (or cols 80) ::bottom-border bottom-border ::group group}
       ::mem-col 1                ; Remember column when moving up and down
       ::tow {::row 1 ::col 1}    ; Top of window
       ::mode (or mode :normal)

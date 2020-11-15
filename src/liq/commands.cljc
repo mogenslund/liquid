@@ -411,7 +411,10 @@
      :buffer-major-modes #(editor/message (str ((editor/current-buffer) ::buffer/major-modes)))
      :buffer-info #(editor/message (with-out-str (pprint/pprint (buffer/info (editor/current-buffer)))))
      :paint-all-buffers #(editor/paint-all-buffers)
+     :paint-all-buffer-groups #(editor/paint-all-buffer-groups)
      :settings #(editor/message (@editor/state ::editor/settings))
+     :window-smaller #(editor/window-resize-vertical -1)
+     :window-larger #(editor/window-resize-vertical 1)
      :ls #(((editor/get-mode :buffer-chooser-mode) :init))
      :previous-regular-buffer editor/previous-regular-buffer
      :help (fn [& args] (apply ((editor/get-mode :help-mode) :init) args))

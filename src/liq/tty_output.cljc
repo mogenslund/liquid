@@ -80,6 +80,7 @@
 
 (defn invalidate-cache
   []
+  (tty-print esc "2J")
   (reset! char-cache {}))
 
 
@@ -137,11 +138,15 @@
                            true (inc col))]
            (draw-char c trow tcol color bgcolor)
            (recur n-trow n-tcol n-row n-col new-cursor-row new-cursor-col (if cursor-match color ccolor))))
-       (when (buf :status-line)
-         (tty-print esc ccolor "m" esc cursor-row ";" cursor-col "H" esc "s" (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space))
-         ;(draw-char (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space) cursor-row cursor-col ccolor "49")
-         (tty-print esc "?25h" esc cursor-row ";" cursor-col "H" esc "s")
-         (reset! last-buffer cache-id))))))
+       (do
+         (when-let [c (w ::buffer/bottom-border)]
+           (doseq [co (range left (+ left cols))]
+             (draw-char c (+ top rows) co "38;5;11" "49")))
+         (when (buf :status-line)
+           (tty-print esc ccolor "m" esc cursor-row ";" cursor-col "H" esc "s" (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space))
+           ;(draw-char (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space) cursor-row cursor-col ccolor "49")
+           (tty-print esc "?25h" esc cursor-row ";" cursor-col "H" esc "s")
+           (reset! last-buffer cache-id)))))))
 
 (def ^:private updater (atom nil))
 (def ^:private queue (atom []))

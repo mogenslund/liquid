@@ -118,6 +118,16 @@
   []
   (get-buffer (current-buffer-id)))
 
+(defn window-resize-vertical
+  [amount]
+  (let [g (-> (current-buffer) ::buffer/window ::buffer/group)]
+    (swap! state update ::buffers
+      (fn [m] (into {}
+                (for [[k v] m]
+                  [k (if (= (-> v ::buffer/window ::buffer/group) g)
+                       (update-in v [::buffer/window ::buffer/rows] #(+ % amount))
+                       v)]))))))
+    
 (defn switch-to-buffer
   [idname]
   (if (number? idname)
@@ -221,7 +231,6 @@
   []
   (doseq [buf (sort-by ::idx (vals (@state ::buffers)))]
     (paint-buffer (buf ::id))))
-       
 
 (comment (map ::buffer/name (sort-by ::idx (vals (@state ::buffers)))))
 (comment (paint-buffer "*delimeter*"))
@@ -230,6 +239,16 @@
   []
   (when-let [f (-> @state ::output-handler :invalidate)]
     (f)))
+
+(defn paint-all-buffer-groups
+  []
+  (invalidate-ui)
+  (doseq [buf (sort-by ::idx (map #(first (sort-by ::idx %)) (vals (group-by #(-> % ::buffer/window ::buffer/group) (vals (@state ::buffers))))))]
+    (paint-buffer (buf ::id))))
+       
+; (group-by ::buffer/group (vals (@state ::buffers)))
+; (map ::id (sort-by ::idx (map #(first (sort-by ::idx %)) (group-by #(-> % ::buffer/window ::buffer/group) (vals (@state ::buffers))))))
+
 
 (defn message
   [s & {:keys [:append :view :timer]}]
@@ -282,13 +301,15 @@
   ([text {:keys [name] :as options}]
    (let [id (util/counter-next)
          o (if (options :rows)
-             options
+             (merge {:group (util/counter-next)} options)
              (let [b (current-buffer) ;; TODO If there is no current-buffer, there will be a problem!
                    w (b ::buffer/window)] 
                (assoc options :top (w ::buffer/top)
                               :left (w ::buffer/left)
                               :rows (w ::buffer/rows)
-                              :cols (w ::buffer/cols)))) 
+                              :cols (w ::buffer/cols)
+                              :group (or (w ::buffer/group) (util/counter-next))
+                              :bottom-border (w ::buffer/bottom-border)))) 
          buf (reduce #(%2 %1)
                      (assoc (buffer/buffer text o) ::id id ::idx id ::buffer/tabwidth (get-setting :default-tabwidth))
                      (@state ::new-buffer-hooks))]
