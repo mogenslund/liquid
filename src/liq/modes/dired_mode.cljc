@@ -71,6 +71,7 @@
    :normal {"q" abort-dired 
             "esc" abort-dired
             "backspace" (fn [] (apply-to-buffer #(-> % buffer/beginning-of-buffer buffer/down)) (choose))
+            "-" (fn [] (apply-to-buffer #(-> % buffer/beginning-of-buffer buffer/down)) (choose))
             "\n" choose
             "C-o" :output-snapshot
             "C- " #(((editor/get-mode :buffer-chooser-mode) :init))

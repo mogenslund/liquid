@@ -414,10 +414,15 @@
      :paint-all-buffers #(editor/paint-all-buffers)
      :paint-all-buffer-groups #(editor/paint-all-buffer-groups)
      :settings #(editor/message (@editor/state ::editor/settings))
+     :window-detach window-manager/window-detach
      :window-smaller #(window-manager/window-resize-vertical -1)
      :window-larger #(window-manager/window-resize-vertical 1)
+     :window-narrower #(window-manager/window-resize-horizontal -1)
+     :window-wider #(window-manager/window-resize-horizontal 1)
      :window-below window-manager/window-below
      :window-above window-manager/window-above
+     :window-right window-manager/window-right
+     :window-left window-manager/window-left
      :ls #(((editor/get-mode :buffer-chooser-mode) :init))
      :previous-regular-buffer editor/previous-regular-buffer
      :help (fn [& args] (apply ((editor/get-mode :help-mode) :init) args))
