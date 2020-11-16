@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer :refer [delete-region shrink-region set-insert-mode]]
+            [liq.window-manager :as window-manager]
             [clojure.pprint :as pprint]
             #?(:clj [liq.tools.shell :as s])
             #?(:cljs [cljs.js :refer [eval eval-str empty-state]])
@@ -413,10 +414,10 @@
      :paint-all-buffers #(editor/paint-all-buffers)
      :paint-all-buffer-groups #(editor/paint-all-buffer-groups)
      :settings #(editor/message (@editor/state ::editor/settings))
-     :window-smaller #(editor/window-resize-vertical -1)
-     :window-larger #(editor/window-resize-vertical 1)
-     :window-below editor/window-below
-     :window-above editor/window-above
+     :window-smaller #(window-manager/window-resize-vertical -1)
+     :window-larger #(window-manager/window-resize-vertical 1)
+     :window-below window-manager/window-below
+     :window-above window-manager/window-above
      :ls #(((editor/get-mode :buffer-chooser-mode) :init))
      :previous-regular-buffer editor/previous-regular-buffer
      :help (fn [& args] (apply ((editor/get-mode :help-mode) :init) args))

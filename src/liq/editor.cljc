@@ -118,18 +118,6 @@
   []
   (get-buffer (current-buffer-id)))
 
-(defn window-resize-vertical
-  [amount]
-  (let [g (-> (current-buffer) ::buffer/window ::buffer/group)]
-    (swap! state update ::buffers
-      (fn [m] (into {}
-                (for [[k buf] m]
-                  [k (if (= (-> buf ::buffer/window ::buffer/group) g)
-                       (-> buf
-                         (update-in [::buffer/window ::buffer/rows] #(+ % amount))
-                         (update-in [::buffer/window ::buffer/top] #(+ % (if (= % 1) 0 (- amount)))))
-                       buf)]))))))
-   
 (defn switch-to-buffer
   [idname]
   (if (number? idname)
@@ -137,27 +125,6 @@
       (swap! state assoc-in [::buffers idname ::idx] (util/counter-next))
       idname)
     (switch-to-buffer (get-buffer-id-by-name idname)))) 
-
-(defn window-below
-  []
-  (let [buf (current-buffer)
-        bufb (first
-               (filter #(and (> (-> % ::buffer/window ::buffer/top) (-> buf ::buffer/window ::buffer/top))
-                             (not= (% ::buffer/name) "*minibuffer*")
-                             (not= (% ::buffer/name) "*status-line*"))
-                       (all-buffers)))]
-    (when bufb (switch-to-buffer (bufb ::id)))))
-
-(defn window-above
-  []
-  (let [buf (current-buffer)
-        bufb (first
-               (filter #(and (< (-> % ::buffer/window ::buffer/top) (-> buf ::buffer/window ::buffer/top))
-                             (not= (% ::buffer/name) "*minibuffer*")
-                             (not= (% ::buffer/name) "*status-line*"))
-                       (all-buffers)))]
-    (when bufb (switch-to-buffer (bufb ::id)))))
- 
 
 (defn previous-buffer
   "n = 1 means previous"
@@ -200,6 +167,10 @@
 (comment
   (new-buffer))
   
+(defn apply-to-all-buffers
+  [f]
+  (swap! state update ::buffers
+         (fn [m] (into {} (for [[k buf] m] [k (f buf)])))))
 
 (defn highlight-paren
   [buf]
