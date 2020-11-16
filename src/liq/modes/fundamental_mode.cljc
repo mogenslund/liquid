@@ -150,8 +150,12 @@
             "O" :append-line-above
             "C-w" {"-" :window-smaller
                    "+" :window-larger
+                   "<" :window-narrower
+                   ">" :window-wider
                    "j" :window-below
-                   "k" :window-above}}
+                   "k" :window-above
+                   "h" :window-left
+                   "l" :window-right}}
     :visual {"esc" :set-normal-mode 
              "i" {"w" :select-inner-word
                   "(" :select-inner-paren
