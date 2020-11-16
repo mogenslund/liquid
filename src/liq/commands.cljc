@@ -423,6 +423,7 @@
      :window-above window-manager/window-above
      :window-right window-manager/window-right
      :window-left window-manager/window-left
+     :window-arrange-mode window-manager/init
      :ls #(((editor/get-mode :buffer-chooser-mode) :init))
      :previous-regular-buffer editor/previous-regular-buffer
      :help (fn [& args] (apply ((editor/get-mode :help-mode) :init) args))

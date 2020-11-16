@@ -72,3 +72,35 @@
                              (not= (% ::buffer/name) "*status-line*"))
                        (editor/all-buffers)))]
     (when bufb (editor/switch-to-buffer (bufb ::editor/id)))))
+
+(defn init
+ []
+ (editor/apply-to-buffer
+  (fn [buf]
+    (-> buf
+        (buffer/set-normal-mode)
+        (update ::buffer/major-modes #(conj % :window-arrange-mode))))))
+
+(defn abort
+  []
+  (editor/apply-to-buffer
+    (fn [buf]
+      (update buf ::buffer/major-modes (fn [x] (filter #(not= % :window-arrange-mode) x))))))
+
+(def window-arrange-mode
+  {:normal {"esc" abort 
+            "d" :window-detach
+            "K" :window-smaller
+            "J" :window-larger}
+            
+   :syntax
+     {:plain
+       {:style :green}}})
+;; Move window hjkl
+;; Resize window HJKL
+;; Special functions to full, top-half, buttom-half, right-half, left-half. C-h, C-j, C-k, C-l
+;; Detach d
+;; Esc to exit mode
+
+
+

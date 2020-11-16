@@ -20,6 +20,7 @@
             [liq.extras.snake-mode :as snake-mode]
             [liq.buffer :as buffer]
             [liq.editor :as editor]
+            [liq.window-manager :as window-manager]
             [liq.tty-input :as input]
             [liq.util :as util]
             [liq.commands :as commands]
@@ -85,6 +86,7 @@
   (editor/add-mode :clojure-mode clojure-mode/mode)
   (editor/add-mode :parinfer-mode parinfer-mode/mode)
   (editor/add-mode :info-dialog-mode info-dialog-mode/mode)
+  (editor/add-mode :window-arrange-mode window-manager/window-arrange-mode)
   (javascript-mode/load-mode)
   ;(editor/add-mode :spacemacs-mode spacemacs-mode/mode)
   (spacemacs-mode/load-spacemacs-mode)
