@@ -97,6 +97,6 @@
   (editor/add-mode :javascript-mode mode)
   (swap! editor/state update ::editor/new-buffer-hooks conj
     (fn [buf]
-      (if (and (buf ::buffer/filename) (re-matches #"\.*.js" (buf ::buffer/filename)))
+      (if (and (buf ::buffer/filename) (re-matches #".*\.js" (buf ::buffer/filename)))
         (update buf ::buffer/major-modes #(conj % :javascript-mode))
         buf))))
