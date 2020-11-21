@@ -20,3 +20,14 @@ executed.
 
 The :dimensions value is a function return a map with :rows and :cols. It 
 will usually be the output device who knows the dimensions of the print area.
+
+==============================================================================
+Block cursor flicker
+
+When the cursor moves fast it sometimes becomes invisible. This can be avoided
+by adding the following to the .liq file:
+
+    (swap! liq.tty-output/settings assoc
+           :liq.tty-output/cursor-draw-hack true)
+
+A white block will temporary be drawn at the cursor position when it moves.

@@ -6,6 +6,8 @@
               
             [clojure.string :as str]))
 
+(def settings (atom {::cursor-draw-hack false})) ;; cursor-draw-hack draws a block when cursors moves to avoid flicker
+
 (def ^:private last-buffer (atom nil))
 (def esc "\033[")
 
@@ -93,7 +95,7 @@
         tow (buf ::buffer/tow) ; Top of window
         crow (-> buf ::buffer/cursor ::buffer/row)  ; Cursor row
         ccol (-> buf ::buffer/cursor ::buffer/col)] ; Cursor col
-   (when (= cache-id @last-buffer)
+   (when (and (@settings ::cursor-draw-hack) (= cache-id @last-buffer))
      (tty-print "█")) ; To make it look like the cursor is still there while drawing.
    (tty-print esc "?25l") ; Hide cursor
    (when-let [statusline (and (not= (buf ::buffer/name) "*minibuffer*") (buf :status-line))]
@@ -114,7 +116,7 @@
                cursor-match (or (and (= row crow) (= col ccol))
                                 (and (= row crow) (not cursor-col) (> col ccol))
                                 (and (not cursor-row) (> row crow)))
-               c (cond (and cursor-match (buf :status-line)) "█" 
+               c (cond (and (@settings ::cursor-draw-hack) cursor-match (buf :status-line)) "█" 
                        (= (cm ::buffer/char) \tab) (str/join (repeat c-width " "))
                        (= (cm ::buffer/char) \return) (char 633)
                        (cm ::buffer/char) (cm ::buffer/char)
