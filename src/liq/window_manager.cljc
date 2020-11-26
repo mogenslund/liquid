@@ -11,7 +11,7 @@
 
 (defn window-frame-calc
   [left right top bottom]
-  (let [totalrows ((editor/get-window) ::buffer/rows)
+  (let [totalrows (dec ((editor/get-window) ::buffer/rows))
         totalcols ((editor/get-window) ::buffer/cols)
         abs-left (min (dec totalcols) (max 1 (if (integer? left) left (inc (int (* left totalcols))))))
         abs-right (max (inc abs-left) (min totalcols (if (integer? right) right (int (* right totalcols)))))
@@ -38,7 +38,8 @@
             (assoc-in [::buffer/window ::buffer/left] (w :left))
             (assoc-in [::buffer/window ::buffer/top] (w :top))
             (assoc-in [::buffer/window ::buffer/rows] (w :rows))
-            (assoc-in [::buffer/window ::buffer/cols] (w :cols)))
+            (assoc-in [::buffer/window ::buffer/cols] (w :cols))
+            (assoc-in [::buffer/window ::buffer/bottom-border] (when (< (w :rows) (- ((editor/get-window) ::buffer/rows) 2)) "-")))
           buf)))
     (editor/paint-all-buffer-groups)))
 
