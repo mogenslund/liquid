@@ -29,10 +29,12 @@
         keyw (keyword (first fargs))
         args (rest fargs)
         n (if (and (first args) (re-matches #"\d+" (first args))) (Integer/parseInt (first args)) 1)]
-    (when-let [command (-> @editor/state ::editor/commands keyw)]
-      (let [m (or (meta command) {})]
-        (cond (m :motion) (apply-to-buffer #(command % n))
-              true (apply command args))))))
+    (try
+      (when-let [command (-> @editor/state ::editor/commands keyw)]
+        (let [m (or (meta command) {})]
+          (cond (m :motion) (apply-to-buffer #(command % n))
+                true (apply command args))))
+      (catch Exception e (editor/message (str "Exception: " (.getMessage e)))))))
 
 (defn abort-minibuffer
   []

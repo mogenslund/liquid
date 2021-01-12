@@ -10,6 +10,19 @@ quit, discarding changes.
 ==============================================================================
 Modify commands
 
+In this section there is a simple example on how to create a command that acts
+on a buffer.
+
+The steps are:
+
+1. Load relevant namespaces
+2. Create a function that takes a buffer and evaluates to a buffer.
+   This function sort of "encapsulates" the change.
+3. Register the function as a "colon" command 
+
+Just type "c p p" in each form below to live-update Liquid with the new
+command.
+
     (ns user
       (:require [liq.editor :as editor]
                 [liq.buffer :as buffer]))
@@ -34,6 +47,10 @@ the right
 The command can also be used for keybinding, like this:
 
     (editor/add-key-bindings :help-mode :normal {"C-t" :move10})
+
+The (editor/apply-to-buffer ...) function takes a buffer -> buffer funciton
+and converts it to a 0-arity function (action) that applies the function on
+a given buffer or the current active buffer.
 
 Example with command taking parameters:
 

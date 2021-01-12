@@ -177,21 +177,18 @@ make evaluation and result flow more smooth.
       rows (w ::buffer/rows)
       cols (w ::buffer/cols w)]
   (editor/set-setting :auto-switch-to-output false)
-  (editor/apply-to-buffer "output"
-    #(assoc % ::buffer/window {::buffer/top (- rows 5)
-                               ::buffer/left 1
-                               ::buffer/rows 5
-                               ::buffer/cols cols}))
+  (editor/apply-to-buffer "*output*"
+    #(-> %
+         (assoc-in [::buffer/window ::buffer/top] (- rows 8))
+         (assoc-in [::buffer/window ::buffer/left] 1)
+         (assoc-in [::buffer/window ::buffer/rows] 8)
+         (assoc-in [::buffer/window ::buffer/cols] cols)))
   (editor/apply-to-buffer "scratch"
-    #(assoc % ::buffer/window {::buffer/top 1
-                               ::buffer/left 1
-                               ::buffer/rows (- rows 7)
-                               ::buffer/cols cols}))
-  (editor/new-buffer "-----------------------------"
-                     {:name "*delimeter*"
-                      :top (- rows 6)
-                      :left 1
-                      :rows 1
-                      :cols cols})
+    #(-> %
+         (assoc-in [::buffer/window ::buffer/top] 1)
+         (assoc-in [::buffer/window ::buffer/left] 1)
+         (assoc-in [::buffer/window ::buffer/rows] (- rows 10))
+         (assoc-in [::buffer/window ::buffer/cols] cols)))
   (editor/switch-to-buffer "scratch")
-  (editor/paint-buffer))
+  (editor/paint-all-buffers))
+
