@@ -171,24 +171,13 @@ make evaluation and result flow more smooth.
 
 (ns user
   (:require [liq.editor :as editor]
-            [liq.buffer :as buffer]))
+            [liq.buffer :as buffer]
+            [liq.window-manager :as window-manager]))
 
-(let [w (editor/get-window)
-      rows (w ::buffer/rows)
-      cols (w ::buffer/cols w)]
+(let [s -11]
   (editor/set-setting :auto-switch-to-output false)
-  (editor/apply-to-buffer "*output*"
-    #(-> %
-         (assoc-in [::buffer/window ::buffer/top] (- rows 8))
-         (assoc-in [::buffer/window ::buffer/left] 1)
-         (assoc-in [::buffer/window ::buffer/rows] 8)
-         (assoc-in [::buffer/window ::buffer/cols] cols)))
-  (editor/apply-to-buffer "scratch"
-    #(-> %
-         (assoc-in [::buffer/window ::buffer/top] 1)
-         (assoc-in [::buffer/window ::buffer/left] 1)
-         (assoc-in [::buffer/window ::buffer/rows] (- rows 10))
-         (assoc-in [::buffer/window ::buffer/cols] cols)))
+  (editor/switch-to-buffer "*output*")
+  (window-manager/window-set 1 0 s 0)
   (editor/switch-to-buffer "scratch")
-  (editor/paint-all-buffers))
+  (window-manager/window-set 1 0 1 (- s 2)))
 
