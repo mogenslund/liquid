@@ -116,7 +116,7 @@
              (buffer/right (dec (count text)))
              buffer/set-normal-mode)))))
 
-(defn delete-line
+(defn ^:buffer delete-line
   [buf]
   (let [text (buffer/line buf)]
     (util/set-clipboard-content text true)
@@ -297,25 +297,25 @@
 (defn load-commands
   []
   (swap! editor/state update ::editor/commands merge 
-    {:left ^:motion #(buffer/left %1 %2)
-     :down ^:motion #(buffer/down %1 %2)
-     :up ^:motion #(buffer/up %1 %2)
-     :right ^:motion #(buffer/right %1 %2)
+    {:left #'buffer/left
+     :down #'buffer/down
+     :up #'buffer/up
+     :right #'buffer/right
      :first-non-blank #(non-repeat-fun buffer/first-non-blank)
      :0 #(non-repeat-fun buffer/beginning-of-line)
      :beginning-of-line #(non-repeat-fun buffer/beginning-of-line)
      :move-matching-paren #(non-repeat-fun buffer/move-matching-paren)
-     :word-forward ^:motion #(buffer/word-forward %1 %2)
-     :word-forward-ws ^:motion #(buffer/word-forward-ws %1 %2)
-     :beginning-of-word ^:motion #(buffer/beginning-of-word %1 %2)
-     :end-of-word ^:motion #(buffer/end-of-word %1 %2)
-     :end-of-word-ws ^:motion #(buffer/end-of-word-ws %1 %2)
-     :end-of-line ^:motion (fn [buf n] (buffer/end-of-line buf))
+     :word-forward #'buffer/word-forward
+     :word-forward-ws #'buffer/word-forward-ws
+     :beginning-of-word #'buffer/beginning-of-word
+     :end-of-word #'buffer/end-of-word
+     :end-of-word-ws #'buffer/end-of-word-ws
+     :end-of-line #'buffer/end-of-line
     ;:delete-char (fn [& args] (repeat-fun buffer/delete-char args))
      :delete-char (fn [& args] (repeat-fun #(do (util/set-clipboard-content (str (buffer/get-char %1)) false) (buffer/delete-char %1 %2)) args))
-     :copy-selection-to-clipboard #(apply-to-buffer copy-selection-to-clipboard)
-     :copy-line copy-line
-     :yank-filename yank-filename
+     :copy-selection-to-clipboard (with-meta #(apply-to-buffer copy-selection-to-clipboard) {:doc "Copy selection to clipboard"})
+     :copy-line #'copy-line
+     :yank-filename #'yank-filename
      :yank-inner-word (fn [] (non-repeat-fun #(->> % buffer/word-region (yank-region %))))
      :yank-inner-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (yank-region %))))
      :yank-inner-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (shrink-region %) (yank-region %))))
@@ -327,7 +327,7 @@
      :yank-outer-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (yank-region %))))
 
      :delete #(apply-to-buffer delete)
-     :delete-line #(non-repeat-fun delete-line)
+     :delete-line #'delete-line
      :delete-inner-word (fn [] (non-repeat-fun #(->> % buffer/word-region (cut-region %))))
      :delete-inner-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (cut-region %))))
      :delete-inner-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (shrink-region %) (cut-region %))))
@@ -369,14 +369,14 @@
      :select-outer-quote (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/quote-region %))))
      :select-line (fn [] (non-repeat-fun #(buffer/expand-selection % (buffer/line-region %))))
 
-     :insert-at-line-end #(non-repeat-fun buffer/insert-at-line-end)
-     :insert-at-beginning-of-line #(non-repeat-fun buffer/insert-at-beginning-of-line)
-     :delete-to-line-end #(non-repeat-fun buffer/delete-to-line-end)
+     :insert-at-line-end #'buffer/insert-at-line-end
+     :insert-at-beginning-of-line #'buffer/insert-at-beginning-of-line
+     :delete-to-line-end #'buffer/delete-to-line-end
 
-     :append-line #(non-repeat-fun buffer/append-line)
+     :append-line (fn [] (non-repeat-fun #(buffer/append-line %)))
      :append-line-above #(non-repeat-fun (fn [buf] (-> buf buffer/beginning-of-line (buffer/insert-char \newline) buffer/up)))
-     :join-lines #(non-repeat-fun buffer/join-lines)
-     :join-lines-space #(non-repeat-fun buffer/join-lines-space)
+     :join-lines #'buffer/join-lines
+     :join-lines-space #'buffer/join-lines-space
 
      :eval #(eval-sexp-at-point (editor/current-buffer))
      :eval-sexp-at-point #(eval-sexp-at-point (editor/current-buffer))
@@ -387,43 +387,43 @@
      :paste-clipboard paste-clipboard
      :paste-clipboard-here paste-clipboard-here
 
-     :beginning-of-buffer ^:motion #(buffer/beginning-of-buffer %1 %2)
+     :beginning-of-buffer #'buffer/beginning-of-buffer
      :navigate-definitions #(typeahead-defs (editor/current-buffer))
      :navigate-lines #(typeahead-lines (editor/current-buffer))
      :open-file-at-point open-file-at-point
-     :end-of-buffer #(non-repeat-fun buffer/end-of-buffer)
-     :scroll-cursor-top (fn [] (non-repeat-fun buffer/scroll-cursor-top))
-     :scroll-page (fn [] (non-repeat-fun buffer/page-down))
-     :page-down (fn [] (non-repeat-fun buffer/page-down))
-     :page-up (fn [] (non-repeat-fun buffer/page-up))
+     :end-of-buffer #'buffer/end-of-buffer
+     :scroll-cursor-top #'buffer/scroll-cursor-top
+     :scroll-page #'buffer/page-down
+     :page-down #'buffer/page-down
+     :page-up #'buffer/page-up
 
-     :set-visual-mode #(non-repeat-fun buffer/set-visual-mode)
-     :set-normal-mode #(non-repeat-fun buffer/set-normal-mode)
-     :set-insert-mode #(non-repeat-fun buffer/set-insert-mode)
+     :set-visual-mode #'buffer/set-visual-mode
+     :set-normal-mode #'buffer/set-normal-mode
+     :set-insert-mode #'buffer/set-insert-mode
      :insert-after-point (fn [] (non-repeat-fun #(-> % buffer/set-insert-mode buffer/right)))
      :search  #(non-repeat-fun buffer/search)
-     :undo #(non-repeat-fun buffer/undo)
-     :q #(editor/exit-program)
-     :q! #(editor/force-exit-program)
-     :bnext #(editor/oldest-buffer)
-     :bn #(editor/oldest-buffer)
+     :undo #'buffer/undo
+     :q #'editor/exit-program
+     :q! #'editor/force-exit-program
+     :bnext #'editor/oldest-buffer
+     :bn #'editor/oldest-buffer
      :new #(editor/new-buffer "" {})
      :buffers #(((editor/get-mode :buffer-chooser-mode) :init))
      :buffer-major-modes #(editor/message (str ((editor/current-buffer) ::buffer/major-modes)))
      :buffer-info #(editor/message (with-out-str (pprint/pprint (buffer/info (editor/current-buffer)))))
-     :paint-all-buffers #(editor/paint-all-buffers)
-     :paint-all-buffer-groups #(editor/paint-all-buffer-groups)
+     :paint-all-buffers #'editor/paint-all-buffers
+     :paint-all-buffer-groups #'editor/paint-all-buffer-groups
      :settings #(editor/message (@editor/state ::editor/settings))
-     :window-detach window-manager/window-detach
+     :window-detach #'window-manager/window-detach
      :window-smaller #(window-manager/window-resize-vertical -1)
      :window-larger #(window-manager/window-resize-vertical 1)
      :window-narrower #(window-manager/window-resize-horizontal -1)
      :window-wider #(window-manager/window-resize-horizontal 1)
-     :window-below window-manager/window-below
-     :window-above window-manager/window-above
-     :window-right window-manager/window-right
-     :window-left window-manager/window-left
-     :window-arrange-mode window-manager/init
+     :window-below #'window-manager/window-below
+     :window-above #'window-manager/window-above
+     :window-right #'window-manager/window-right
+     :window-left #'window-manager/window-left
+     :window-arrange-mode #'window-manager/init
      :window-set (fn [sleft sright stop sbottom] (window-manager/window-set (Double/parseDouble sleft)
                                                                             (Double/parseDouble sright)
                                                                             (Double/parseDouble stop)
@@ -431,7 +431,7 @@
      :ls #(((editor/get-mode :buffer-chooser-mode) :init))
      :previous-regular-buffer editor/previous-regular-buffer
      :help (fn [& args] (apply ((editor/get-mode :help-mode) :init) args))
-     :w #(write-file)
+     :w #'write-file
      :wq #(do (write-file) (editor/exit-program))
      :t #(editor/open-file "/home/sosdamgx/proj/liquid/src/dk/salza/liq/slider.clj")
      :bd #(editor/kill-buffer)

@@ -85,7 +85,7 @@
       (update ::lines subvec (dec row1) row2)
       (update-in [::cursor ::row] #(max (- % row1 -1) 1))))
 
-(defn set-undo-point
+(defn ^:buffer set-undo-point
   "Return new lines with the current lines to the undo stack.
   Input: Buffer
   Output: Buffer
@@ -95,7 +95,7 @@
     (assoc buf ::lines-stack newstack
                ::lines-undo newstack)))
 
-(defn undo
+(defn ^:buffer undo
   "Returns the first buffer in the undo stack."
   [buf]
   (if (empty? (buf ::lines-undo))
@@ -105,7 +105,7 @@
                ::lines-stack (conj (buf ::lines-stack) (-> buf ::lines-undo first))
                ::lines-undo (rest (buf ::lines-undo)))))
 
-(defn debug-clear-undo
+(defn ^:buffer debug-clear-undo
   [buf]
   (assoc buf
     ::lines-undo (list)
@@ -158,26 +158,26 @@
   [buf]
   (buf ::selection))
 
-(defn remove-selection
+(defn ^:buffer remove-selection
   "Set selection point to nil."
   [buf]
   (assoc buf ::selection nil))
 
-(defn set-visual-mode
+(defn ^:buffer set-visual-mode
   "Set mode to :visual and set selection point."
   [buf]
   (-> buf
       (assoc ::mode :visual)
       set-selection))
 
-(defn set-normal-mode
+(defn ^:buffer set-normal-mode
   "Set mode to :normal and set selection point to nil."
   [buf]
   (-> buf
       (assoc ::mode :normal)
       remove-selection))
   
-(defn set-insert-mode
+(defn ^:buffer set-insert-mode
   "Set mode to :insert and set selection point to nil."
   [buf]
   (-> buf
@@ -385,7 +385,7 @@
 ;; Movements
 ;; =========
 
-(defn right
+(defn ^:buffer right
   "Move cursor forward.
   If n is specifed forward n steps."
   ([buf n]
@@ -398,7 +398,7 @@
   ([buf]
    (right buf 1)))
 
-(defn left
+(defn ^:buffer left
   "Move cursor backward.
   If n is specifed backward n steps."
   ([buf n]
@@ -406,7 +406,7 @@
   ([buf]
    (left buf 1)))
 
-(defn down
+(defn ^:buffer down
   "Move cursor down.
   If n is specified move down n steps."
   ([buf n]
@@ -419,7 +419,7 @@
   ([buf]
    (down buf 1)))
 
-(defn up
+(defn ^:buffer up
   "Move cursor up.
   If n is specified move up n steps."
   ([buf n]
@@ -431,21 +431,21 @@
   ([buf]
    (up buf 1)))
 
-(defn end-of-line
+(defn ^:buffer end-of-line
   "Move cursor to end of current line"
   [buf]
   (-> buf
       (assoc ::cursor {::row (-> buf ::cursor ::row) ::col (col-count buf (-> buf ::cursor ::row))}) 
       (assoc ::mem-col (col-count buf (-> buf ::cursor ::row)))))
 
-(defn beginning-of-line
+(defn ^:buffer beginning-of-line
   "Move cursor to beginning of current line"
   [buf]
   (-> buf
       (assoc ::cursor {::row (-> buf ::cursor ::row) ::col 1}) 
       (assoc ::mem-col 1)))
 
-(defn beginning-of-buffer
+(defn ^:buffer beginning-of-buffer
   "Move cursor to the beginning of the buffer"
   ([buf n]
    (-> buf
@@ -457,7 +457,7 @@
        (assoc ::mem-col 1))))
 
 
-(defn end-of-buffer
+(defn ^:buffer end-of-buffer
   "Move cursor to the end of the buffer"
   [buf]
   (-> buf
@@ -468,7 +468,7 @@
 ;; =============
 
 
-(defn append-line-at-end
+(defn ^:buffer append-line-at-end
   "Append empty lines at end"
   ([buf n]
    (loop [buf0 buf n0 n]
@@ -581,7 +581,7 @@
    (-> buf
        (insert-char (-> buf ::cursor ::row) (-> buf ::cursor ::col) char)
        (assoc ::cursor {::row (if (= char \newline) (inc (-> buf ::cursor ::row)) (-> buf ::cursor ::row))
-                   ::col (if (= char \newline) 1 (inc (-> buf ::cursor ::col)))}))))
+                        ::col (if (= char \newline) 1 (inc (-> buf ::cursor ::col)))}))))
 
 
 (defn append-line
@@ -678,7 +678,7 @@
         [(next-point buf p1) (previous-point buf p2)]
         [(previous-point buf p1) (next-point buf p2)]))))
 
-(defn delete-backward
+(defn ^:buffer delete-backward
   [buf]
   (cond (> (-> buf ::cursor ::col) 1) (-> buf left delete-char)
         (= (-> buf ::cursor ::row) 1) buf
@@ -701,14 +701,14 @@
         (insert-char \m)
         text)))
 
-(defn delete-to-line-end
+(defn ^:buffer delete-to-line-end
   "Delete content form the cursor to the end of the line."
   [buf]
   (left (delete-region buf [(buf ::cursor)
                             {::row (-> buf ::cursor ::row)
                              ::col (col-count buf (-> buf ::cursor ::row))}])))
 
-(defn clear
+(defn ^:buffer clear
   [buf]
   (assoc buf ::lines [[]]
              ::cursor {::row 1 ::col 1} 
@@ -772,27 +772,27 @@
   [buf text]
   (insert-buffer buf (buffer text)))
 
-(defn insert-at-line-end
+(defn ^:buffer insert-at-line-end
   [buf]
   (-> buf
       set-insert-mode
       end-of-line
       right))
 
-(defn first-non-blank
+(defn ^:buffer first-non-blank
   [buf]
   (let [l (line buf)
         col (+ (or (count (re-find #"\s*" l)) 0) 1)]
     (-> buf
         (assoc-in [::cursor ::col] col))))
 
-(defn insert-at-beginning-of-line
+(defn ^:buffer insert-at-beginning-of-line
   [buf]
   (-> buf
       set-insert-mode
       first-non-blank))
 
-(defn join-lines
+(defn ^:buffer join-lines
   [buf]
   (if (= (-> buf ::cursor ::row) (-> buf ::lines count))
     buf
@@ -802,7 +802,7 @@
         delete-backward
         (adjust-hidden-rows (-> buf ::cursor ::row) -1))))
 
-(defn join-lines-space
+(defn ^:buffer join-lines-space
   [buf]
   (if (= (-> buf ::cursor ::row) (-> buf ::lines count))
     buf
@@ -811,10 +811,10 @@
                (-> buf set-insert-mode end-of-line right (insert-char \space)))
           col (-> buf down first-non-blank ::cursor ::col)
           row (inc (-> buf ::cursor ::row))]
-    (-> b1
-        (delete {::row row ::col 0} {::row row ::col (dec col)})
-        delete-backward
-        left))))
+      (-> b1
+          (delete {::row row ::col 0} {::row row ::col (dec col)})
+          delete-backward
+          left))))
 
 
 (defn set-attribute
@@ -953,7 +953,7 @@
 (comment (paren-region (buffer "ab (cde\naaa bbb (ccc))") {::row 2 ::col 5}))
 (comment (pr-str (paren-region (buffer "ab cde\naaa bbb ccc") {::row 2 ::col 3})))
 
-(defn move-matching-paren
+(defn ^:buffer move-matching-paren
   [buf]
   (let [r (paren-matching-region buf (buf ::cursor))]
     (if r
@@ -998,7 +998,7 @@
     [0]
     (map count (drop-last (str/split text #"(?<=\W)\b")))))
 
-(defn beginning-of-word
+(defn ^:buffer beginning-of-word
   ([buf]
    (loop [b (or (previous-point buf) buf)]
      (let [p (b ::cursor)
@@ -1012,7 +1012,7 @@
   ([buf n] (nth (iterate beginning-of-word buf) n)))
 
 
-(defn end-of-word
+(defn ^:buffer end-of-word
   ([buf]
    (loop [b (or (next-point buf) buf)]
      (let [p (b ::cursor)
@@ -1040,14 +1040,14 @@
 (comment (-> (buffer "\n") end-point))
 (comment (-> (buffer "\n") down ::cursor))
 
-(defn end-of-word-region
+(defn ^:buffer end-of-word-region
   ([buf]
    [(buf ::cursor) ((end-of-word buf) ::cursor)])
   ([buf n]
    [(buf ::cursor) ((end-of-word buf n) ::cursor)]))
 
 
-(defn end-of-word-ws
+(defn ^:buffer end-of-word-ws
   ([buf]
    (loop [b (or (next-point buf) buf)]
      (let [p (b ::cursor)
@@ -1063,7 +1063,7 @@
              true (recur (right b))))))
   ([buf n] (nth (iterate end-of-word-ws buf) n)))
 
-(defn end-of-word-ws-region
+(defn ^:buffer end-of-word-ws-region
   ([buf]
    [(buf ::cursor) ((end-of-word-ws buf) ::cursor)])
   ([buf n]
@@ -1089,7 +1089,7 @@
 
 (comment (hide-region (buffer "abc\ndef") [{::row 1 ::col 1} {::row 2 ::col 2}]))
 
-(defn word-forward
+(defn ^:buffer word-forward
   ([buf]
    (loop [b (or (next-point buf) buf)]
      (let [p (b ::cursor)
@@ -1104,7 +1104,7 @@
              true (recur (next-point b))))))
   ([buf n] (nth (iterate word-forward buf) n)))
 
-(defn word-forward-ws
+(defn ^:buffer word-forward-ws
   ([buf]
    (loop [b (or (next-point buf) buf)]
      (let [p (b ::cursor)
@@ -1127,11 +1127,11 @@
              (+ %1 1 (quot (dec (col-count buf %2)) cols)))
           0 (range row1 row2))) 
 
-(defn beginning-of-window
+(defn ^:buffer beginning-of-window
   [buf]
   (assoc buf ::cursor (buf ::tow)))
 
-(defn end-of-window
+(defn ^:buffer end-of-window
   [buf]
   (let [row1 (-> buf ::tow ::row)
         rows (-> buf ::window ::rows)
@@ -1141,11 +1141,11 @@
         (beginning-of-line (down buf (- row2 (-> buf ::cursor ::row) 2)))
         (recur (inc row2))))))
 
-(defn scroll-cursor-top
+(defn ^:buffer scroll-cursor-top
   [buf]
   (assoc buf ::tow {::row (-> buf ::cursor ::row) ::col 1}))
 
-(defn scroll-cursor-bottom
+(defn ^:buffer scroll-cursor-bottom
   [buf]
   (let [row1 (-> buf ::cursor ::row)
         rows (-> buf ::window ::rows)
@@ -1155,19 +1155,19 @@
         (assoc-in buf [::tow ::row] row2)
         (recur (dec row2))))))
 
-(defn page-down
+(defn ^:buffer page-down
   [buf]
   (-> buf
       end-of-window
       down
-      scroll-cursor-top )) 
+      scroll-cursor-top)) 
 
-(defn page-up
+(defn ^:buffer page-up
   [buf]
   (-> buf
       beginning-of-window
       up
-      scroll-cursor-bottom ))
+      scroll-cursor-bottom))
 
 (defn recalculate-tow
   "This is a first draft, which does not handle edge

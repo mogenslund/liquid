@@ -356,7 +356,8 @@
   (when-let [command (-> @state ::commands k)]
     (let [m (or (meta command) {})
           n (@state ::repeat-counter)
-          action (cond (m :motion) #(apply-to-buffer (fn [buf] (command buf (max 1 n))))
+          action (cond (and (m :buffer) (not (some #{2} (map count (m :arglists))))) #(apply-to-buffer command)
+                       (m :buffer) #(apply-to-buffer (fn [buf] (command buf (max 1 n))))
                        true command)]
       (action)
       (swap! state assoc ::repeat-counter 0

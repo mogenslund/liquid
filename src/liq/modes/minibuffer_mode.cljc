@@ -28,11 +28,12 @@
   (let [fargs (str/split s #" ")
         keyw (keyword (first fargs))
         args (rest fargs)
-        n (if (and (first args) (re-matches #"\d+" (first args))) (Integer/parseInt (first args)) 1)]
+        n (when (and (first args) (re-matches #"\d+" (first args))) (Integer/parseInt (first args)))]
     (try
       (when-let [command (-> @editor/state ::editor/commands keyw)]
         (let [m (or (meta command) {})]
-          (cond (m :motion) (apply-to-buffer #(command % n))
+          (cond (and (m :buffer) n) (apply-to-buffer #(command % n))
+                (m :buffer) (apply-to-buffer #(command %))
                 true (apply command args))))
       (catch Exception e (editor/message (str "Exception: " (.getMessage e)))))))
 
