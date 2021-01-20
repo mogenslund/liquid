@@ -18,6 +18,7 @@
             #?(:cljs [liq.browser-io :as browser-io])
             [liq.extras.markdownfolds :as markdownfolds]
             [liq.extras.snake-mode :as snake-mode]
+            [liq.extras.freemove-mode :as freemove-mode]
             [liq.buffer :as buffer]
             [liq.editor :as editor]
             [liq.window-manager :as window-manager]
@@ -64,6 +65,11 @@
   (markdownfolds/load-markdownfolds)
   (swap! editor/state assoc-in [:liq.editor/modes :snake-mode] liq.extras.snake-mode/mode)
   (swap! editor/state assoc-in [:liq.editor/commands :snake] liq.extras.snake-mode/run)
+  (swap! editor/state assoc-in [:liq.editor/modes :freemove-mode] liq.extras.freemove-mode/mode)
+  (swap! editor/state assoc-in [:liq.editor/commands :freemove]
+    (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :freemove-mode))))
+  (swap! editor/state assoc-in [:liq.editor/commands :fm]
+    (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :freemove-mode))))
   (swap! editor/state assoc-in [:liq.editor/commands :p]
     (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :parinfer-mode))))
   (swap! editor/state assoc-in [:liq.editor/commands :parinfer]

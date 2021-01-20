@@ -351,14 +351,21 @@
   [major-modes mode c]
   ((merge-mode-maps major-modes mode) c))
 
+(defn resolve-command
+  [command]
+  (let [m (or (meta command) {})
+        n (@state ::repeat-counter)]
+    (cond (and (m :buffer) (not (some #{2} (map count (m :arglists))))) #(apply-to-buffer command)
+          (m :buffer) #(apply-to-buffer (fn [buf] (command buf (max 1 n))))
+          true command)))
+  
+
 (defn handle-keyword-action
   [k]
   (when-let [command (-> @state ::commands k)]
     (let [m (or (meta command) {})
           n (@state ::repeat-counter)
-          action (cond (and (m :buffer) (not (some #{2} (map count (m :arglists))))) #(apply-to-buffer command)
-                       (m :buffer) #(apply-to-buffer (fn [buf] (command buf (max 1 n))))
-                       true command)]
+          action (resolve-command command)]
       (action)
       (swap! state assoc ::repeat-counter 0
                          ::last-action action)))
@@ -394,7 +401,7 @@
                      
         (swap! state assoc ::skip-number false)
         (cond (= action ::last-action) (when (@state ::last-action) ((@state ::last-action))) 
-              (fn? action) (do (swap! state assoc ::last-action action) (action))
+              (or (fn? action) (var? action)) (do (swap! state assoc ::last-action action) ((resolve-command action)))
               (keyword? action) (handle-keyword-action action)
               (map? action) (do (reset! tmp-keymap action) (when (action :description) (message (action :description))))
               ;action (swap! state update-in [::buffers (current-buffer-id)] (action :function))

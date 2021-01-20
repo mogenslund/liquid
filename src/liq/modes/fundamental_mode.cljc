@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer :refer [delete-region shrink-region set-insert-mode]]
+            [liq.commands :as c]
             [liq.util :as util]))
 
 (defn non-repeat-fun
@@ -37,7 +38,15 @@
             "C-b" :previous-regular-buffer
             "C-f" :page-down
             "C-o" :output-snapshot
-            "t" (fn [] (apply-to-buffer #(buffer/insert-string % "Just\nTesting")))
+            "t" {"a" #(editor/message "Test A")
+                 "b" (with-meta #(editor/message "Test B") {:doc "Some documentation for Test B"})
+                 "c" :testc
+                 "d" :testd
+                 "e" (with-meta (fn [buf]
+                                    (future (Thread/sleep 1000) (editor/message "Test E: Using with-meta inline"))
+                                    (buffer/down buf))
+                                {:buffer true :doc "Some documentation for Test E"})
+                 }
             "f2" editor/oldest-buffer
             "f3" #(non-repeat-fun buffer/debug-clear-undo)
             "." ::editor/last-action 

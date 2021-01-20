@@ -1,0 +1,59 @@
+help.txt test-forms.txt                                               salza.dk
+
+
+                             Test forms
+
+
+Forms to evaluate to test and try different functionality.
+
+The forms can be used to experiments with different build blocks when
+extending Liquid.
+
+
+==============================================================================
+Requirements
+
+Evaluate ns form with c p p load dependencies:
+
+(ns user
+  (:require [clojure.string :as str]
+            [liq.editor :as editor]
+            [liq.buffer :as buffer]
+            [liq.commands :as commands]
+            [liq.window-manager :as window-manager]
+            [clojure.pprint :as pprint]
+            [liq.util :as util]))
+
+==============================================================================
+Meta data
+
+(meta (((-> @editor/state ::editor/modes :fundamental-mode :normal) "t") "a"))
+(meta (((-> @editor/state ::editor/modes :fundamental-mode :normal) "t") "b"))
+(-> @editor/state ::editor/commands :testc meta)
+(-> @editor/state ::editor/commands :testd meta)
+(meta (((-> @editor/state ::editor/modes :fundamental-mode :normal) "t") "e"))
+
+
+==============================================================================
+Function lookup
+
+(->> (all-ns) (map ns-name) (map name) (str/join "\n"))
+
+(->> (ns-publics 'liq.commands) vals (map meta) (str/join "\n"))
+(->> (ns-publics 'liq.buffer) vals (map meta) (map :doc) (str/join "\n"))
+
+(->> (all-ns) (map ns-name) (map name) sort (str/join "\n"))
+
+(->> (all-ns)
+     (mapcat #(ns-publics %))
+     vals
+     (map meta)
+     (filter :buffer)
+     (str/join "\n" ))
+
+
+
+
+
+
+

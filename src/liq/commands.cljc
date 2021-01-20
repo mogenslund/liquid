@@ -294,6 +294,14 @@
            (buffer/insert-string
              (buffer/text (editor/get-buffer "*output*")))))))
 
+(defn yank-inner-word
+  []
+  (non-repeat-fun #(->> % buffer/word-region (yank-region %))))
+
+(defn yank-inner-paren
+  []
+  (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (yank-region %))))
+
 (defn load-commands
   []
   (swap! editor/state update ::editor/commands merge 
@@ -316,8 +324,8 @@
      :copy-selection-to-clipboard (with-meta #(apply-to-buffer copy-selection-to-clipboard) {:doc "Copy selection to clipboard"})
      :copy-line #'copy-line
      :yank-filename #'yank-filename
-     :yank-inner-word (fn [] (non-repeat-fun #(->> % buffer/word-region (yank-region %))))
-     :yank-inner-paren (fn [] (non-repeat-fun #(->> % buffer/paren-region (shrink-region %) (yank-region %))))
+     :yank-inner-word #'yank-inner-word
+     :yank-inner-paren #'yank-inner-paren
      :yank-inner-bracket (fn [] (non-repeat-fun #(->> % buffer/bracket-region (shrink-region %) (yank-region %))))
      :yank-inner-brace (fn [] (non-repeat-fun #(->> % buffer/brace-region (shrink-region %) (yank-region %))))
      :yank-inner-quote (fn [] (non-repeat-fun #(->> % buffer/quote-region (shrink-region %) (yank-region %))))
@@ -460,5 +468,9 @@
      :bb (fn [& args] (external-command (str "bb " (if (empty? args) "%" (str/join " " args)))))
      :e e-cmd
      :Ex (fn [] (e-cmd "."))
+     :testc ^:buffer (fn [buf] (future (Thread/sleep 1000) (editor/message "Test C: With inline buffer meta")) (buffer/down buf))
+     :testd (with-meta (fn [buf] (future (Thread/sleep 1000) (editor/message "Test D: Using with-meta inline"))
+                                 (buffer/down buf)) {:buffer true :doc "Some documentation for Test C"})
      :edit e-cmd}))
  
+

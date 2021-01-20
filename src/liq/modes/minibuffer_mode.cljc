@@ -74,5 +74,5 @@
             "\t" commands-completion
             "\n" execute}
    :normal {"esc" (fn [] (apply-to-buffer #(assoc % ::buffer/mode :insert)))
-            "l" #(apply-to-buffer buffer/right)}
+            "l" #'buffer/right}
    :init run})
