@@ -4,11 +4,6 @@
             [liq.buffer :as buffer]
             [liq.util :as util]))
 
-;; (def state (atom {:block nil :overwritten nil})) -> Use ::block and ::overwritten in buf
-
-;; !!!!!!! Save "baseline" buf. When move make new move from baseline buffer.
-
-
 (defn buffer-data
   [buf]
   (str 
@@ -16,6 +11,27 @@
        (buffer/text buf) "\n"
        ;(buffer/get-selected-text buf) "\n"
        (buf ::buffer/cursor) "\n"))
+
+(defn trim-line
+  [buf row]
+  (let [cursor (buf ::buffer/cursor)
+        line (buffer/line buf row)
+        tline (str/trimr line)]
+    (if (not= line tline)
+      (-> buf
+          (assoc ::buffer/cursor {::buffer/row row ::buffer/col (inc (count tline))})
+          (buffer/delete-to-line-end)
+          (assoc ::buffer/cursor cursor))
+      buf)))
+  
+
+(defn ^:buffer trim-buffer
+  [buf]
+  (let [cursor (-> buf ::buffer/cursor)]
+    (loop [b buf r 1]
+      (if (> r (buffer/line-count b))
+        (buffer/beginning-of-line (assoc b ::buffer/cursor cursor))
+        (recur (trim-line b r) (inc r))))))
 
 ;; Beundry is after two spaces, after beginning of line and space or beginning of line
 (defn beginning-of-boundry
@@ -107,7 +123,9 @@
                 ::tmp-region r1
                 ::tmp-drow drow1
                 ::tmp-dcol dcol1)
-         (dmove-and-space drow1 dcol1)
+         ;(dmove-and-space drow1 dcol1)
+         (dmove-and-space drow1 (+ dcol1 (count text)))
+         (buffer/left (count text))
          buffer/set-insert-mode
          (buffer/delete-char (count text))
          ;buffer/set-insert-mode
@@ -232,7 +250,8 @@
   [buf]
   (-> buf
       (dissoc ::tmp-buf ::tmp-region ::tmp-drow ::tmp-dcol)
-      (update ::buffer/major-modes rest)))
+      (update ::buffer/major-modes rest)
+      trim-buffer))
 
 (defn ^:buffer to-normal-mode
   [buf]
