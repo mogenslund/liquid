@@ -37,12 +37,35 @@
         mapxy (fn [p] [(mapx (first p)) (mapy (second p))])]
     (txtbitmap (apply vector (map mapxy points)))))
 
+(defn box
+  [p1 p2]
+  (let [rx (range (min (p1 0) (p2 0)) (max (p1 0) (p2 0)))
+        ry (range (min (p1 1) (p2 1)) (max (p1 1) (p2 1)))]
+    (for [x rx y ry] [x y])))
+
+(defn txtbar
+  [barwidth barsep values]
+  (let [intvalues (map int values)
+        ma (apply max intvalues)
+        mi (apply min intvalues)
+        height (- ma (max 0 mi))]
+        ;pixvalues (map #(quot (* height %) ma) values)]
+    (txtbitmap
+      (apply concat
+             (map-indexed
+               (fn [idx v]
+                   (box [(* (+ barwidth barsep) idx) height] [(+ (* (+ barwidth barsep) idx) barwidth) (- height v)]))
+               intvalues)))))
+
 ;; Esamples
 (comment
 
   ;; Basic samples
   (txtbitmap [[0 0] [10 1] [10 2] [4 5] [6 5]])
   (txtplot 100 200 [[-100 2] [-5 3] [0 0] [3 -15]])
+  (txtbar 2 6 [2 9 8 1 4 5 0 2 12 9 9 3])
+  (txtbar 10 4 [2 9 8 1 4 5 0 2 12 9 9 3])
+  (txtbar 4 6 [-3 -2 -1 0 1 2 3 4])
 
   ;; Sinus curve
   (let [xs (range -10 10 0.04)
