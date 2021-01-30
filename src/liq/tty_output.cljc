@@ -83,6 +83,14 @@
   (tty-print esc "2J")
   (reset! char-cache {}))
 
+(defn double-width?
+  "Not very precise yet!"
+  [c]
+  (cond (re-matches #"[A-ÿ]" c) false
+        (re-matches #"[ぁ-んァ-ン]" c) true
+        (re-matches #"[ァ-ン]"c) true
+        (re-matches #"[一-龯] "c) true
+        :else false))
 
 (defn print-buffer
   [buf]
@@ -113,7 +121,9 @@
        (do
        ;; Check if row has changed...
          (let [cm (or (-> buf ::buffer/lines (get (dec row)) (get (dec col))) {}) ; Char map like {::buffer/char \x ::buffer/style :string} 
-               c-width (if (= (cm ::buffer/char) \tab) (- tw (mod (- tcol left) tw)) 1) ; Width of the char
+               c-width (cond (= (cm ::buffer/char) \tab) (- tw (mod (- tcol left) tw))
+                             (double-width? (str (cm ::buffer/char))) 2
+                             true 1) ; Width of the char
                cursor-match (or (and (= row crow) (= col ccol))
                                 (and (= row crow) (not cursor-col) (> col ccol))
                                 (and (not cursor-row) (> row crow)))
