@@ -44,12 +44,12 @@
         ccol (+ (-> buf ::buffer/window ::buffer/left)
                 (-> buf ::buffer/cursor ::buffer/col)
                 -1)
-        left (max 1 (min (- ccol (count search)) (- wcols 40)))
-        top (if (> (- wrows crow) 10)
+        left (max 1 (min (- ccol (count search)) (- wcols 80)))
+        top (if (> (- wrows crow) 20)
               crow
-              (max 1 (- crow 10)))
-        cols 40
-        rows 10]
+              (max 1 (- crow 20)))
+        cols 80
+        rows 20]
     (editor/message (str {:top top :left left :rows rows :cols cols}))
     {:top top :left left :rows rows :cols cols}))
 

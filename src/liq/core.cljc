@@ -96,7 +96,7 @@
   (javascript-mode/load-mode)
   ;(editor/add-mode :spacemacs-mode spacemacs-mode/mode)
   (spacemacs-mode/load-spacemacs-mode)
-  ;(swap! editor/state assoc-in [::editor/modes :fundamental-mode :insert "\t"] word-completion/word-typeahead)
+  (swap! editor/state assoc-in [::editor/modes :fundamental-mode :insert "M-,"] word-completion/word-typeahead)
   (cond (or (read-arg args "--jframe") (util/windows?))
         (do
           (editor/set-output-handler jframe-io/output-handler)
