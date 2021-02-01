@@ -258,7 +258,7 @@
 
 (defn force-kill-buffer
   ([idname]
-   (when (> (count (regular-buffers)) 1)
+   (when (not= idname "scratch")
      (let [id (if (number? idname) idname (get-buffer-id-by-name idname))]
        (swap! state update ::buffers dissoc id))
      (previous-regular-buffer 0)))

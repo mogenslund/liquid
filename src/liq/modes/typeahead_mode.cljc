@@ -36,20 +36,20 @@
 (defn calc-frame
   [buf search]
   (editor/get-window)
-  (let [wcols ((editor/get-window) ::buffer/cols)
-        wrows ((editor/get-window) ::buffer/rows)
+  (let [wcols (-> buf ::buffer/window ::buffer/cols)
+        wrows (-> buf ::buffer/window ::buffer/rows)
         crow (+ (-> buf ::buffer/window ::buffer/top)
                 (-> buf ::buffer/cursor ::buffer/row)
                 (- (-> buf ::buffer/tow ::buffer/row)))
         ccol (+ (-> buf ::buffer/window ::buffer/left)
                 (-> buf ::buffer/cursor ::buffer/col)
                 -1)
-        left (max 1 (min (- ccol (count search)) (- wcols 80)))
-        top (if (> (- wrows crow) 20)
+        left (max 1 (min (- ccol (count search)) (- wcols 40)))
+        top (if (> (- wrows crow) 6)
               crow
-              (max 1 (- crow 20)))
-        cols 80
-        rows 20]
+              (max 1 (- crow 6)))
+        cols 40
+        rows (- wrows top)]
     (editor/message (str {:top top :left left :rows rows :cols cols}))
     {:top top :left left :rows rows :cols cols}))
 
