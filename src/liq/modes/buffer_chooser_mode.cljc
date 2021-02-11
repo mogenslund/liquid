@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer]
+            [liq.extras.command-navigator :as command-navigator]
             [liq.util :as util]))
 
 (defn load-content
@@ -26,7 +27,8 @@
 
 (def mode
   {:insert {"esc" (fn [] (apply-to-buffer #(-> % (assoc ::buffer/mode :normal) buffer/left)))}
-   :normal {"q" editor/previous-buffer
+   :normal {"C- " #(do (editor/previous-buffer) (command-navigator/run))
+            "q" editor/previous-buffer
             "\n" choose-buffer
             "h" :left 
             "j" :down
