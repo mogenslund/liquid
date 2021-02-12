@@ -27,9 +27,9 @@
 
 (def mode
   {:insert {"esc" (fn [] (apply-to-buffer #(-> % (assoc ::buffer/mode :normal) buffer/left)))}
-   :normal {"C- " #(do (editor/previous-buffer) (command-navigator/run))
-            "q" editor/previous-buffer
+   :normal {"q" editor/previous-buffer
             "\n" choose-buffer
+            "esc" editor/previous-buffer
             "h" :left 
             "j" :down
             "k" :up

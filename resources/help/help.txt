@@ -48,6 +48,7 @@ word-completion.txt
 how-it-works.txt
 lynx-integration.txt
 orchard-integration.txt
+command-navigator.txt
 
 TIPS & TRICKS
 project-specific-modifications.txt

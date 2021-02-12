@@ -1,0 +1,40 @@
+help.txt command-navigator.txt                                        salza.dk
+
+                            Command Navigator
+
+
+Typing space-space in normal mode will activate the command navigator.
+
+==============================================================================
+Adding content
+
+    (ns user
+      (:require [liq.extras.command-navigator :as command-navigator]
+                [liq.editor :as editor]))
+
+    (command-navigator/add-file "/tmp/tmp.clj")
+    (command-navigator/add-files-below "~/somefolder")
+    (command-navigator/add-folder "~/somefolder")
+
+    (defn my-function
+      "Some documentation"
+      []
+      (editor/message (str "It works " (rand-int 100))))
+
+    (editor/set-command :my-command #'my-function)
+
+This piece of code will:
+
+ * Make it possible to open /tmp/tmp.clj from the typeahead
+
+ * Make it possible to open every file below ~/somefolder from the typeahead
+   recursively. (Be careful not to include too many files!)
+
+ * Make it possible to open ~/somefolder in dired mode. (Better choice for
+   folders with a lot below.)
+
+ * Look up my-command in typeahead by command name and documentation and
+   execute the command.
+
+Evalute the code. Type space twice, and try it out!
+
