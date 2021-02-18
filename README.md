@@ -25,6 +25,9 @@ There is no made up language or syntax to extend &lambda;iquid.
  * Since &lambda;iquid is pure Clojure it can be used to extend any Clojure or Java program, so the editor lives inside the program.. like magic.
  * Turn it around, you can use any Clojure and any Java library to extend &lambda;iquid.. if the library can do it then &lambda;iquid can do it. Configure keyboard shortcuts and commands to tame the libraries. Use code to integrate.
 
+# Video
+[Authors Liquid Setup](https://www.youtube.com/watch?v=-MC0P4rj3e8)
+
 ## Community
 For discussions, help, tips and support, use
 

@@ -57,7 +57,7 @@
                    (box [(* (+ barwidth barsep) idx) height] [(+ (* (+ barwidth barsep) idx) barwidth) (- height v)]))
                intvalues)))))
 
-;; Esamples
+;; Examples
 (comment
 
   ;; Basic samples
