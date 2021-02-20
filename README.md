@@ -45,6 +45,12 @@ Or download jar [liq.jar](https://salza.dk/liq.jar) and execute
 
     java -jar liq.jar
 
+#### Disappearing cursor
+If the cursor seems to disappear when moving fast, try executing this code when loading liquid (e.g in the .liq file):
+
+    (swap! liq.tty-output/settings assoc :liq.tty-output/cursor-draw-hack true)
+
+(It is not enabled by default, because it then sometimes cause other display issues.)
   
 #### Starter kit
 A place to start is [Liquid Starter Kit](https://github.com/mogenslund/liquid-starter-kit)
