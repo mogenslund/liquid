@@ -52,7 +52,7 @@
 (let [this-ns *ns*]
   (defn var-at-point
     [buf]
-    (some->> (re-find #"\w.*\w" (-> buf buffer/left buffer/word)) symbol (ns-resolve this-ns))))
+    (some->> (re-find #"\w.*\w\??!?" (-> buf buffer/left buffer/word)) symbol (ns-resolve this-ns))))
 
 (defn goto-var
   [file var]
@@ -72,7 +72,7 @@
 
 (defn goto-definition-local
   [buf]
-  (let [fun (re-find #"\w.*\w" (-> buf buffer/left buffer/word))
+  (let [fun (re-find #"\w.*\w\??!?" (-> buf buffer/left buffer/word))
         hit #(-> %
                  buffer/beginning-of-buffer
                  (buffer/search (str "\\x28defn? " fun)))]
