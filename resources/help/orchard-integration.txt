@@ -1,7 +1,7 @@
-help.txt orchart-integration.txt                                      salza.dk
+help.txt orchard-integration.txt                                      salza.dk
 
 
-                          Orchart Integration
+                          Orchard Integration
 
 
 The plugin liquid-orchard is for enhanced goto definition functionality.
@@ -10,7 +10,7 @@ The plugin is located here
 
     https://github.com/mogenslund/liquid-orchard
 
-Wrappring the library
+Wrapping the library
 
     https://github.com/clojure-emacs/orchard
 
@@ -23,7 +23,7 @@ The current version of the plugin will replace the built-in goto-definition
 function with keybinding g D.
 
 Since orchard is capable of much more, the plugin will probably grow over time
-levaraging even more functionlity.
+leveraging even more functionality.
 
 Using the plugin together with liquid is done in two steps:
 

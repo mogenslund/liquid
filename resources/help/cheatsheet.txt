@@ -13,14 +13,14 @@ $          End of line
 gg         Beginning of buffer (Type number before to go to line)
 G          End of buffer
 gi         Typeahead headline and definition navigation
-gl         Typeahead lines to navigate to specifik line
+gl         Typeahead lines to navigate to specific line
 gd         Navigate to definition (locally)
 gD         Navigate to definition (globally)
 zt         Scroll so cursor is on top of the window
 w          Forward to beginning of word
-W          Forward to beginning of word (including punctation)
+W          Forward to beginning of word (including punctuation)
 e          Forward to end of word 
-E          Forward to end of word (including punctation)
+E          Forward to end of word (including punctuation)
 b          Backward to beginning of word
 /<search>  Search
 n          Find next
@@ -166,7 +166,7 @@ Examples
 
 Save a file in ~/.liq to load the content on startup.
 
-The example below will create an outputbuffer at the buttom of the window to 
+The example below will create an outputbuffer at the bottom of the window to
 make evaluation and result flow more smooth.
 
 (ns user

@@ -6,7 +6,7 @@ help.txt spacemacs-mode.txt                                           salza.dk
 
 Spacemacs mode is a mode that add Spacemacs like keybindings. Only few of the 
 bindings have been implemented, but enough to provide a structure. If someone 
-wants more emplemented, look to see if you can manage it yourself, and create 
+wants more implemented, look to see if you can manage it yourself, and create
 a pullrequest. Maybe also write to me with a description of the one you are 
 missing.
 

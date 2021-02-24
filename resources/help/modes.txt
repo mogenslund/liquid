@@ -31,4 +31,4 @@ will be choose, since :custom-mode, as the first mode has "C-b" defined for
 :insert mode.
 
 If the current mode is :insert and "C-n" is pressed, the :down action will be
-choosen from the :fundamental-mode, since it is not defined for :custom-mode.
+chosen from the :fundamental-mode, since it is not defined for :custom-mode.

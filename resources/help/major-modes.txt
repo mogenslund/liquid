@@ -34,7 +34,7 @@ If for example the mode is :normal and a key like "f3" is pressed, the editor
 will first look for a function in :normal in :mode1 defined for "f3". If there
 is no hit, it will look in :mode2 etc.
 
-Syntax highligthing will choosen from the first mode in the list containing a
+Syntax highlighting will choose from the first mode in the list containing a
 :syntax keyword. This allows one to add a mode only redefining parts of the
 mode, like keybindings and not necessarily syntax highlighting and visa versa.
 

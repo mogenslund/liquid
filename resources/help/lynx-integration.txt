@@ -12,7 +12,7 @@ cursor is on a link, Lynx will be used to display the content of the page in
 Liquid.
 
 If gw is typed while inside brackets with a number, like "[99]", Liquid will 
-look for a matching link reference starting with 99: <link> and grap the link 
+look for a matching link reference starting with 99: <link> and grab the link
 from there. This is how Lynx displays links.
 
 ==============================================================================

@@ -2,9 +2,9 @@ help.txt evaluation.txt                                               salza.dk
 
                                 Evaluation
 
-To evaluate code snippets press: c c p. If selection is active the selected 
+To evaluate code snippets press: c p p. If selection is active the selected
 code will be executed. (Be aware the selection needs to contain valid code to 
-evaluate succesfully.)
+evaluate successfully.)
 
 If nothing is selected the smallest form containing the cursor will be 
 evaluated.
