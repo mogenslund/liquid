@@ -5,11 +5,11 @@ Background
 
 The main inspiration for Liquid is VIM. The intention is that people with VIM 
 experience should be able to adapt quickly. I find VIM really great for 
-editing text. Since Emacs also has its areas of superiosity, I find no reason 
+editing text. Since Emacs also has its areas of superiority, I find no reason
 not to get inspired by that as well. This is primarily in regards to 
 extensibility and major modes.
 
-There are two kinds of modes. Inpsired by Emacs there are major modes which 
+There are two kinds of modes. Inspired by Emacs there are major modes which
 defines the behavior in a given context and to provide app-like 
 functionality. Major modes can have built in modes, which are more like VIM 
 modes for modal editing, like insert mode, normal mode and visual mode. 
@@ -21,7 +21,7 @@ VIM users would switch back and forth between insert mode and normal mode.
 ==============================================================================
 Extra help
 
-Since a lot of funcinality is inspired by VIM, please also consult the VIM 
+Since a lot of functionality is inspired by VIM, please also consult the VIM
 help while this project is getting mature. Of cause not all of VIM 
 functionality has been implemented, but a lot of the basic stuff is similar. 
 Please write me if some very fundamental feature is missing.

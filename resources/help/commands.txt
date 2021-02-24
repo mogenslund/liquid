@@ -48,7 +48,7 @@ The command can also be used for keybinding, like this:
 
     (editor/add-key-bindings :help-mode :normal {"C-t" :move10})
 
-The (editor/apply-to-buffer ...) function takes a buffer -> buffer funciton
+The (editor/apply-to-buffer ...) function takes a buffer -> buffer function
 and converts it to a 0-arity function (action) that applies the function on
 a given buffer or the current active buffer.
 

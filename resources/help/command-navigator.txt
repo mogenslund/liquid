@@ -36,5 +36,5 @@ This piece of code will:
  * Look up my-command in typeahead by command name and documentation and
    execute the command.
 
-Evalute the code. Type space twice, and try it out!
+Evaluate the code. Type space twice, and try it out!
 

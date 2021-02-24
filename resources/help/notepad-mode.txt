@@ -4,7 +4,7 @@ help.txt notepad-mode.txt                                             salza.dk
                              Notepad mode 
 
 
-Notepad mode can be enabled with the commanline parameter --notepad.
+Notepad mode can be enabled with the commandline parameter --notepad.
 
 When :notepad-mode is enabled Liquid will behave similar to notepad when in
 insert mode, so very Windows like.

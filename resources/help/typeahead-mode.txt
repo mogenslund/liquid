@@ -20,7 +20,7 @@ function, which is the function that will be called with the result item.
 
 
     (def res (atom ""))
-    (typeahead-mode/run ["apple" "ananas" "pineapple" "grape" "kiwi"]
+    (typeahead-mode/run ["apple" "bananas" "pineapple" "grape" "kiwi"]
                         str
                         #(reset! res %))
     (deref res)

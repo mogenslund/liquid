@@ -51,8 +51,8 @@ File navigation typeahead
 The code in this section will create a list of clj and js files in the /tmp
 folder.
 
-The "-" key will be assiged to a typeahead of this list where the file 
-choosen will be opened.
+The "-" key will be assigned to a typeahead of this list where the file
+chosen will be opened.
 
 By changing the folder to the root of a project, all the files in the project
 can be opened just by pressing "-" (or whatever keybinding is used) and
