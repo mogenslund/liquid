@@ -1,10 +1,11 @@
 (ns liq.util
   (:require [clojure.string :as str]
-            #?(:clj [clojure.java.io :as io]
-              ; :cljs [lumo.io :as io :refer [slurp spit]]
-              )
+            #?(:clj [clojure.java.io :as io])
             #?(:bb [clojure.java.io :as io])
-            #?(:cljs [cljs.js :refer [eval eval-str empty-state]])))
+            #?(:cljs [cljs.js :refer [eval eval-str empty-state]])
+            #?(:cljs [fs])
+            #?(:cljs [path])
+            #?(:cljs [os])))
 
 (def counter (atom 0))
 (defn counter-next
@@ -24,7 +25,8 @@
 
 (defn windows?
   []
-  (boolean (re-find #"(?i)windows" (System/getProperty "os.name"))))
+  #?(:clj (boolean (re-find #"(?i)windows" (System/getProperty "os.name")))
+     :cljs (boolean (re-find #"(?i)win" (.platform os)))))
 
 (defn sleep
   ""
@@ -34,90 +36,108 @@
 
 (defn folder?
   [filepath]
-  (.isDirectory (io/file filepath)))
+  #?(:clj (.isDirectory (io/file filepath))
+     :cljs (.isDirectory (fs/lstatSync filepath))))
 
 (defn file?
   [filepath]
-  (.isFile (io/file filepath)))
+  #?(:clj (.isFile (io/file filepath))
+     :cljs (.isFile (fs/lstatSync filepath))))
 
 (defn exists?
   [filepath]
-  (.exists (io/file filepath)))
+  #?(:clj (.exists (io/file filepath))
+     :cljs (fs/existsSync filepath)))
+
+(defn absolute
+  [filepath]
+  #?(:clj (.getAbsolutePath (io/file filepath))
+     :cljs (path/resolve filepath)))
+
+(defn absolute?
+  [filepath]
+  #?(:clj (.isAbsolute (io/file filepath))
+     :cljs (path/isAbsolute filepath)))
+
+(defn canonical
+  [filepath]
+  #?(:clj (.getCanonicalPath (io/file filepath))
+     :cljs (path/resolve filepath)))
 
 (defn get-folder
   [filepath]
   (cond (re-matches #"https?:.*" filepath) (re-find #"https?:.*/" filepath)
         (folder? filepath) filepath
-        true (str (.getParent (io/file filepath)))))
+        true #?(:clj (str (.getParent (io/file filepath)))
+                :cljs (path/basename (path/dirname filepath)))))
 
 (defn resolve-home
   [path]
   (cond (re-matches #"https?:.*" path) path
-        true (.getCanonicalPath (io/file (str/replace path #"^~" (str/replace (System/getProperty "user.home") "\\" "\\\\"))))))
+        true #?(:clj (.getCanonicalPath (io/file (str/replace path #"^~" (str/replace (System/getProperty "user.home") "\\" "\\\\"))))
+                :cljs (str/replace path #"^~" (str/replace (os/homedir) "\\" "\\\\")))))
 
 (defn resolve-path
   [part alternative-parent]
   (cond (nil? part) "."
         (re-matches #"https?:.*" part) part
         (re-matches #"https?:.*" alternative-parent) (str alternative-parent part)
-        (.isAbsolute (io/file part)) (.getCanonicalPath (io/file part))
-        (re-find #"^~" part) (str (.getCanonicalPath (io/file (str/replace part #"^~" (System/getProperty "user.home")))))
-        true (str (.getCanonicalPath (io/file alternative-parent part)))))
+        (absolute? part) (canonical part)
+        (re-find #"^~" part) (resolve-home part)
+        true (str (canonical #?(:clj (io/file alternative-parent part)
+                                :cljs (path/join alternative-parent part))))))
 
 (defn file
   ([folder filename]
-    (str (io/file folder filename)))
+   #?(:clj (str (io/file folder filename))
+      :cljs (str (path/join folder filename))))
   ([filepath]
-    (str (io/file filepath))))
+   #?(:clj (str (io/file filepath))
+      :cljs (str (path/join filepath)))))
 
 (defn filename
   [filepath]
-  (str (.getName (io/file filepath))))
+  (str #?(:clj (.getName (io/file filepath))
+          :cljs (path/basename filepath))))
 
 (defn parent
-  [filepath]
+  [filepath])
   ;; if root return nil
-  )
-
-(defn absolute
-  [filepath]
-  (.getAbsolutePath (io/file filepath)))
-
-(defn canonical
-  [filepath]
-  (.getCanonicalPath (io/file filepath)))
+  
 
 (defn tmp-file
   [filename]
-  (str (io/file (System/getProperty "java.io.tmpdir") filename)))
+  #?(:clj (str (io/file (System/getProperty "java.io.tmpdir") filename))
+     :cljs (str (path/join (os/tmpdir) filename))))
 
 (defn get-roots
   []
-  (map str (java.io.File/listRoots)))
+  #?(:clj (map str (java.io.File/listRoots))))
 
 (defn get-children
   [filepath]
-  (map str (.listFiles (io/file filepath))))
+  (map str #?(:clj (.listFiles (io/file filepath))
+              :cljs (fs/readdirSync filepath))))
 
 (defn get-folders
   [filepath]
-  (map str (filter #(.isDirectory %) (.listFiles (io/file filepath)))))
+  (map str (filter folder? (get-children filepath))))
 
 (defn get-files
   [filepath]
-  (filter file? (map str (.listFiles (io/file filepath)))))
+  (filter file? (map str  (get-children filepath))))
 
 (defn read-file
   [path]
   #?(:clj (cond (re-matches #"https?:.*" path) (slurp path)
                 (.exists (io/file path)) (slurp path))
-     :cljs (do))) ;(slurp path)
-     
+     :cljs (fs/readFileSync path))) ;(slurp path)
 
 (defn write-file
   [path content]
-  (io/make-parents path)
-  (spit path content))
+  #?(:clj (do (io/make-parents path)
+              (spit path content))
+     :cljs (fs/writeFileSync path content)))
 
 (defn eval-safe
   [text]
@@ -139,13 +159,15 @@
 
 (defn clipboard-content
   []
-  #?(:clj (if (java.awt.GraphicsEnvironment/isHeadless)
-            @localclipboard
-            (let [clipboard (.getSystemClipboard (java.awt.Toolkit/getDefaultToolkit))]
-              (try
-                (.getTransferData (.getContents clipboard nil) (java.awt.datatransfer.DataFlavor/stringFlavor))
-                (catch Exception e ""))))
+  #?(:bb @localclipboard
+     :clj (if (java.awt.GraphicsEnvironment/isHeadless)
+           @localclipboard
+           (let [clipboard (.getSystemClipboard (java.awt.Toolkit/getDefaultToolkit))]
+             (try
+               (.getTransferData (.getContents clipboard nil) (java.awt.datatransfer.DataFlavor/stringFlavor))
+               (catch Exception e ""))))
      :cljs @localclipboard))
+     
 
 (defn clipboard-line?
   []
@@ -153,7 +175,9 @@
 
 (defn set-clipboard-content
   ([text line]
-   #?(:clj (do (reset! localclipboard text)
+   #?(:bb (do (reset! localclipboard text)
+              (reset! line? line))
+      :clj (do (reset! localclipboard text)
                (reset! line? line)
                (when (not (java.awt.GraphicsEnvironment/isHeadless))
                  (let [clipboard (.getSystemClipboard (java.awt.Toolkit/getDefaultToolkit))]

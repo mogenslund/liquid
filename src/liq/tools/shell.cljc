@@ -9,13 +9,15 @@
 (defn datetimestamp
   "Todays date in yyyy-mm-dd-HH-mm-ss format"
   []
-  (.format (java.text.SimpleDateFormat. "yyyy-MM-dd-HH-mm-ss")
-           (.getTime (java.util.Calendar/getInstance))))
+  #?(:bb (do)
+     :clj (.format (java.text.SimpleDateFormat. "yyyy-MM-dd-HH-mm-ss")
+                   (.getTime (java.util.Calendar/getInstance)))))
 
 (defn today
   []
-  (.format (java.text.SimpleDateFormat. "yyyy-MM-dd")
-           (.getTime (java.util.Calendar/getInstance))))
+  #?(:bb (do)
+     :clj (.format (java.text.SimpleDateFormat. "yyyy-MM-dd")
+                   (.getTime (java.util.Calendar/getInstance)))))
 
 (defn- split-arguments
   "Splits arguments/vector into list of parameters

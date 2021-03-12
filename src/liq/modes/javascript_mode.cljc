@@ -1,8 +1,7 @@
 (ns liq.modes.javascript-mode
   (:require [clojure.string :as str]
             [clojure.repl :as repl]
-            [clojure.java.io :as io]
-            [clojure.java.shell :as shell]
+            #?(:clj [clojure.java.shell :as shell])
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer]
             [liq.util :as util]))
@@ -25,11 +24,15 @@
    :definition-begin #"[\w\#\.\-\_\:\+\=\>\<\/\!\?\*]+"
    :definition-end #"."})
 
+(defn sh
+  [& args]
+  #?(:clj (apply shell/sh args)))
+
 (def mode
-  {:normal {"c" {"p" {"f" (fn [] (editor/message ((shell/sh "node" ((editor/current-buffer) ::buffer/filename)) :out)))
-                      "å" (fn [] (editor/message ((shell/sh "node" ((editor/current-buffer) ::buffer/filename)) :out)))}
-                 "å" (fn [] (editor/message ((shell/sh "node" ((editor/current-buffer) ::buffer/filename)) :out)))}
-            "f5" (fn [] (editor/message ((shell/sh "node" ((editor/current-buffer) ::buffer/filename)) :out)))
+  {:normal {"c" {"p" {"f" (fn [] (editor/message ((sh "node" ((editor/current-buffer) ::buffer/filename)) :out)))
+                      "å" (fn [] (editor/message ((sh "node" ((editor/current-buffer) ::buffer/filename)) :out)))}
+                 "å" (fn [] (editor/message ((sh "node" ((editor/current-buffer) ::buffer/filename)) :out)))}
+            "f5" (fn [] (editor/message ((sh "node" ((editor/current-buffer) ::buffer/filename)) :out)))
             "½" (fn [] (editor/message (rand-int 1000)))}
    :syntax
     {:plain ; Context

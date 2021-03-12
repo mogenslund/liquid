@@ -11,10 +11,13 @@
             [liq.modes.javascript-mode :as javascript-mode]
             [liq.modes.spacemacs-mode :as spacemacs-mode]
             [liq.modes.notepad-mode :as notepad-mode]
-            [liq.modes.parinfer-mode :as parinfer-mode]
+            #?(:bb (do)
+               :clj [liq.modes.parinfer-mode :as parinfer-mode])
             [liq.modes.info-dialog-mode :as info-dialog-mode]
-            #?(:clj [liq.extras.cool-stuff :as cool-stuff])
-            #?(:clj [liq.jframe-io :as jframe-io])
+            #?(:bb (do)
+               :clj [liq.extras.cool-stuff :as cool-stuff])
+            #?(:bb (do)
+               :clj [liq.jframe-io :as jframe-io])
             #?(:cljs [liq.browser-io :as browser-io])
             [liq.extras.markdownfolds :as markdownfolds]
             [liq.extras.snake-mode :as snake-mode]
@@ -59,9 +62,23 @@
     (catch Exception e (editor/message (str "Error loading " p ":\n" e)))))
   ([] (load-dot-liq "~/.liq")))
 
+(defn load-parinfer-mode
+  []
+  #?(:bb (do)
+     :clj (do (editor/add-mode :parinfer-mode parinfer-mode/mode)
+              (swap! editor/state assoc-in [:liq.editor/commands :p]
+                (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :parinfer-mode))))
+              (swap! editor/state assoc-in [:liq.editor/commands :parinfer]
+                (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :parinfer-mode))))
+              (swap! editor/state assoc-in [:liq.editor/commands :parinferoff]
+                (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes (fn [l] (remove (fn [elem] (= elem :parinfer-mode)) l))))))
+              (swap! editor/state assoc-in [:liq.editor/commands :poff]
+                (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes (fn [l] (remove (fn [elem] (= elem :parinfer-mode)) l)))))))))
+
 (defn load-extras
   []
-  #?(:clj (cool-stuff/load-cool-stuff))
+  #?(:bb (do)
+     :clj (cool-stuff/load-cool-stuff))
   (markdownfolds/load-markdownfolds)
   (swap! editor/state assoc-in [:liq.editor/modes :snake-mode] liq.extras.snake-mode/mode)
   (swap! editor/state assoc-in [:liq.editor/commands :snake] liq.extras.snake-mode/run)
@@ -69,15 +86,7 @@
   (swap! editor/state assoc-in [:liq.editor/commands :freemove]
     (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :freemove-mode))))
   (swap! editor/state assoc-in [:liq.editor/commands :fm]
-    (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :freemove-mode))))
-  (swap! editor/state assoc-in [:liq.editor/commands :p]
-    (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :parinfer-mode))))
-  (swap! editor/state assoc-in [:liq.editor/commands :parinfer]
-    (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :parinfer-mode))))
-  (swap! editor/state assoc-in [:liq.editor/commands :parinferoff]
-    (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes (fn [l] (remove (fn [elem] (= elem :parinfer-mode)) l))))))
-  (swap! editor/state assoc-in [:liq.editor/commands :poff]
-    (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes (fn [l] (remove (fn [elem] (= elem :parinfer-mode)) l)))))))
+    (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :freemove-mode)))))
 
 ;; clj -m liq.experiments.core
 (defn -main
@@ -90,7 +99,6 @@
   (editor/add-mode :typeahead-mode typeahead-mode/mode)
   (editor/add-mode :dired-mode dired-mode/mode)
   (editor/add-mode :clojure-mode clojure-mode/mode)
-  (editor/add-mode :parinfer-mode parinfer-mode/mode)
   (editor/add-mode :info-dialog-mode info-dialog-mode/mode)
   (editor/add-mode :window-arrange-mode window-manager/window-arrange-mode)
   (javascript-mode/load-mode)
@@ -99,9 +107,10 @@
   (swap! editor/state assoc-in [::editor/modes :fundamental-mode :insert "M-,"] word-completion/word-typeahead)
   (cond (or (read-arg args "--jframe") (util/windows?))
         (do
-          (editor/set-output-handler jframe-io/output-handler)
-          (jframe-io/init editor/handle-input)
-          (editor/set-exit-handler jframe-io/exit-handler))
+          #?(:bb (do)
+             :clj (do (editor/set-output-handler jframe-io/output-handler)
+                      (jframe-io/init editor/handle-input)
+                      (editor/set-exit-handler jframe-io/exit-handler))))
         (read-arg args "--browser")
         (do
           #?(:cljs
@@ -135,14 +144,15 @@
         (editor/new-buffer "" {:name "scratch" :top 1 :left 1 :rows (- rows 7) :cols cols :bottom-border "-"})))
     (editor/paint-buffer)
     (load-extras)
+    (load-parinfer-mode)
     #?(:clj (load-dot-liq (or (read-arg args "--init=") "~/.liq")))))
 
 #?(:cljs (set! cljs.core/*main-cli-fn* -main))
 #?(:cljs (defn init [] (-main "--browser")))
 
 (ns user
-  (:require [clojure.java.shell :as shell]
-            [clojure.java.io :as io]
+  (:require #?(:clj [clojure.java.shell :as shell])
+            #?(:clj [clojure.java.io :as io])
             [clojure.pprint :as pprint]
             [liq.extras.mindmap :refer [mindmap]]
             [liq.extras.txtplot :refer [txtbitmap txtplot]]

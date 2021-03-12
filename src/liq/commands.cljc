@@ -224,7 +224,8 @@
 
 (defn eval-sexp-at-point
   [buf]
-  #?(:clj
+  #?(:bb (do)
+     :clj
       (do
         (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
         (let [sexp (if (= (buf ::buffer/mode) :visual) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))

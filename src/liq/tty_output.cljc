@@ -13,12 +13,14 @@
 
 (defn- tty-print
   [& args]
-  #?(:clj (.print (System/out) (str/join "" args))
+  #?(:bb (binding [*out* (io/writer System/out)] (print (str/join "" args)))
+     :clj (.print (System/out) (str/join "" args))
      :cljs (js/process.stdout.write (str/join "" args))))
 
 (defn- tty-println
   [& args]
-  #?(:clj (.println (System/out) (str/join "" args))
+  #?(:bb (binding [*out* (io/writer System/out)] (println (str/join "" args)))
+     :clj (.println (System/out) (str/join "" args))
      :cljs (js/process.stdout.write (str (str/join "" args) "\n"))))
 
 (defn rows

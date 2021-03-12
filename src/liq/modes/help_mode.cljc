@@ -1,20 +1,20 @@
 (ns liq.modes.help-mode
   (:require [clojure.string :as str]
-            [clojure.java.io :as io]
+            #?(:clj [clojure.java.io :as io])
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer]
             [liq.util :as util]))
 
 (defn load-topic
   [topic]
-  (if-let [id (editor/get-buffer-id-by-name (str "*Help - " topic "*"))]
-    (switch-to-buffer id)
-    (when-let [path (if (re-find #"/" topic)
-                      topic
-                      (or (io/resource (str "help/" topic))
-                          (io/resource (str "help/" topic ".txt"))))]
-      (editor/new-buffer (slurp path)
-                         {:major-modes (list :help-mode :spacemacs-mode :clojure-mode :fundamental-mode) :name (str "*Help - " topic "*")}))))
+  #?(:clj (if-let [id (editor/get-buffer-id-by-name (str "*Help - " topic "*"))]
+            (switch-to-buffer id)
+            (when-let [path (if (re-find #"/" topic)
+                              topic
+                              (or (io/resource (str "help/" topic))
+                                  (io/resource (str "help/" topic ".txt"))))]
+              (editor/new-buffer (slurp path)
+                                 {:major-modes (list :help-mode :spacemacs-mode :clojure-mode :fundamental-mode) :name (str "*Help - " topic "*")})))))
  
 
 ; (slurp (io/resource (str "help/" topic)))

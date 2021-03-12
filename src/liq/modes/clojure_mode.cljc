@@ -1,11 +1,12 @@
 (ns liq.modes.clojure-mode
   (:require [clojure.string :as str]
             [clojure.repl :as repl]
-            [clojure.java.io :as io]
+            #?(:clj [clojure.java.io :as io])
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [liq.buffer :as buffer]
             [liq.util :as util])
-  (:import [java.net URLClassLoader]))
+  (:import #?(:bb []
+              :clj [java.net URLClassLoader])))
 
 (defn get-namespace
   [buf]
@@ -34,11 +35,12 @@
 
 (defn classloaders-classpath
   []
-  (->> (.getContextClassLoader (Thread/currentThread)) 
-       (iterate #(.getParent ^ClassLoader %))
-       (take-while identity)
-       (filter #(instance? URLClassLoader %))
-       (mapcat #(.getURLs ^URLClassLoader %))))
+  #?(:bb (do)
+     :clj (->> (.getContextClassLoader (Thread/currentThread)) 
+               (iterate #(.getParent ^ClassLoader %))
+               (take-while identity)
+               (filter #(instance? URLClassLoader %))
+               (mapcat #(.getURLs ^URLClassLoader %)))))
 
 (defn classpaths
   []
@@ -46,8 +48,8 @@
 
 (defn file-of-var
   [a-var]
-  (when-some [path (some-> a-var meta :file)]
-    (first (sequence (comp (map #(io/file % path)) (filter #(.exists %))) (classpaths)))))
+  #?(:clj (when-some [path (some-> a-var meta :file)]
+            (first (sequence (comp (map #(io/file % path)) (filter #(.exists %))) (classpaths))))))
 
 (let [this-ns *ns*]
   (defn var-at-point

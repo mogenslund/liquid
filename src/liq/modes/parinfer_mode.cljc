@@ -4,7 +4,6 @@
   The command parinfer-rust should be available
   as a command line program."
   (:require [clojure.string :as str]
-            [clojure.java.io :as io]
             [clojure.data.json :as json]
             [liq.editor :as editor :refer [apply-to-buffer switch-to-buffer get-buffer]]
             [clojure.java.shell :as shell]

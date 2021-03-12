@@ -1,5 +1,5 @@
 (ns liq.extras.command-navigator
-  (:require [clojure.java.io :as io]
+  (:require #?(:clj [clojure.java.io :as io])
             [clojure.string :as str]
             [clojure.repl :as repl]
             [liq.editor :as editor]
@@ -9,10 +9,10 @@
 
 (defn files-below
   [path]
-  (filter #(not (re-find #"\.(png|class|jpg|pdf|git/)" %))
-          (filter util/file?
-                  (map #(.getAbsolutePath %)
-                       (file-seq (io/file (util/resolve-home path)))))))
+  #?(:clj (filter #(not (re-find #"\.(png|class|jpg|pdf|git/)" %))
+                  (filter util/file?
+                          (map #(.getAbsolutePath %)
+                               (file-seq (io/file (util/resolve-home path))))))))
 
 
 (defn add-file

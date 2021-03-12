@@ -1,4 +1,18 @@
-(ns liq.tty-shared)
+(ns liq.tty-shared
+  (:require [clojure.string :as str]
+            [clojure.java.io :as io]))
+
+(defn tty-print
+  [& args]
+  #?(:bb (binding [*out* (io/writer System/out)] (print (str/join "" args)))
+     :clj (.print (System/out) (str/join "" args))
+     :cljs (js/process.stdout.write (str/join "" args))))
+
+(defn tty-println
+  [& args]
+  #?(:bb (binding [*out* (io/writer System/out)] (println (str/join "" args)))
+     :clj (.println (System/out) (str/join "" args))
+     :cljs (js/process.stdout.write (str (str/join "" args) "\n"))))
 
 (defn raw2keyword
   [raw]
