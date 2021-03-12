@@ -32,7 +32,7 @@
                 (tty-println n)
                 (Thread/sleep 100)
                 (recur ((shell/sh "/bin/sh" "-c" "stty size </dev/tty") :out) (inc n)))))
-     :cljs (aget (js/process.stdout.getWindowSize) 0))) 
+     :cljs (or 40 (aget (js/process.stdout.getWindowSize) 0)))) 
 
 (defn cols
   []
@@ -43,7 +43,7 @@
                (tty-println n)
                (Thread/sleep 100)
                (recur ((shell/sh "/bin/sh" "-c" "stty size </dev/tty") :out) (inc n)))))
-     :cljs (aget (js/process.stdout.getWindowSize) 0))) 
+     :cljs (or 120 (aget (js/process.stdout.getWindowSize) 0)))) 
 
 
 (defn get-dimensions

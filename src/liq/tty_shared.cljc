@@ -1,6 +1,6 @@
 (ns liq.tty-shared
   (:require [clojure.string :as str]
-            [clojure.java.io :as io]))
+            #?(:clj [clojure.java.io :as io])))
 
 (defn tty-print
   [& args]
