@@ -58,6 +58,7 @@
         (when (not= input "C-q")
           (fun input)
           (recur (read-input)))))
+    (Thread/sleep 30000)
     (shutdown-agents)
     (set-line-mode)))
 

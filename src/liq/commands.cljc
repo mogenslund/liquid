@@ -53,7 +53,7 @@
   []
   (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
   (let [buf (editor/current-buffer)
-        w (buffer/word buf)
+        w (str/replace (buffer/word buf) #"\"" "")
         project-part (when-let [p (re-find #"^:\+(?:\w+|-)+$" w)] (str (subs p 2) ".md"))
         part (or project-part (re-find #"[^:\(\)\[\]\{\}]+" w))
         buffer-file (or (buf ::buffer/filename)
