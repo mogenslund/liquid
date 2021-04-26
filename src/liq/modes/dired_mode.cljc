@@ -87,6 +87,8 @@
             "down" :down 
             "up" :up 
             "right" :right
+            "v" :set-visual-mode
+            "y" {"y" :copy-line}
             "n" #(apply-to-buffer buffer/search)
             "0" #(apply-to-buffer buffer/beginning-of-line)
             "$" #(apply-to-buffer buffer/end-of-line)
@@ -96,7 +98,18 @@
             "%" new-file
             "/" #(((editor/get-mode :minibuffer-mode) :init) "/")
             ":" #(((editor/get-mode :minibuffer-mode) :init) ":")}
-    :visual {"esc" #(apply-to-buffer buffer/set-normal-mode)}
+    :visual {"esc" :set-normal-mode 
+             "i" {"w" :select-inner-word
+                  "(" :select-inner-paren
+                  "[" :select-inner-bracket
+                  "{" :select-inner-brace
+                  "\"" :select-inner-quote}
+             "a" {"(" :select-outer-paren
+                  "[" :select-outer-bracket
+                  "{" :select-outer-brace
+                  "\"" :select-outer-quote}
+             "V" :select-line
+             "y" :copy-selection-to-clipboard} 
     :init run
     :syntax
      {:plain ; Context

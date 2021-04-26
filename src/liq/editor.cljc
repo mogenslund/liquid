@@ -243,6 +243,26 @@
 ; (group-by ::buffer/group (vals (@state ::buffers)))
 ; (map ::id (sort-by ::idx (map #(first (sort-by ::idx %)) (group-by #(-> % ::buffer/window ::buffer/group) (vals (@state ::buffers))))))
 
+(defn highlight-buffer
+  ([idname]
+   (apply-to-buffer idname
+     (fn [buf]
+       (let [hl (first (filter identity (map #(-> % get-mode :syntax) (buf ::buffer/major-modes))))]
+         (if hl
+           (highlighter/highlight buf hl)
+           buf)))))
+  ([] (highlight-buffer (current-buffer-id))))
+
+(defn highlight-buffer-row
+  ([idname]
+   (apply-to-buffer idname
+     (fn [buf]
+       (let [hl (first (filter identity (map #(-> % get-mode :syntax) (buf ::buffer/major-modes))))]
+         (if hl
+           (highlighter/highlight buf hl (-> buf ::buffer/cursor ::buffer/row))
+           buf)))))
+  ([] (highlight-buffer-row (current-buffer-id))))
+
 
 (defn message
   [s & {:keys [:append :view :timer]}]
@@ -250,6 +270,7 @@
     ;(apply-to-buffer "*output*" #(-> % (buffer/append-buffer (buffer/buffer (str s "\n"))) buffer/end-of-buffer))
     (apply-to-buffer "*output*" #(-> % buffer/end-of-buffer (buffer/insert-string (str s "\n")) buffer/end-of-buffer))
     (apply-to-buffer "*output*" #(-> % buffer/clear (buffer/insert-string (str s)))))
+  (when (not append) (highlight-buffer "*output*"))
   (paint-buffer "*output*")
   (when (and view (get-setting :auto-switch-to-output))
     (switch-to-buffer "*output*")
@@ -270,26 +291,6 @@
      (force-kill-buffer idname)
      (message "There are unsaved changes. Use bd! to force kill." :view true :timer 1500)))
   ([] (kill-buffer (current-buffer-id))))
-
-(defn highlight-buffer
-  ([idname]
-   (apply-to-buffer idname
-     (fn [buf]
-       (let [hl (first (filter identity (map #(-> % get-mode :syntax) (buf ::buffer/major-modes))))]
-         (if hl
-           (highlighter/highlight buf hl)
-           buf)))))
-  ([] (highlight-buffer (current-buffer-id))))
-
-(defn highlight-buffer-row
-  ([idname]
-   (apply-to-buffer idname
-     (fn [buf]
-       (let [hl (first (filter identity (map #(-> % get-mode :syntax) (buf ::buffer/major-modes))))]
-         (if hl
-           (highlighter/highlight buf hl (-> buf ::buffer/cursor ::buffer/row))
-           buf)))))
-  ([] (highlight-buffer-row (current-buffer-id))))
 
 (defn new-buffer
   ([text {:keys [name] :as options}]

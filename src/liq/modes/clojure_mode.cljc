@@ -95,6 +95,7 @@
    :yellow-begin "➜"
    :bold-begin #"(?<=\*)\w+"
    :bold-end #"\*"
+   :headline-begin #"^[A-Z][- A-Z]+$"
    :definition-begin #"[\w\#\.\-\_\:\+\=\>\<\/\!\?\*]+"
    :definition-end #"."})
 
@@ -112,6 +113,7 @@
                   (match :red-begin) :red
                   (match :bold-begin) :bold
                   (match :special-begin) :special
+                  (match :headline-begin) :headline
                   #"[-a-zA-Z0-9]+\.txt" :topic
                   #"---.*---" :topic
                   #"===.*===" :topic}}
@@ -134,6 +136,10 @@
      :special
       {:style :special
        :matchers {(match :definition-begin) :definition}}
+
+     :headline
+      {:style :yellow
+       :matchers {#"$" :plain}}
 
      :green
       {:style :green
