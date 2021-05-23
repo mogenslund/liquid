@@ -10,6 +10,13 @@
   (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
   (editor/apply-to-buffer fun))
 
+(def Emacs-C-x
+ {"C-e" :eval-sexp-at-point
+  "C-f" :Ex
+  "C-s" :w
+  "C-c" :q
+  "C-b" #(((editor/get-mode :buffer-chooser-mode) :init))})
+
 (def mode
   {:commands {":ts" #(editor/message (str % " -- " (buffer/sexp-at-point (editor/current-buffer))))}
    :insert {"esc" (fn [] (apply-to-buffer #(buffer/left (buffer/set-normal-mode %))))
@@ -28,7 +35,7 @@
             "home" :beginning-of-line
             "end" :end-of-line
             "delete" :delete-char
-            "C-x" {"C-e" :eval-sexp-at-point} 
+            "C-x" Emacs-C-x 
             "M-x" (fn [] (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
                        (((editor/get-mode :minibuffer-mode) :init) ":"))}
    :normal {"esc" (fn []
@@ -38,6 +45,7 @@
             "C-b" :previous-regular-buffer
             "C-f" :page-down
             "C-o" :output-snapshot
+            "C-x" Emacs-C-x
             "t" {"a" #(editor/message "Test A")
                  "b" (with-meta #(editor/message "Test B") {:doc "Some documentation for Test B"})
                  "c" :testc
@@ -45,8 +53,8 @@
                  "e" (with-meta (fn [buf]
                                     (future (Thread/sleep 1000) (editor/message "Test E: Using with-meta inline"))
                                     (buffer/down buf))
-                                {:buffer true :doc "Some documentation for Test E"})
-                 }
+                                {:buffer true :doc "Some documentation for Test E"})}
+                 
             "f2" editor/oldest-buffer
             "f3" #(non-repeat-fun buffer/debug-clear-undo)
             "." ::editor/last-action 
