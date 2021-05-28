@@ -155,7 +155,7 @@
             #?(:clj [clojure.java.io :as io])
             [clojure.pprint :as pprint]
             [liq.extras.mindmap :refer [mindmap]]
-            [liq.extras.txtplot :refer [txtbitmap txtplot]]
+            [liq.extras.txtplot :refer [txtbitmap txtplot txtbar]]
             [liq.util :as util]
             [liq.buffer :as buffer]
             [liq.editor :as editor]))

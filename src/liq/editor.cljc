@@ -118,6 +118,15 @@
   []
   (get-buffer (current-buffer-id)))
 
+(defn current-file
+  []
+  ((current-buffer) ::buffer/filename))
+
+(defn current-folder
+  []
+  (let [f (or ((current-buffer) ::buffer/filename) ".")]
+    (util/absolute (util/get-folder f))))
+
 (defn switch-to-buffer
   [idname]
   (if (number? idname)
@@ -320,6 +329,13 @@
     (if (get-buffer-id-by-name p)
       (switch-to-buffer p)
       (new-buffer (or (util/read-file p) "") {:name p :filename p}))))
+
+(defn reload-file
+  []
+  (let [path ((current-buffer) ::buffer/filename)]
+    (when (and path (not (buffer/dirty? (current-buffer))))
+      (kill-buffer)
+      (open-file path))))
 
 (defn dirty-buffers
   []

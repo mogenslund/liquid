@@ -417,6 +417,7 @@
      :bnext #'editor/oldest-buffer
      :bn #'editor/oldest-buffer
      :new #(editor/new-buffer "" {})
+     :reload-file #(editor/reload-file)
      :buffers #(((editor/get-mode :buffer-chooser-mode) :init))
      :buffer-major-modes #(editor/message (str ((editor/current-buffer) ::buffer/major-modes)))
      :buffer-info #(editor/message (with-out-str (pprint/pprint (buffer/info (editor/current-buffer)))))
