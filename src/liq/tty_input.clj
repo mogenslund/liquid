@@ -3,7 +3,9 @@
             [clojure.java.io :as io]
             [clojure.java.shell :as shell]
             [liq.util :as util]
-            [liq.tty-shared :as shared]))
+            [liq.tty-shared :as shared])
+  (:import [java.io PrintStream FileOutputStream FileDescriptor]
+           [java.io ByteArrayOutputStream BufferedReader]))
 
 (def esc "\033[")
 (def ^:private sysout (System/out))
@@ -27,6 +29,7 @@
 
 (defn exit-handler
   []
+  (PrintStream. (FileOutputStream. (FileDescriptor/out)))
   (shared/tty-print "\033[0;37m\033[2J")
   (shared/tty-print "\033[?25h")
   (shell/sh "/bin/sh" "-c" "stty -echo cooked </dev/tty")
@@ -39,12 +42,26 @@
   (shared/tty-print esc "0;0H" esc "s")
   (set-raw-mode))
 
+(defn redirect-stdout
+  [fun]
+  (System/setOut
+    (PrintStream.
+      (proxy [ByteArrayOutputStream] []
+        (write [& b] (fun (if (= (count b) 1) (str (char (first b))) (str/join "" (map char (first b))))))))))
+
+(defn redirect-stderr
+  [fun]
+  (System/setErr
+    (PrintStream.
+      (proxy [ByteArrayOutputStream] []
+        (write [& b] (fun (if (= (count b) 1) (str (char (first b))) (str/join "" (map char (first b))))))))))
+
 (defn input-handler
   [fun]
   ;(tty-print esc "0;37m" esc "2J")
   (shared/tty-print esc "0;0H" esc "s")
   (future
-    (let [r (java.io.BufferedReader. *in*)
+    (let [r (BufferedReader. *in*)
           read-input (fn [] (shared/raw2keyword
                               (let [input0 (.read r)]
                                 (if (= input0 27)

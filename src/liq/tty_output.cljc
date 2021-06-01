@@ -2,6 +2,7 @@
   (:require [liq.buffer :as buffer]
             #?(:clj [clojure.java.io :as io])
             #?(:clj [clojure.java.shell :as shell])
+            [liq.tty-shared :as shared]
               ; :cljs [lumo.io :as io]
               
             [clojure.string :as str]))
@@ -11,25 +12,13 @@
 (def ^:private last-buffer (atom nil))
 (def esc "\033[")
 
-(defn- tty-print
-  [& args]
-  #?(:bb (binding [*out* (io/writer System/out)] (print (str/join "" args)))
-     :clj (.print (System/out) (str/join "" args))
-     :cljs (js/process.stdout.write (str/join "" args))))
-
-(defn- tty-println
-  [& args]
-  #?(:bb (binding [*out* (io/writer System/out)] (println (str/join "" args)))
-     :clj (.println (System/out) (str/join "" args))
-     :cljs (js/process.stdout.write (str (str/join "" args) "\n"))))
-
 (defn rows
   []
   #?(:clj (loop [shellinfo ((shell/sh "/bin/sh" "-c" "stty size </dev/tty") :out) n 0]
             (if (or (re-find #"^\d+" shellinfo) (> n 10))
               (Integer/parseInt (re-find #"^\d+" shellinfo))
               (do
-                (tty-println n)
+                (shared/tty-println n)
                 (Thread/sleep 100)
                 (recur ((shell/sh "/bin/sh" "-c" "stty size </dev/tty") :out) (inc n)))))
      :cljs (or 40 (aget (js/process.stdout.getWindowSize) 0)))) 
@@ -40,7 +29,7 @@
             (if (or (re-find #"\d+$" shellinfo) (> n 10)) 
              (dec (Integer/parseInt (re-find #"\d+$" shellinfo)))
              (do
-               (tty-println n)
+               (shared/tty-println n)
                (Thread/sleep 100)
                (recur ((shell/sh "/bin/sh" "-c" "stty size </dev/tty") :out) (inc n)))))
      :cljs (or 120 (aget (js/process.stdout.getWindowSize) 0)))) 
@@ -75,14 +64,14 @@
       (reset! countdown-cache 9))
     (when (> @countdown-cache 0)
       (swap! countdown-cache dec)
-      (tty-print esc color "m")
-      (tty-print esc bgcolor "m")
-      (tty-print esc row ";" col "H" esc "s" ch)
+      (shared/tty-print esc color "m")
+      (shared/tty-print esc bgcolor "m")
+      (shared/tty-print esc row ";" col "H" esc "s" ch)
       (swap! char-cache assoc k footprint))))
 
 (defn invalidate-cache
   []
-  (tty-print esc "2J")
+  (shared/tty-print esc "2J")
   (reset! char-cache {}))
 
 (defn double-width?
@@ -107,8 +96,8 @@
         crow (-> buf ::buffer/cursor ::buffer/row)  ; Cursor row
         ccol (-> buf ::buffer/cursor ::buffer/col)] ; Cursor col
    (when (and (@settings ::cursor-draw-hack) (= cache-id @last-buffer))
-     (tty-print "█")) ; To make it look like the cursor is still there while drawing.
-   (tty-print esc "?25l") ; Hide cursor
+     (shared/tty-print "█")) ; To make it look like the cursor is still there while drawing.
+   (shared/tty-print esc "?25l") ; Hide cursor
    (when-let [statusline (and (not= (buf ::buffer/name) "*minibuffer*") (buf :status-line))]
      (print-buffer statusline))
   ;; Looping over the rows and cols in buffer window in the terminal
@@ -155,9 +144,9 @@
            (doseq [co (range left (+ left cols))]
              (draw-char c (+ top rows) co "38;5;11" "49")))
          (when (buf :status-line)
-           (tty-print esc ccolor "m" esc cursor-row ";" cursor-col "H" esc "s" (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space))
+           (shared/tty-print esc ccolor "m" esc cursor-row ";" cursor-col "H" esc "s" (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space))
            ;(draw-char (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space) cursor-row cursor-col ccolor "49")
-           (tty-print esc "?25h" esc cursor-row ";" cursor-col "H" esc "s")
+           (shared/tty-print esc "?25h" esc cursor-row ";" cursor-col "H" esc "s")
            (reset! last-buffer cache-id)))))))
 
 (def ^:private updater (atom nil))

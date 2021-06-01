@@ -13,6 +13,8 @@
                               :default-tabwidth 8}
                   ::exit-handler nil
                   ::window nil
+                  ::stdout ""
+                  ::stderr ""
                   ::output-handler nil}))
 
 (def ^:private macro-seq (atom ())) ; Macrofunctionality might belong to input handler.
@@ -125,7 +127,8 @@
 (defn current-folder
   []
   (let [f (or ((current-buffer) ::buffer/filename) ".")]
-    (util/absolute (util/get-folder f))))
+    (or ((current-buffer) :liq.modes.dired-mode/folder)
+        (util/absolute (util/get-folder f)))))
 
 (defn switch-to-buffer
   [idname]
@@ -286,6 +289,16 @@
     (when timer (future (Thread/sleep timer) (previous-buffer) (paint-buffer))))
   (paint-buffer))
 
+(defn handle-stdout
+  [s]
+  (swap! state update ::stdout str s)
+  (message s :append true))
+
+(defn handle-stderr
+  [s]
+  (swap! state update ::stderr str s)
+  (message s :append true))
+
 (defn force-kill-buffer
   ([idname]
    (when (not= idname "scratch")
@@ -440,3 +453,4 @@
   []
   (when (not @macro-record)
     (doall (map handle-input (reverse @macro-seq)))))
+

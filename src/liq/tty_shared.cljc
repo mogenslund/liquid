@@ -2,16 +2,18 @@
   (:require [clojure.string :as str]
             #?(:clj [clojure.java.io :as io])))
 
+#?(:clj (do (def out0 (java.io.PrintStream. (java.io.FileOutputStream. (java.io.FileDescriptor/out))))))
+
 (defn tty-print
   [& args]
   #?(:bb (binding [*out* (io/writer System/out)] (print (str/join "" args)))
-     :clj (.print (System/out) (str/join "" args))
+     :clj (.print out0 (str/join "" args))
      :cljs (js/process.stdout.write (str/join "" args))))
 
 (defn tty-println
   [& args]
   #?(:bb (binding [*out* (io/writer System/out)] (println (str/join "" args)))
-     :clj (.println (System/out) (str/join "" args))
+     :clj (.println out0 (str/join "" args))
      :cljs (js/process.stdout.write (str (str/join "" args) "\n"))))
 
 (defn raw2keyword

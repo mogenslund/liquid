@@ -88,6 +88,7 @@
   (swap! editor/state assoc-in [:liq.editor/commands :fm]
     (fn [] (editor/apply-to-buffer #(update % ::buffer/major-modes conj :freemove-mode)))))
 
+
 ;; clj -m liq.experiments.core
 (defn -main
   [& args]
@@ -123,7 +124,9 @@
           (editor/set-output-handler output/output-handler)
           (input/init)
           (editor/set-exit-handler input/exit-handler)
-          (input/input-handler editor/handle-input)))
+          (input/input-handler editor/handle-input)
+          (input/redirect-stdout editor/handle-stdout)
+          (input/redirect-stderr editor/handle-stderr)))
   (when (read-arg args "--notepad") (notepad-mode/load-notepad-mode))
   (let [w (editor/get-window)
         rows (w ::buffer/rows)

@@ -32,9 +32,8 @@
 
 (defn external-command
   [text]
-  #?(:clj (let [f (or ((editor/current-buffer) ::buffer/filename "."))
-                folder (or ((editor/current-buffer) :liq.modes.dired-mode/folder)
-                           (util/absolute (util/get-folder f)))
+  #?(:clj (let [f (or (editor/current-file) ".")
+                folder (editor/current-folder)
                 text1 (str/replace text #"%" f)]
             (editor/message (str "Running command: " text1 "\n") :view true)
             (future
@@ -286,14 +285,16 @@
 (defn output-snapshot
   [] 
   (let [id (editor/get-buffer-id-by-name "output-snapshot")]
-    (if id
-      (editor/switch-to-buffer id)
-      (editor/new-buffer "" {:name "output-snapshot"}))
-    (editor/apply-to-buffer
-      #(-> %
-           buffer/clear
-           (buffer/insert-string
-             (buffer/text (editor/get-buffer "*output*")))))))
+    (if (= id (editor/current-buffer-id))
+      (editor/previous-buffer)
+      (do (if id
+            (editor/switch-to-buffer id)
+            (editor/new-buffer "" {:name "output-snapshot"}))
+          (editor/apply-to-buffer
+            #(-> %
+                 buffer/clear
+                 (buffer/insert-string
+                   (buffer/text (editor/get-buffer "*output*")))))))))
 
 (defn yank-inner-word
   []
