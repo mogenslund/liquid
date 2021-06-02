@@ -1,8 +1,9 @@
 (ns liq.tty-shared
   (:require [clojure.string :as str]
-            #?(:clj [clojure.java.io :as io])))
+            #?(:clj [clojure.java.io :as io]))
+  #?(:clj (:import [java.io PrintStream BufferedOutputStream FileOutputStream FileDescriptor])))
 
-#?(:clj (do (def out0 (java.io.PrintStream. (java.io.FileOutputStream. (java.io.FileDescriptor/out))))))
+#?(:clj (def out0 (PrintStream. (BufferedOutputStream. (FileOutputStream. (FileDescriptor/out))))))
 
 (defn tty-print
   [& args]
@@ -15,6 +16,10 @@
   #?(:bb (binding [*out* (io/writer System/out)] (println (str/join "" args)))
      :clj (.println out0 (str/join "" args))
      :cljs (js/process.stdout.write (str (str/join "" args) "\n"))))
+
+(defn flush-output
+  []
+  (.flush out0))
 
 (defn raw2keyword
   [raw]

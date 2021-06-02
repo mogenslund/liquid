@@ -5,7 +5,7 @@
             [liq.util :as util]
             [liq.tty-shared :as shared])
   (:import [java.io PrintStream FileOutputStream FileDescriptor]
-           [java.io ByteArrayOutputStream BufferedReader]))
+           [java.io ByteArrayOutputStream BufferedReader BufferedOutputStream]))
 
 (def esc "\033[")
 (def ^:private sysout (System/out))
@@ -46,14 +46,14 @@
   [fun]
   (System/setOut
     (PrintStream.
-      (proxy [ByteArrayOutputStream] []
+      (proxy [ByteArrayOutputStream] [1024]
         (write [& b] (fun (if (= (count b) 1) (str (char (first b))) (str/join "" (map char (first b))))))))))
 
 (defn redirect-stderr
   [fun]
   (System/setErr
     (PrintStream.
-      (proxy [ByteArrayOutputStream] []
+      (proxy [ByteArrayOutputStream] [1024]
         (write [& b] (fun (if (= (count b) 1) (str (char (first b))) (str/join "" (map char (first b))))))))))
 
 (defn input-handler

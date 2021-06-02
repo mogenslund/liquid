@@ -147,6 +147,7 @@
            (shared/tty-print esc ccolor "m" esc cursor-row ";" cursor-col "H" esc "s" (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space))
            ;(draw-char (or (and (not= (buffer/get-char buf) \tab) (buffer/get-char buf)) \space) cursor-row cursor-col ccolor "49")
            (shared/tty-print esc "?25h" esc cursor-row ";" cursor-col "H" esc "s")
+           (shared/flush-output)
            (reset! last-buffer cache-id)))))))
 
 (def ^:private updater (atom nil))
