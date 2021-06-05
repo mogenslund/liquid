@@ -24,7 +24,7 @@
            (when @socket
              (let [l (.readLine (@socket :reader))]
                (when l
-                 (editor/message l)
+                 (editor/message l :append true)
                  (recur)))))))))
   ([] (jack-in "5555")))
 
@@ -48,6 +48,12 @@
                (buffer/sexp-at-point buf))]
     (send-to-repl sexp)))
 
+(defn send-current-buffer-to-repl
+  []
+  (-> (editor/current-buffer)
+      (buffer/text)
+      (send-to-repl)))
+
 (defn output-split
   ([n]
    (editor/set-setting :auto-switch-to-output false)
@@ -70,7 +76,9 @@
   (swap! editor/state assoc-in [::editor/commands :jack-out] jack-out) 
   (swap! editor/state assoc-in [::editor/commands :output-split] output-split) 
   (editor/add-key-bindings :clojure-mode :normal
-    {"f5" #(send-sexp-at-point-to-repl (editor/current-buffer))
+    {"f4" #(send-current-buffer-to-repl)
+     "f5" #(send-sexp-at-point-to-repl (editor/current-buffer))
      "f6" jack-out})
   (editor/add-key-bindings :clojure-mode :visual
-    {"f5" #(send-sexp-at-point-to-repl (editor/current-buffer))}))
+    {"f4" #(send-current-buffer-to-repl)
+     "f5" #(send-sexp-at-point-to-repl (editor/current-buffer))}))
