@@ -7,12 +7,14 @@
 
 (defn load-content
   [buf]
-  (-> buf
-      buffer/clear
-      (buffer/insert-string (str/join "\n"
-                              (map #(str (% ::buffer/name) (if (buffer/dirty? %) " [+]" "    "))
-                                   (rest (editor/all-buffers)))))
-      buffer/beginning-of-buffer))
+  (let [cols (((-> @editor/state ::editor/output-handler :dimensions)) :cols)]
+    (-> buf
+        buffer/clear
+        (buffer/insert-string (str/join "\n"
+                                (map #(str (util/shorten-path (% ::buffer/name) (max 10 (- cols 8)))
+                                           (if (buffer/dirty? %) " [+]" "    "))
+                                     (rest (editor/all-buffers)))))
+        buffer/beginning-of-buffer)))
 
 (defn run
   []

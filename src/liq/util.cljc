@@ -200,3 +200,21 @@
      (str/join "\n" filtered) "\n"
      (str/join "\n" stacklines))))
 
+(defn shorten-path
+  "Display shorter version of path"
+  [path width]
+  (if (<= (count path) width)
+    path
+    (let [slashes (count (re-seq #"[/\\]" path))
+          p1 (loop [n 0]
+               (let [p (str/replace-first
+                         path
+                         (re-pattern (str "(?<=[^/\\\\][/\\\\])([^/\\\\]*[/\\\\]){" n "}[^/\\\\]*"))
+                         "...")]
+                 (if (or (<= (count p) width) (>= n (- slashes 3)))
+                   p 
+                   (recur (inc n)))))
+          p2 (str/replace-first path #".*(?=[/\\])" "...")]
+      (if (<= (count p1) width)
+        p1
+        p2))))

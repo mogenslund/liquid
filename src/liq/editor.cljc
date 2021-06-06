@@ -216,17 +216,23 @@
   ([nameid]
    (when (@state ::output-handler)
      (apply-to-buffer nameid buffer/update-tow)
-     (let [buf (get-buffer nameid)]
+     (let [buf (get-buffer nameid)
+           cols (((-> @state ::output-handler :dimensions)) :cols) 
+           namepart (util/shorten-path (or (buf ::buffer/filename) (buf ::buffer/name)) (max 10 (- cols 36)))
+           spaces (format (str "%-" (max 1 (- cols (count namepart) 36)) "s") "")
+           pct (int (/ (* 100.0 (-> buf ::buffer/cursor ::buffer/row)) (-> buf ::buffer/lines count)))]
        (apply-to-buffer "*status-line*"
          #(-> %
               buffer/clear
               (buffer/insert-string
-                (str (or (buf ::buffer/filename) (buf ::buffer/name)) "  "
+                (str namepart ; (or (buf ::buffer/filename) (buf ::buffer/name)) "  "
                      (if (buffer/dirty? buf) " [+] " "     ")
                      (cond (= (buf ::buffer/mode) :insert) "-- INSERT --   "
                            (= (buf ::buffer/mode) :visual) "-- VISUAL --   "
                            true "               ")
-                     (-> buf ::buffer/cursor ::buffer/row) "," (-> buf ::buffer/cursor ::buffer/col)))
+                     spaces
+                     (-> buf ::buffer/cursor ::buffer/row) "," (-> buf ::buffer/cursor ::buffer/col)
+                     "  " pct "%"))
               buffer/beginning-of-buffer
               buffer/update-tow))
        ;((@state ::output-handler) (get-buffer "*status-line*"))
