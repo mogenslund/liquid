@@ -391,6 +391,7 @@
   [command]
   (let [m (or (meta command) {})
         n (@state ::repeat-counter)]
+    ;(when (not= n 0) (swap! state assoc ::repeat-counter 0))
     (cond (and (m :buffer) (not (some #{2} (map count (m :arglists))))) #(apply-to-buffer command)
           (m :buffer) #(apply-to-buffer (fn [buf] (command buf (max 1 n))))
           true command)))

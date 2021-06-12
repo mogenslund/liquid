@@ -27,11 +27,14 @@ Evaluate ns form with c p p load dependencies:
 ==============================================================================
 Meta data
 
-(meta (((-> @editor/state ::editor/modes :fundamental-mode :normal) "t") "a"))
-(meta (((-> @editor/state ::editor/modes :fundamental-mode :normal) "t") "b"))
+(-> @editor/state ::editor/modes :fundamental-mode :normal
+    (get "t") (get "a") meta)
+(-> @editor/state ::editor/modes :fundamental-mode :normal
+    (get "t") (get "b") meta)
 (-> @editor/state ::editor/commands :testc meta)
 (-> @editor/state ::editor/commands :testd meta)
-(meta (((-> @editor/state ::editor/modes :fundamental-mode :normal) "t") "e"))
+(-> @editor/state ::editor/modes :fundamental-mode :normal
+    (get "t") (get "e") meta)
 
 
 ==============================================================================

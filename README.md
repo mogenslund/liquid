@@ -39,7 +39,7 @@ For discussions, help, tips and support, use
 
 #### Quick start
 
-    clojure -Sdeps '{:deps {mogenslund/liquid {:mvn/version "2.1.0"}}}' -m liq.core
+    clojure -Sdeps '{:deps {mogenslund/liquid {:mvn/version "2.1.1"}}}' -m liq.core
 
 Or download jar [liq.jar](https://salza.dk/liq.jar) and execute
 
