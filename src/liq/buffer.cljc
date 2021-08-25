@@ -185,6 +185,15 @@
       (assoc ::mode :insert)
       remove-selection))
 
+(defn ^:buffer add-major-mode
+  "Add major mode to buffer"
+  [buf major-mode]
+  (update buf ::major-modes conj major-mode))
+
+(defn ^:buffer remove-major-mode
+  [buf major-mode]
+  (update buf ::major-modes (fn [l] (remove #(= % major-mode) l))))
+
 (defn expand-selection
   "Expand a selection with a region"
   [buf r]

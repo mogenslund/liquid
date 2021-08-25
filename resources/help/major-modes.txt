@@ -42,3 +42,22 @@ See syntax-highlighting.txt for more details around syntax highlighting.
 
 See keybindings.txt for more details around keybindings.
 
+==============================================================================
+Simple mode for override keybindings
+
+Executing the code below will create a very simple mode :my-mode, which only
+contains changes to some keys. Escape will remove the mode from the current
+buffer again. This is useful for temporary overriding keybindings.
+
+    (def my-mode
+      {:normal
+        {"esc" #(editor/apply-to-buffer
+                  (fn [buf] (buffer/remove-major-mode buf :my-mode)))
+         "a" #(editor/message (str "You pressed a " (rand-int 10)))
+         "b" #(editor/message (str "You pressed a " (rand-int 10)))}})
+
+
+    (editor/add-mode :my-mode #'my-mode)
+    (editor/apply-to-buffer #(buffer/add-major-mode % :my-mode))
+
+

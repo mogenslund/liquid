@@ -96,9 +96,9 @@
    :bold-begin #"(?<=\*)\w+"
    :bold-end #"\*"
    :headline-begin #"^[A-Z0-9][- A-Z0-9ÆØÅ]+$"
-   :gherkin-blue #"Feature: |Scenario: |Background: |  When "
-   :gherkin-yellow #"  Given "
-   :gherkin-green #"  Then "
+   :gherkin-blue #"Feature: |Scenario: |Scenario Outline: |Background: |  Examples:  |  Rule: "
+   :gherkin-yellow #"  Given |  When |  Then |  And |  But |  \* "
+   ;:gherkin-green #"  Then "
    :definition-begin #"[\w\#\.\-\_\:\+\=\>\<\/\!\?\*]+"
    :definition-end #"."})
 
@@ -112,7 +112,7 @@
                   (match :keyword-begin) :keyword
                   (match :comment-begin) :comment
                   (match :green-begin) :green
-                  (match :gherkin-green) :green
+                  ;(match :gherkin-green) :green
                   (match :yellow-begin) :yellow
                   (match :gherkin-yellow) :yellow
                   (match :red-begin) :red
