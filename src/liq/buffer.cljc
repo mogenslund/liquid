@@ -296,7 +296,7 @@
   ([buf] (word buf (-> buf ::cursor ::row) (-> buf ::cursor ::col))))
 
 (defn text
-  "Get the text ind the buffer.
+  "Get the text in the buffer.
   If a region or two points is specified the text will be the
   contained text."
   ([buf]
