@@ -43,10 +43,13 @@
 
 (defn e-cmd
   [& args]
-  (let [t (first args)]
+  (let [t (first args)
+        l (second args)]
     (cond (or (= t ".") (not t)) (((editor/get-mode :dired-mode) :init))
           (util/folder? t) (((editor/get-mode :dired-mode) :init) t)
-          true (editor/open-file t))))
+          true (editor/open-file t))
+    (when l
+      (editor/apply-to-buffer #(buffer/beginning-of-buffer % (Integer/parseInt l))))))
 
 (defn open-file-at-point
   []
@@ -55,13 +58,14 @@
         w (str/replace (buffer/word buf) #"\"" "")
         project-part (when-let [p (re-find #"^:\+(?:\w+|-)+$" w)] (str (subs p 2) ".md"))
         part (or project-part (re-find #"[^:\(\)\[\]\{\}]+" w))
+        linenr (re-find #"(?<=:)\d+" w)
         buffer-file (or (buf ::buffer/filename)
                         ((editor/get-buffer (editor/previous-regular-buffer-id)) ::buffer/filename))
         alternative-parent (if buffer-file
                              (util/get-folder buffer-file)
                              (or ((editor/get-buffer (editor/previous-regular-buffer-id)) :liq.modes.dired-mode/folder) "."))
         filepath (util/resolve-path part alternative-parent)]
-    (e-cmd filepath)))
+    (e-cmd filepath linenr)))
 
 (defn copy-selection-to-clipboard
   [buf]
