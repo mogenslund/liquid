@@ -34,11 +34,19 @@
   [text]
   #?(:clj (let [f (or (editor/current-file) ".")
                 folder (editor/current-folder)
-                text1 (str/replace text #"%" f)]
+                text1 (str/replace text #"%" f)
+                bf (atom [])
+                done (atom false)]
             (editor/message (str "Running command: " text1 "\n") :view true)
-            (future
-              (doseq [output (s/cmdseq folder "/bin/sh" "-c" text1)]
-                (editor/message output :append true)))))
+            (future (doseq [output (s/cmdseq folder "/bin/sh" "-c" text1)]
+                        (swap! bf conj output))
+                    (reset! done true))
+            (future (while (or (not @done) (> (count @bf) 0))
+                        (let [l @bf]
+                          (if (> (count l) 0)
+                            (do (swap! bf #(into [] (drop (count l) %)))
+                                (editor/message (str/join "\n" l) :append true))
+                            (Thread/sleep 100)))))))
    #?(:cljs (do)))
 
 (defn e-cmd
