@@ -202,8 +202,9 @@
   (let [sexp (if (= (buf ::buffer/mode) :visual) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
         namespace (or (get-namespace buf) "user")]
     (try
-      (load-string
-        (str "(do (ns " namespace ") (in-ns '" namespace ") " sexp ")"))
+      (eval
+        (read-string {:read-cond :allow}
+          (str "(do (ns " namespace ") (in-ns '" namespace ") " sexp ")")))
       (catch Exception e (println (util/pretty-exception e))))))
 
 (defn sanitize-output
@@ -221,10 +222,11 @@
           (binding [*print-length* 200]
             (editor/message "" :view true); ( :view true :timer 1500)
             (future
-              (with-redefs [println (fn [& args] (editor/message (str/join " " args) :append true))]
-                (try
-                  (println (sanitize-output (load-string text)))
-                  (catch Exception e (println (util/pretty-exception e)))))))))
+              (binding [*ns* (find-ns (symbol namespace))]
+                (with-redefs [println (fn [& args] (editor/message (str/join " " args) :append true))]
+                  (try
+                    (println (sanitize-output (eval (read-string {:read-cond :allow} text))))
+                    (catch Exception e (println (util/pretty-exception e))))))))))
      :cljs (do
              (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
              (let [code (buffer/text buf)]
@@ -242,19 +244,20 @@
         (let [sexp (if (= (buf ::buffer/mode) :visual) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
               namespace (or (get-namespace buf) "user")]
           (create-ns (symbol namespace))
-          (binding [*print-length* 200
-                    *ns* (find-ns (symbol namespace))]
+          (binding [*print-length* 200]
             (editor/message "" :view true); ( :view true :timer 1500)
             (future
-              (with-redefs [println (fn [& args] (editor/message (str/join " " args) :append true))]
-                (try
-                  (println (sanitize-output
-                             (load-string
-                               (str
-                                 "(do (ns " namespace ") (in-ns '"
-                                 namespace
-                                 ") " sexp "\n)"))))
-                  (catch Exception e (println (util/pretty-exception e)))))))))
+              (binding [*ns* (find-ns (symbol namespace))]
+                (with-redefs [println (fn [& args] (editor/message (str/join " " args) :append true))]
+                  (try
+                    (println (sanitize-output
+                               (eval
+                                 (read-string {:read-cond :allow}
+                                   (str
+                                     "(do (ns " namespace ") (in-ns '"
+                                     namespace
+                                     ") " sexp "\n)")))))
+                    (catch Exception e (println (util/pretty-exception e))))))))))
      :cljs (do
              (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
              (let [sexp (if (= (buf ::buffer/mode) :visual) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
@@ -271,8 +274,9 @@
   (let [sexp (if (= (buf ::buffer/mode) :visual) (buffer/get-selected-text buf) (buffer/sexp-at-point buf))
         namespace (or (get-namespace buf) "user")]
     (try
-      (load-string
-        (str "(do (ns " namespace ") (in-ns '" namespace ") " sexp ")"))
+      (eval
+        (read-string {:read-cond :allow}
+          (str "(do (ns " namespace ") (in-ns '" namespace ") " sexp ")")))
       (catch Exception e (println (util/pretty-exception e))))))
 
 

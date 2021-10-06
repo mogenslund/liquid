@@ -17,8 +17,15 @@
                   ::stderr ""
                   ::output-handler nil}))
 
+(def exceptions (atom []))
+
 (def ^:private macro-seq (atom ())) ; Macrofunctionality might belong to input handler.
 (def ^:private macro-record (atom false))
+
+(defn invalidate-ui
+  []
+  (when-let [f (-> @state ::output-handler :invalidate)]
+    (f)))
 
 (defn get-window
   []
@@ -171,9 +178,11 @@
 (defn apply-to-buffer
   "Apply function to buffer"
   ([idname fun]
-   (if (number? idname)
-     (swap! state update-in [::buffers idname] (buffer/ensure-buffer-fun fun))
-     (apply-to-buffer (get-buffer-id-by-name idname) fun)))
+   (try
+     (if (number? idname)
+       (swap! state update-in [::buffers idname] (buffer/ensure-buffer-fun fun))
+       (apply-to-buffer (get-buffer-id-by-name idname) fun))
+     (catch Exception e (swap! exceptions conj (util/pretty-exception e)))))
   ([fun] (apply-to-buffer (current-buffer-id) fun)))
 
 (comment
@@ -246,11 +255,6 @@
 
 (comment (map ::buffer/name (sort-by ::idx (vals (@state ::buffers)))))
 (comment (paint-buffer "*delimeter*"))
-
-(defn invalidate-ui
-  []
-  (when-let [f (-> @state ::output-handler :invalidate)]
-    (f)))
 
 (defn paint-all-buffer-groups
   []
@@ -445,6 +449,10 @@
               (= mode :insert) (apply-to-buffer #(buffer/insert-char % (first c))))
         (cond (= c "esc") (highlight-buffer) ; TODO Maybe not highlight from scratch each time
               (= mode :insert) (highlight-buffer-row))
+        (let [ex @exceptions]
+          (when (not (empty? ex))
+            (reset! exceptions [])
+            (message (str/join "\n" ex))))
         (paint-buffer)))))
 
 (defn record-macro
