@@ -218,7 +218,8 @@
   #?(:clj
       (do
         (when (not= (@editor/state ::editor/repeat-counter) 0) (swap! editor/state assoc ::editor/repeat-counter 0))
-        (let [text (buffer/text buf)]
+        (let [text (buffer/text buf)
+              namespace (or (get-namespace buf) "user")]
           (binding [*print-length* 200]
             (editor/message "" :view true); ( :view true :timer 1500)
             (future
