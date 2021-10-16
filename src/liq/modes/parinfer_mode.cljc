@@ -77,7 +77,8 @@
               (assoc ::buffer/cursor {::buffer/row (+ (out :cursorLine) r1) ::buffer/col (inc (out :cursorX))})
               (buffer/set-insert-mode))
           (do (future (editor/message (str (out :error)))) (fun buf))))
-      (do (future (editor/message (str (res :err) " - " (res :out)))) (fun buf)))))
+      (do ;(future (editor/message (str (res :err) " - " (res :out))))
+          (fun buf)))))
 
 
 (defn run
