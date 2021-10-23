@@ -75,12 +75,18 @@
   (reset! char-cache {}))
 
 (defn double-width?
-  "Not very precise yet!"
   [c]
   (cond (re-matches #"[A-ÿ]" c) false
-        (re-matches #"[ぁ-んァ-ン]" c) true
-        (re-matches #"[ァ-ン]"c) true
-        (re-matches #"[一-龯] "c) true
+
+        ;; Japanese
+        (re-matches #"[\u3041-\u3096]" c) true                           ;; Hiragana
+        (re-matches #"[\u30A0-\u30FF]" c) true                           ;; Katakana (full-width)
+        (re-matches #"[\uFF5F-\uFF9F]" c) true                           ;; Katakana (half-width)
+        (re-matches #"[\u3400-\u4DB5\u4E00-\u9FCB\uF900-\uFA6A]" c) true ;; Kanji
+        (re-matches #"[\u2E80-\u2FD5]" c) true                           ;; Kanji Radicals
+        (re-matches #"[\uFF01-\uFF5E]" c) true                           ;; Alphanumeric and Punctuation (full-width)
+        (re-matches #"[\u3000-\u303F]" c) true                           ;; Symbols and Punctuation
+
         :else false))
 
 (defn print-buffer
