@@ -1,3 +1,4 @@
-(ns user)
+(ns user
+  (:require [liq.editor :as editor]))
 
-(editor/insert "\n\nDEVELOP LIQUID\n")
+(editor/message "DEVELOPMENT LIQUID")

@@ -10,7 +10,7 @@
 
 (defn get-namespace
   [buf]
-  (->> (buffer/line buf 1)
+  (->> (buffer/text buf)
        (re-find #"(?<=\x28ns )[-a-zA-Z0-9.]+")))
 
 (defn maybe-shorten
@@ -75,10 +75,10 @@
     (if-some [var (var-at-point buf)]
       (if-some [file (file-of-var var)]
         (goto-var file var)
-        (editor/message "Cannot find var for this." :view true))
-      (editor/message "Cannot find source file for this." :view true))
+        (editor/message "Cannot find var for this."))
+      (editor/message "Cannot find source file for this."))
     (catch Exception e
-      (editor/message (str e) :view true))))
+      (editor/message (str e)))))
 
 (defn goto-definition-local
   [buf]

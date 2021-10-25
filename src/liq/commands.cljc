@@ -192,9 +192,8 @@
 
 (defn get-namespace
   [buf]
-  (let [content (buffer/line buf 1)]
-    (re-find #"(?<=\(ns )[-a-z0-9\\.]+" content))) ;)
-
+  (->> (buffer/text buf)
+       (re-find #"(?<=\x28ns )[-a-zA-Z0-9.]+")))
 
 (defn raw-eval-sexp-at-point
   [buf]
