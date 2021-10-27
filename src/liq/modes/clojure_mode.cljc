@@ -10,7 +10,8 @@
 
 (defn get-namespace
   [buf]
-  (re-find #"(?<=\x28ns )[-a-zA-Z.]+" (buffer/text buf)))
+  (->> (buffer/text buf)
+       (re-find #"(?<=\x28ns )[-a-zA-Z0-9.]+")))
 
 (defn maybe-shorten
   [s full short]
@@ -51,10 +52,14 @@
   #?(:clj (when-some [path (some-> a-var meta :file)]
             (first (sequence (comp (map #(io/file % path)) (filter #(.exists %))) (classpaths))))))
 
-(let [this-ns *ns*]
-  (defn var-at-point
-    [buf]
-    (some->> (re-find #"\w.*\w\??!?" (-> buf buffer/left buffer/word)) symbol (ns-resolve this-ns))))
+(defn var-at-point
+  [buf]
+  (let [buffer-ns (-> (get-namespace buf)
+                      (util/get-ns-by-name))]
+    (some->> (-> buf buffer/left buffer/word)
+             (re-find #"\w.*\w\??!?")
+             (symbol)
+             (ns-resolve buffer-ns))))
 
 (defn goto-var
   [file var]
@@ -67,10 +72,13 @@
 (defn goto-definition
   [buf]
   (try
-    (when-some [var (var-at-point buf)]
-      (when-some [file (file-of-var var)]
-        (goto-var file var)))
-    (catch Exception e (str e))))
+    (if-some [var (var-at-point buf)]
+      (if-some [file (file-of-var var)]
+        (goto-var file var)
+        (editor/message "Cannot find var for this."))
+      (editor/message "Cannot find source file for this."))
+    (catch Exception e
+      (editor/message (str e)))))
 
 (defn goto-definition-local
   [buf]

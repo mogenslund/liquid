@@ -8,6 +8,7 @@
             #?(:cljs [os])))
 
 (def counter (atom 0))
+
 (defn counter-next
   []
   (swap! counter inc))
@@ -103,7 +104,6 @@
 (defn parent
   [filepath])
   ;; if root return nil
-  
 
 (defn tmp-file
   [filename]
@@ -167,7 +167,6 @@
                (.getTransferData (.getContents clipboard nil) (java.awt.datatransfer.DataFlavor/stringFlavor))
                (catch Exception e ""))))
      :cljs @localclipboard))
-     
 
 (defn clipboard-line?
   []
@@ -218,3 +217,10 @@
       (if (<= (count p1) width)
         p1
         p2))))
+
+(defn get-ns-by-name
+  [name]
+  (->> (all-ns)
+       (filter #(= (-> % ns-name str) name))
+       (first)))
+
