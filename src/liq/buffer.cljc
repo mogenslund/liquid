@@ -617,15 +617,17 @@
 (defn delete-line
   ([buf row]
    (if (<= (line-count buf) 1)
-     (assoc (set-undo-point buf) ::lines [[]]
-             ::cursor {::row 1 ::col 1}
-             ::mem-col 1)
+     (assoc (set-undo-point buf)
+            ::lines [[]]
+            ::cursor {::row 1 ::col 1}
+            ::mem-col 1)
      (let [b1 (update buf ::lines #(remove-from-vector % row))
            newrow (min (line-count b1) row)
            newcol (max (min (col-count b1 newrow) (-> buf ::cursor ::col)) 1)]
         (-> b1
             (assoc ::cursor {::row newrow ::col newcol})
-            (adjust-hidden-rows row -1)))))
+            (adjust-hidden-rows row -1)
+            (set-dirty true)))))
   ([buf] (delete-line buf (-> buf ::cursor ::row))))
 
 (comment (pr-str (text (-> (buffer "aaa\nbbb\nccc") down right delete-line))))
