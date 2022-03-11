@@ -17,11 +17,26 @@
   "C-c" :q
   "C-b" #(((editor/get-mode :buffer-chooser-mode) :init))})
 
+(def fd-chord-timestamp (atom 0))
+
+(defn ^:buffer fd-chord-f
+  [buf]
+  (reset! fd-chord-timestamp (System/currentTimeMillis))
+  (buffer/insert-char buf "f"))
+
+(defn ^:buffer fd-chord-d
+  [buf]
+  (if (and (= (buffer/get-char (buffer/left buf)) "f") (< (- (System/currentTimeMillis) @fd-chord-timestamp) 100))
+    (-> buf buffer/delete-backward buffer/set-normal-mode)
+    (buffer/insert-char buf "d")))
+
 (def mode
   {:commands {":ts" #(editor/message (str % " -- " (buffer/sexp-at-point (editor/current-buffer))))}
    :insert {"esc" (fn [] (apply-to-buffer #(buffer/left (buffer/set-normal-mode %))))
             "backspace" #(non-repeat-fun buffer/delete-backward)
             ;; Emacs
+            "f" #'fd-chord-f
+            "d" #'fd-chord-d
             "C-b" :left
             "C-n" :down
             "C-p" :up
